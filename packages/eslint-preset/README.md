@@ -30,12 +30,14 @@ ESLint-пресет для автоматической проверки веб-
 ### Установка
 
 ```bash
-npm install --save-dev ru-a11y-toolkit-eslint eslint eslint-plugin-jsx-a11y
+npm install --save-dev ru-a11y-toolkit-eslint eslint
 ```
 
 ```bash
-yarn add -D ru-a11y-toolkit-eslint eslint eslint-plugin-jsx-a11y
+yarn add -D ru-a11y-toolkit-eslint eslint
 ```
+
+> `eslint-plugin-jsx-a11y` устанавливается автоматически как зависимость пакета.
 
 ### Настройка `eslint.config.js` (ESLint 9 Flat Config)
 

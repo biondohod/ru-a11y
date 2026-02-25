@@ -43,9 +43,9 @@ npm install --save-dev ru-a11y-toolkit-overlay   # только React Overlay (�
 ### Установка
 
 ```bash
-npm install --save-dev ru-a11y-toolkit-eslint eslint eslint-plugin-jsx-a11y
+npm install --save-dev ru-a11y-toolkit-eslint eslint
 # или через umbrella:
-npm install --save-dev ru-a11y-toolkit eslint eslint-plugin-jsx-a11y
+npm install --save-dev ru-a11y-toolkit eslint
 ```
 
 ### Настройка
