@@ -1,6 +1,6 @@
 {
   "name": "ru-a11y-toolkit-eslint",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "ESLint-плагин для проверки веб-доступности согласно ГОСТ Р 52872-2019 и Постановлению Правительства РФ №102. Часть ru-a11y-toolkit.",
   "main": "index.js",
   "exports": {
@@ -67,7 +67,7 @@
     "url": "https://github.com/biondohod/ru-a11y.git",
     "directory": "packages/eslint-preset"
   },
-  "homepage": "https://github.com/biondohod/ru-a11y/tree/main/packages/eslint-preset#readme",
+  "homepage": "https://github.com/biondohod/ru-a11y/tree/master/packages/eslint-preset#readme",
   "bugs": {
     "url": "https://github.com/biondohod/ru-a11y/issues"
   }
