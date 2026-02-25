@@ -1,0 +1,38 @@
+{
+  "name": "ru-a11y-toolkit-cli",
+  "version": "0.1.0",
+  "description": "CLI-сканер доступности для проверки готовых страниц по URL (в разработке). Часть ru-a11y-toolkit.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"CLI в разработке\" && exit 0"
+  },
+  "keywords": [
+    "accessibility",
+    "a11y",
+    "cli",
+    "ГОСТ",
+    "доступность",
+    "puppeteer",
+    "axe-core",
+    "ru-a11y"
+  ],
+  "author": {
+    "name": "biondohod",
+    "url": "https://github.com/biondohod"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/biondohod/ru-a11y.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://github.com/biondohod/ru-a11y/tree/main/packages/cli#readme",
+  "bugs": {
+    "url": "https://github.com/biondohod/ru-a11y/issues"
+  },
+  "files": [
+    "index.js",
+    "README.md"
+  ],
+  "private": true
+}

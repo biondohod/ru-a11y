@@ -1,0 +1,37 @@
+{
+  "name": "ru-a11y-toolkit-overlay",
+  "version": "0.1.0",
+  "description": "Runtime-визуализатор ошибок доступности в браузере для React-приложений (в разработке). Часть ru-a11y-toolkit.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Overlay в разработке\" && exit 0"
+  },
+  "keywords": [
+    "accessibility",
+    "a11y",
+    "react",
+    "overlay",
+    "ГОСТ",
+    "доступность",
+    "ru-a11y"
+  ],
+  "author": {
+    "name": "biondohod",
+    "url": "https://github.com/biondohod"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/biondohod/ru-a11y.git",
+    "directory": "packages/react-overlay"
+  },
+  "homepage": "https://github.com/biondohod/ru-a11y/tree/main/packages/react-overlay#readme",
+  "bugs": {
+    "url": "https://github.com/biondohod/ru-a11y/issues"
+  },
+  "files": [
+    "index.js",
+    "README.md"
+  ],
+  "private": true
+}

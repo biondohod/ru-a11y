@@ -1,8 +1,9 @@
-# @ru-a11y/eslint-preset
+# ru-a11y-toolkit-eslint
 
-[//]: # ([![npm version]&#40;https://img.shields.io/npm/v/@ru-a11y/eslint-preset&#41;]&#40;https://www.npmjs.com/package/@ru-a11y/eslint-preset&#41;)
+[![npm version](https://img.shields.io/npm/v/ru-a11y-toolkit-eslint)](https://www.npmjs.com/package/ru-a11y-toolkit-eslint)
+[![license](https://img.shields.io/npm/l/ru-a11y-toolkit-eslint)](../../LICENSE)
 
-[//]: # ([![license]&#40;https://img.shields.io/npm/l/@ru-a11y/eslint-preset&#41;]&#40;./LICENSE&#41;)
+> Часть [ru-a11y-toolkit](../../README.md) — можно установить отдельно или в составе всего toolkit.
 
 ESLint-пресет для автоматической проверки веб-доступности React/JSX-приложений согласно **российским нормативам**:
 
@@ -29,33 +30,38 @@ ESLint-пресет для автоматической проверки веб-
 ### Установка
 
 ```bash
-npm install --save-dev @ru-a11y/eslint-preset eslint eslint-plugin-jsx-a11y
+npm install --save-dev ru-a11y-toolkit-eslint eslint eslint-plugin-jsx-a11y
 ```
 
 ```bash
-yarn add -D @ru-a11y/eslint-preset eslint eslint-plugin-jsx-a11y
+yarn add -D ru-a11y-toolkit-eslint eslint eslint-plugin-jsx-a11y
 ```
 
-### Настройка `.eslintrc.js`
+### Настройка `eslint.config.js` (ESLint 9 Flat Config)
 
 **Базовый уровень** (ГОСТ Р 52872-2019, уровень A — критические ошибки):
 ```js
-module.exports = {
-  extends: ['@ru-a11y/eslint-preset/recommended'],
-};
+const ruA11y = require('ru-a11y-toolkit-eslint');
+module.exports = [ruA11y.configs.recommended];
 ```
 
 **Стандартный уровень** (ГОСТ AA + Постановление №102 — для гос. сайтов):
 ```js
-module.exports = {
-  extends: ['@ru-a11y/eslint-preset/gost-aa'],
-};
+const ruA11y = require('ru-a11y-toolkit-eslint');
+module.exports = [ruA11y.configs['gost-aa']];
 ```
 
-**Строгий уровень** (ГОСТ AAA + дополнительные RU-паттерны — максимальная строгость):
+**Строгий уровень** (ГОСТ AAA — максимальная строгость):
+```js
+const ruA11y = require('ru-a11y-toolkit-eslint');
+module.exports = [ruA11y.configs.strict];
+```
+
+### Настройка `.eslintrc.js` (ESLint 8 Legacy)
+
 ```js
 module.exports = {
-  extends: ['@ru-a11y/eslint-preset/strict'],
+  extends: ['ru-a11y-toolkit-eslint/gost-aa'],
 };
 ```
 
@@ -390,7 +396,7 @@ anchorHasContent: [
 
 ## Сравнение с `eslint-plugin-jsx-a11y`
 
-| Возможность | `eslint-plugin-jsx-a11y` | `@ru-a11y/eslint-preset` |
+| Возможность | `eslint-plugin-jsx-a11y` | `ru-a11y-toolkit-eslint` |
 |-------------|--------------------------|--------------------------|
 | Язык сообщений | Английский | **Русский** |
 | Стандарт | WCAG 2.1 | **ГОСТ Р 52872-2019 + №102** |
@@ -402,7 +408,7 @@ anchorHasContent: [
 | Готовые пресеты для РФ | ❌ | ✅ `recommended`, `gost-aa`, `strict` |
 | Ссылки на российские НПА | ❌ | ✅ В каждом сообщении |
 
-`@ru-a11y/eslint-preset` **расширяет** `eslint-plugin-jsx-a11y`, а не заменяет его. В пресетах `gost-aa` и `strict` используются оба плагина совместно.
+`ru-a11y-toolkit-eslint` **расширяет** `eslint-plugin-jsx-a11y`, а не заменяет его.
 
 ---
 
@@ -411,48 +417,42 @@ anchorHasContent: [
 ### Тонкая настройка отдельных правил
 
 ```js
-// .eslintrc.js
-module.exports = {
-  extends: ['@ru-a11y/eslint-preset/gost-aa'],
-  rules: {
-    // Требовать lang="ru" для гос. сайта
-    '@ru-a11y/gost-a11y/require-lang-attr': ['error', { enforceRussian: true }],
+// eslint.config.js
+const ruA11y = require('ru-a11y-toolkit-eslint');
 
-    // Дополнительные допустимые href для skip-link
-    '@ru-a11y/gost-a11y/require-skip-link': [
-      'error',
-      {
+module.exports = [
+  {
+    ...ruA11y.configs['gost-aa'],
+    rules: {
+      ...ruA11y.configs['gost-aa'].rules,
+      // Требовать lang="ru" для гос. сайта
+      '@ru-a11y/gost-a11y/require-lang-attr': ['error', { enforceRussian: true }],
+      // Дополнительные допустимые href для skip-link
+      '@ru-a11y/gost-a11y/require-skip-link': ['error', {
         allowedHrefs: ['#main', '#content', '#основной-контент'],
-      },
-    ],
-
-    // Строгая проверка масштабирования с проверкой инлайн-стилей
-    '@ru-a11y/gost-a11y/zoom-200-warning': [
-      'error',
-      { minFontSizePx: 16, checkInlineStyles: true },
-    ],
-
-    // Требовать <caption> для всех таблиц
-    '@ru-a11y/gost-a11y/table-requires-th': [
-      'error',
-      { requireCaption: true, requireScope: true },
-    ],
+      }],
+      // Строгая проверка масштабирования
+      '@ru-a11y/gost-a11y/zoom-200-warning': ['error', { minFontSizePx: 16, checkInlineStyles: true }],
+      // Требовать <caption> для всех таблиц
+      '@ru-a11y/gost-a11y/table-requires-th': ['error', { requireCaption: true, requireScope: true }],
+    },
   },
-};
+];
 ```
 
 ### Использование только плагина (без пресета)
 
 ```js
-module.exports = {
-  plugins: ['@ru-a11y/gost-a11y'],
+const ruA11y = require('ru-a11y-toolkit-eslint');
+
+module.exports = [{
+  plugins: { '@ru-a11y/gost-a11y': ruA11y },
   rules: {
     '@ru-a11y/gost-a11y/require-lang-attr': 'error',
     '@ru-a11y/gost-a11y/zoom-200-warning': 'error',
     '@ru-a11y/gost-a11y/require-skip-link': 'warn',
-    // ... другие правила по необходимости
   },
-};
+}];
 ```
 
 ### Игнорирование отдельных мест
@@ -469,9 +469,34 @@ module.exports = {
 
 ---
 
-## Нормативная база
+## Разработка
 
-### ГОСТ Р 52872-2019
+```bash
+# Клонировать репозиторий
+git clone https://github.com/biondohod/ru-a11y.git
+cd ru-a11y/packages/eslint-preset
+
+# Запустить тесты
+npm test
+
+# Запустить тесты с watch-режимом
+npm test -- --watch
+```
+
+---
+
+## Лицензия
+
+MIT © [biondohod](https://github.com/biondohod)
+
+---
+
+## Связанные пакеты (в разработке)
+
+- **[`ru-a11y-toolkit-overlay`](../react-overlay/README.md)** — Runtime-визуализатор ошибок доступности в браузере
+- **[`ru-a11y-toolkit-cli`](../cli/README.md)** — CLI-сканер для проверки готовых страниц (Puppeteer + axe-core)
+- **[`ru-a11y-toolkit`](../../README.md)** — umbrella-пакет, включающий все три модуля
+
 
 «Интернет-ресурсы и другая информация, представленная в электронно-цифровой форме. Приложения для стационарных и мобильных устройств, иные пользовательские интерфейсы. Требования доступности для людей с инвалидностью и других лиц с ограничениями жизнедеятельности»
 

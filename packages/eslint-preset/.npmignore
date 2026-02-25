@@ -1,0 +1,16 @@
+# Зависимости
+node_modules/
+
+# Тесты
+tests/
+
+# IDE и редакторы
+.idea/
+.vscode/
+
+# Временные и debug-файлы
+*.log
+out*.txt
+jest-*.txt
+debug-*.js
+

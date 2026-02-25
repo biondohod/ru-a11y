@@ -1,7 +1,7 @@
 {
-  "name": "@ru-a11y/eslint-preset",
+  "name": "ru-a11y-toolkit-eslint",
   "version": "1.0.0",
-  "description": "ESLint-пресет для проверки веб-доступности согласно ГОСТ Р 52872-2012 и ПП РФ №102",
+  "description": "ESLint-плагин для проверки веб-доступности согласно ГОСТ Р 52872-2019 и Постановлению Правительства РФ №102. Часть ru-a11y-toolkit.",
   "main": "index.js",
   "exports": {
     ".": "./index.js",
@@ -20,9 +20,15 @@
     "ГОСТ",
     "доступность",
     "React",
-    "jsx-a11y"
+    "jsx-a11y",
+    "russia",
+    "ru-a11y",
+    "wcag"
   ],
-  "author": "biondohod",
+  "author": {
+    "name": "biondohod",
+    "url": "https://github.com/biondohod"
+  },
   "license": "MIT",
   "peerDependencies": {
     "eslint": "^9.0.0 || ^10.0.0",
@@ -40,6 +46,7 @@
     "@babel/preset-react": "^7.22.0",
     "babel-jest": "^29.7.0",
     "eslint": "^9.0.0",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
     "jest": "^29.7.0"
   },
   "jest": {
@@ -57,10 +64,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/biondohod/ru-a11y"
+    "url": "https://github.com/biondohod/ru-a11y.git",
+    "directory": "packages/eslint-preset"
   },
+  "homepage": "https://github.com/biondohod/ru-a11y/tree/main/packages/eslint-preset#readme",
   "bugs": {
     "url": "https://github.com/biondohod/ru-a11y/issues"
   }
 }
-

@@ -1,2 +1,16 @@
 node_modules/
-.idea
+.idea/
+.vscode/
+
+# Логи
+*.log
+npm-debug.log*
+
+# Временные файлы тестов и отладки
+out*.txt
+jest-*.txt
+debug-*.js
+
+# OS
+.DS_Store
+Thumbs.db

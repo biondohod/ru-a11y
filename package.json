@@ -1,8 +1,8 @@
 {
-  "name": "ru-a11y",
+  "name": "ru-a11y-toolkit",
   "version": "0.1.0",
-  "private": true,
-  "description": "Монорепозиторий toolkit для автоматизированной веб-доступности React/JS-приложений под российские нормативы",
+  "description": "Toolkit для автоматизированной проверки веб-доступности React/JS-приложений под российские нормативы (ГОСТ Р 52872-2019, Постановление №102)",
+  "main": "index.js",
   "workspaces": [
     "packages/*"
   ],
@@ -12,12 +12,46 @@
     "lint": "eslint packages --ext .js,.jsx,.ts,.tsx",
     "build": "npm run build --workspaces --if-present"
   },
+  "dependencies": {
+    "ru-a11y-toolkit-eslint": "1.0.0"
+  },
+  "keywords": [
+    "accessibility",
+    "a11y",
+    "eslint",
+    "eslint-plugin",
+    "ГОСТ",
+    "доступность",
+    "React",
+    "JSX",
+    "wcag",
+    "russia",
+    "ru-a11y"
+  ],
+  "author": {
+    "name": "biondohod",
+    "url": "https://github.com/biondohod"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/biondohod/ru-a11y.git"
+  },
+  "homepage": "https://github.com/biondohod/ru-a11y#readme",
+  "bugs": {
+    "url": "https://github.com/biondohod/ru-a11y/issues"
+  },
+  "files": [
+    "index.js",
+    "README.md",
+    "LICENSE"
+  ],
   "devDependencies": {
     "@babel/core": "^7.23.0",
     "@babel/eslint-parser": "^7.23.0",
     "@babel/preset-env": "^7.23.0",
     "@babel/preset-react": "^7.22.0",
-    "eslint": "^8.56.0",
+    "eslint": "^9.0.0",
     "eslint-plugin-jsx-a11y": "^6.8.0",
     "jest": "^29.7.0",
     "babel-jest": "^29.7.0"
@@ -30,16 +64,5 @@
     "transform": {
       "^.+\\.jsx?$": "babel-jest"
     }
-  },
-  "keywords": [
-    "accessibility",
-    "a11y",
-    "ГОСТ",
-    "доступность",
-    "React",
-    "ESLint"
-  ],
-  "author": "biondohod",
-  "license": "MIT"
+  }
 }
-
