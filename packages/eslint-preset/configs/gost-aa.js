@@ -12,6 +12,9 @@
  *
  * Поддерживает как Flat Config (ESLint 9+, eslint.config.js),
  * так и Legacy Config (ESLint 8, .eslintrc.js).
+ *
+ * @example
+ * module.exports = { extends: ['@ru-a11y/eslint-preset/gost-aa'] }
  */
 
 'use strict';
@@ -53,85 +56,80 @@ const rules = {
   ],
 
   // -----------------------------------------------------------------------
-  // Правила из eslint-plugin-jsx-a11y (стандартные WCAG 2.1, уровень AA)
-  // Отфильтрованы и адаптированы под требования ГОСТ Р 52872-2019
+  // Правила jsx-a11y с русскими сообщениями (WCAG 2.1, уровень AA)
+  // Обёрнуты в @ru-a11y/gost-a11y — сообщения на русском со ссылками
+  // на ГОСТ Р 52872-2019 и Постановление №102
   // -----------------------------------------------------------------------
 
   // Альтернативный текст для изображений (ГОСТ Р 52872-2019 §5.1.1; Постановление №102 п. г))
-  'jsx-a11y/alt-text': 'error',
+  '@ru-a11y/gost-a11y/jsx-a11y/alt-text': 'error',
 
   // Элементы <a> должны иметь содержимое (ГОСТ Р 52872-2019 §5.2.4; Постановление №102 п. ж))
-  'jsx-a11y/anchor-has-content': 'error',
+  '@ru-a11y/gost-a11y/jsx-a11y/anchor-has-content': 'error',
 
   // Якорные ссылки должны быть допустимыми (Постановление №102 п. ж))
-  'jsx-a11y/anchor-is-valid': 'error',
+  '@ru-a11y/gost-a11y/jsx-a11y/anchor-is-valid': 'error',
 
-  // ARIA-атрибуты должны иметь допустимые значения (WCAG 4.1.2)
-  'jsx-a11y/aria-props': 'error',
+  // ARIA-атрибуты должны быть допустимыми (WCAG 4.1.2)
+  '@ru-a11y/gost-a11y/jsx-a11y/aria-props': 'error',
 
-  // Значения ARIA должны быть валидными (WCAG 4.1.2)
-  'jsx-a11y/aria-proptypes': 'error',
+  // Значения ARIA-атрибутов должны быть валидными (WCAG 4.1.2)
+  '@ru-a11y/gost-a11y/jsx-a11y/aria-proptypes': 'error',
 
   // ARIA-роли должны быть допустимыми (WCAG 4.1.2)
-  'jsx-a11y/aria-role': 'error',
+  '@ru-a11y/gost-a11y/jsx-a11y/aria-role': 'error',
 
-  // Не добавлять ARIA на скрытые элементы (WCAG 4.1.2)
-  'jsx-a11y/aria-unsupported-elements': 'error',
+  // Не добавлять ARIA на неподдерживающие элементы (WCAG 4.1.2)
+  '@ru-a11y/gost-a11y/jsx-a11y/aria-unsupported-elements': 'error',
 
-  // Интерактивные элементы должны поддерживать управление с клавиатуры (Постановление №102 п. а))
-  'jsx-a11y/click-events-have-key-events': 'error',
+  // Интерактивные элементы должны поддерживать клавиатуру (Постановление №102 п. а))
+  '@ru-a11y/gost-a11y/jsx-a11y/click-events-have-key-events': 'error',
 
   // Заголовки должны содержать текст (ГОСТ Р 52872-2019 §5.2.3; Постановление №102 п. е))
-  'jsx-a11y/heading-has-content': 'error',
+  '@ru-a11y/gost-a11y/jsx-a11y/heading-has-content': 'error',
 
   // <html> должен иметь атрибут lang (ГОСТ Р 52872-2019 §5.2.4)
-  'jsx-a11y/html-has-lang': 'error',
+  '@ru-a11y/gost-a11y/jsx-a11y/html-has-lang': 'error',
 
   // <iframe> должен иметь уникальный title (ГОСТ Р 52872-2019 §5.1.1; Постановление №102 п. а))
-  'jsx-a11y/iframe-has-title': 'error',
+  '@ru-a11y/gost-a11y/jsx-a11y/iframe-has-title': 'error',
 
-  // Изображения не должны иметь абстрактный alt (Постановление №102 п. г))
-  'jsx-a11y/img-redundant-alt': 'error',
+  // alt не должен содержать слова "изображение", "фото" и т.п. (Постановление №102 п. г))
+  '@ru-a11y/gost-a11y/jsx-a11y/img-redundant-alt': 'error',
 
   // Интерактивные элементы должны быть фокусируемы (Постановление №102 п. а))
-  'jsx-a11y/interactive-supports-focus': 'error',
+  '@ru-a11y/gost-a11y/jsx-a11y/interactive-supports-focus': 'error',
 
   // label должен быть связан с контролом (ГОСТ Р 52872-2019 §5.1.3; Постановление №102 п. м))
-  'jsx-a11y/label-has-associated-control': 'error',
+  '@ru-a11y/gost-a11y/jsx-a11y/label-has-associated-control': 'error',
 
   // Медиаэлементы должны иметь субтитры (Постановление №102 п. г))
-  'jsx-a11y/media-has-caption': 'warn',
+  '@ru-a11y/gost-a11y/jsx-a11y/media-has-caption': 'warn',
 
   // Обработчики мыши должны иметь аналоги для клавиатуры (Постановление №102 п. а))
-  'jsx-a11y/mouse-events-have-key-events': 'error',
+  '@ru-a11y/gost-a11y/jsx-a11y/mouse-events-have-key-events': 'error',
 
-  // tabIndex не должен быть положительным числом (Постановление №102 п. а))
-  'jsx-a11y/no-positive-tabindex': 'error',
+  // tabIndex не должен быть положительным (Постановление №102 п. а))
+  '@ru-a11y/gost-a11y/jsx-a11y/tabindex-no-positive': 'error',
 
-  // Неинтерактивные элементы не должны иметь интерактивные роли (WCAG 4.1.2)
-  'jsx-a11y/no-noninteractive-element-interactions': 'warn',
+  // Неинтерактивные элементы не должны иметь интерактивные обработчики (WCAG 4.1.2)
+  '@ru-a11y/gost-a11y/jsx-a11y/no-noninteractive-element-interactions': 'warn',
 
-  // Неинтерактивные элементы не должны получать tabIndex без необходимости
-  'jsx-a11y/no-noninteractive-tabindex': 'warn',
+  // Неинтерактивные элементы не должны получать tabIndex (WCAG 2.4.3)
+  '@ru-a11y/gost-a11y/jsx-a11y/no-noninteractive-tabindex': 'warn',
 
-  // Избыточные ARIA-роли не рекомендуются
-  'jsx-a11y/no-redundant-roles': 'warn',
+  // Избыточные ARIA-роли не рекомендуются (WCAG 4.1.2)
+  '@ru-a11y/gost-a11y/jsx-a11y/no-redundant-roles': 'warn',
 
   // Scope должен использоваться только на <th> (ГОСТ Р 52872-2019 §5.1.5)
-  'jsx-a11y/scope': 'error',
+  '@ru-a11y/gost-a11y/jsx-a11y/scope': 'error',
 };
 
 /**
  * Legacy Config (ESLint 8): используется в .eslintrc.js
- * @example
- * module.exports = { extends: ['@ru-a11y/eslint-preset/gost-aa'] }
  */
 const legacyConfig = {
-  plugins: [
-    '@ru-a11y/gost-a11y',
-    // eslint-plugin-jsx-a11y требуется как peerDependency
-    'jsx-a11y',
-  ],
+  plugins: ['@ru-a11y/gost-a11y'],
   rules,
 };
 

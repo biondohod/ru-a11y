@@ -150,6 +150,379 @@ const messages = {
       'Добавьте <caption>Описание таблицы</caption> как первый дочерний элемент <table>. ' +
       '[Постановление №102 п. а) — структура и смысловые связи должны определяться программой]',
   },
+
+  // -----------------------------------------------------------------------
+  // Русские переводы сообщений eslint-plugin-jsx-a11y
+  // Формат: массив { match: string|RegExp, replace: string }
+  // match — подстрока оригинального английского сообщения
+  // replace — полный русский текст
+  // Ссылки: ГОСТ Р 52872-2019, Постановление №102, WCAG 2.1
+  // -----------------------------------------------------------------------
+
+  jsxA11y: {
+
+    // --- alt-text ---
+    // "img elements must have an alt prop..."
+    // "Input elements must have alt prop..."
+    // "area elements must have alt prop..."
+    // ГОСТ Р 52872-2019 §5.1.1; Постановление №102 п. г)
+    altText: [
+      {
+        match: 'must have an alt prop',
+        replace:
+          'Элемент должен иметь атрибут alt с текстовой альтернативой. ' +
+          'Для декоративных изображений используйте alt="". ' +
+          '[ГОСТ Р 52872-2019 §5.1.1; Постановление №102 п. г) — нетекстовый контент должен иметь текстовую альтернативу]',
+      },
+    ],
+
+    // --- anchor-has-content ---
+    // "Anchors must have content and the content must be accessible by a screen reader."
+    // ГОСТ Р 52872-2019 §5.2.4; Постановление №102 п. ж)
+    anchorHasContent: [
+      {
+        match: 'Anchors must have content',
+        replace:
+          'Элемент <a> должен содержать текст или доступную текстовую альтернативу (aria-label, aria-labelledby). ' +
+          'Пустые ссылки непонятны пользователям скринридеров. ' +
+          '[ГОСТ Р 52872-2019 §5.2.4; Постановление №102 п. ж) — назначение ссылки должно быть понятно из текста]',
+      },
+    ],
+
+    // --- anchor-is-valid ---
+    // "The href attribute is required for an anchor to be keyboard accessible..."
+    // "Anchor used as a button..."
+    // Постановление №102 п. ж)
+    anchorIsValid: [
+      {
+        match: 'href attribute is required for an anchor',
+        replace:
+          'Атрибут href обязателен для ссылки — без него элемент недоступен с клавиатуры. ' +
+          'Используйте <button> для действий или добавьте корректный href. ' +
+          '[ГОСТ Р 52872-2019 §5.2.4; Постановление №102 п. ж) — ссылки должны быть навигируемы]',
+      },
+      {
+        match: 'Anchor used as a button',
+        replace:
+          'Ссылка используется как кнопка. ' +
+          'Используйте элемент <button> для действий, не являющихся навигацией. ' +
+          '[Постановление №102 п. а) — интерактивные элементы должны быть доступны с клавиатуры]',
+      },
+      {
+        match: 'The href prop',
+        replace:
+          'Атрибут href содержит некорректное значение. ' +
+          'Используйте реальный URL или якорь (#id). ' +
+          '[ГОСТ Р 52872-2019 §5.2.4]',
+      },
+    ],
+
+    // --- aria-props ---
+    // "aria-X: This attribute is an invalid ARIA attribute."
+    // WCAG 4.1.2
+    ariaProps: [
+      {
+        match: 'is an invalid ARIA attribute',
+        replace:
+          'Указанный атрибут не является допустимым ARIA-атрибутом. ' +
+          'Проверьте правильность написания. ' +
+          '[WCAG 4.1.2 — используемые ARIA-атрибуты должны быть валидными]',
+      },
+    ],
+
+    // --- aria-proptypes ---
+    // "The value for aria-X must be a boolean."
+    // "The value for aria-X must be a string."  и т.д.
+    // WCAG 4.1.2
+    ariaProptypes: [
+      {
+        match: 'The value for aria-',
+        replace:
+          'Значение указанного ARIA-атрибута имеет неверный тип. ' +
+          'Проверьте допустимые значения в спецификации WAI-ARIA. ' +
+          '[WCAG 4.1.2 — значения ARIA-атрибутов должны соответствовать их типу]',
+      },
+    ],
+
+    // --- aria-role ---
+    // "Elements with ARIA roles must use a valid, non-abstract ARIA role."
+    // WCAG 4.1.2
+    ariaRole: [
+      {
+        match: 'must use a valid, non-abstract ARIA role',
+        replace:
+          'Атрибут role содержит недопустимое или абстрактное значение. ' +
+          'Используйте стандартные роли WAI-ARIA: button, dialog, navigation, main и др. ' +
+          '[WCAG 4.1.2 — роли должны соответствовать спецификации WAI-ARIA]',
+      },
+    ],
+
+    // --- aria-unsupported-elements ---
+    // "This element does not support ARIA roles, states and properties."
+    // WCAG 4.1.2
+    ariaUnsupportedElements: [
+      {
+        match: 'does not support ARIA roles',
+        replace:
+          'Этот элемент не поддерживает ARIA-роли и атрибуты — ' +
+          'они будут проигнорированы вспомогательными технологиями. ' +
+          '[WCAG 4.1.2 — ARIA не должна применяться к элементам, которые её не поддерживают]',
+      },
+    ],
+
+    // --- click-events-have-key-events ---
+    // "Visible, non-interactive elements with click handlers must have at least one keyboard listener."
+    // Постановление №102 п. а); WCAG 2.1.1
+    clickEventsHaveKeyEvents: [
+      {
+        match: 'click handlers must have at least one keyboard listener',
+        replace:
+          'Элемент с обработчиком onClick должен также обрабатывать события клавиатуры ' +
+          '(onKeyDown, onKeyUp или onKeyPress) для пользователей, не использующих мышь. ' +
+          '[Постановление №102 п. а) — функциональность должна быть доступна с клавиатуры; WCAG 2.1.1]',
+      },
+    ],
+
+    // --- heading-has-content ---
+    // "Headings must have content and the content must be accessible by a screen reader."
+    // ГОСТ Р 52872-2019 §5.2.3; Постановление №102 п. е)
+    headingHasContent: [
+      {
+        match: 'Headings must have content',
+        replace:
+          'Заголовок не содержит текста или доступной текстовой альтернативы. ' +
+          'Пустые заголовки бесполезны для пользователей скринридеров и нарушают структуру документа. ' +
+          '[ГОСТ Р 52872-2019 §5.2.3; Постановление №102 п. е) — заголовки должны описывать тему раздела]',
+      },
+    ],
+
+    // --- html-has-lang ---
+    // "<html> elements must have the lang prop."
+    // ГОСТ Р 52872-2019 §5.2.4; Постановление №102 п. а)
+    htmlHasLang: [
+      {
+        match: 'elements must have the lang prop',
+        replace:
+          'Элемент <html> должен иметь атрибут lang с допустимым кодом языка BCP-47 (например, lang="ru"). ' +
+          'Это позволяет скринридерам выбрать правильный голосовой профиль. ' +
+          '[ГОСТ Р 52872-2019 §5.2.4; Постановление №102 п. а) — информация должна быть доступна вспомогательным технологиям]',
+      },
+    ],
+
+    // --- iframe-has-title ---
+    // "<iframe> elements must have a unique title property."
+    // ГОСТ Р 52872-2019 §5.1.1; Постановление №102 п. а)
+    iframeHasTitle: [
+      {
+        match: 'must have a unique title property',
+        replace:
+          'Элемент <iframe> должен иметь непустой атрибут title с описанием содержимого фрейма. ' +
+          'Например: title="Карта расположения офиса" или title="Видеоролик с демонстрацией". ' +
+          '[ГОСТ Р 52872-2019 §5.1.1; Постановление №102 п. а) — структура должна корректно определяться скринридерами]',
+      },
+    ],
+
+    // --- img-redundant-alt ---
+    // "Redundant alt attribute. Screen-readers already announce `img` tags as an image..."
+    // ГОСТ Р 52872-2019 §5.1.1; Постановление №102 п. г)
+    imgRedundantAlt: [
+      {
+        match: 'Redundant alt attribute',
+        replace:
+          'Атрибут alt не должен содержать слова "изображение", "картинка", "фото", "рисунок", "image", "photo", "picture" — ' +
+          'скринридер уже сообщает тип элемента. Опишите смысловое содержание изображения. ' +
+          '[ГОСТ Р 52872-2019 §5.1.1; Постановление №102 п. г) — текстовая альтернатива должна быть информативной]',
+      },
+    ],
+
+    // --- interactive-supports-focus ---
+    // "Elements with the 'X' interactive role must be focusable."
+    // Постановление №102 п. а); WCAG 2.1.1
+    interactiveSupportsFocus: [
+      {
+        match: 'interactive role must be focusable',
+        replace:
+          'Интерактивный элемент должен быть доступен с клавиатуры (поддерживать фокус). ' +
+          'Добавьте tabIndex={0} или используйте нативный интерактивный HTML-элемент (<button>, <a>). ' +
+          '[Постановление №102 п. а) — управление с клавиатуры; WCAG 2.1.1]',
+      },
+    ],
+
+    // --- label-has-associated-control ---
+    // "A form label must be associated with a control."
+    // ГОСТ Р 52872-2019 §5.1.3; Постановление №102 п. м)
+    labelHasAssociatedControl: [
+      {
+        match: 'form label must be associated with a control',
+        replace:
+          'Элемент <label> должен быть связан с полем ввода через атрибут htmlFor или путём вложения поля внутрь метки. ' +
+          '[ГОСТ Р 52872-2019 §5.1.3; Постановление №102 п. м) — элементы управления должны иметь метки]',
+      },
+    ],
+
+    // --- media-has-caption ---
+    // "Media elements such as <audio> and <video> must have a <track> for captions."
+    // Постановление №102 п. г); WCAG 1.2.2
+    mediaHasCaption: [
+      {
+        match: 'must have a <track> for captions',
+        replace:
+          'Медиаэлемент должен содержать субтитры (<track kind="captions">) ' +
+          'для пользователей с нарушениями слуха. ' +
+          '[Постановление №102 п. г) — аудиовизуальная информация должна иметь текстовую альтернативу; WCAG 1.2.2]',
+      },
+    ],
+
+    // --- mouse-events-have-key-events ---
+    // "onMouseOver must be accompanied by onFocus for accessibility."
+    // "onMouseOut must be accompanied by onBlur for accessibility."
+    // Постановление №102 п. а); WCAG 2.1.1
+    mouseEventsHaveKeyEvents: [
+      {
+        match: 'onMouseOver must be accompanied by onFocus',
+        replace:
+          'Обработчик onMouseOver должен дополняться обработчиком onFocus ' +
+          'для поддержки навигации с клавиатуры. ' +
+          '[Постановление №102 п. а) — функциональность должна быть доступна с клавиатуры; WCAG 2.1.1]',
+      },
+      {
+        match: 'onMouseOut must be accompanied by onBlur',
+        replace:
+          'Обработчик onMouseOut должен дополняться обработчиком onBlur ' +
+          'для поддержки навигации с клавиатуры. ' +
+          '[Постановление №102 п. а) — функциональность должна быть доступна с клавиатуры; WCAG 2.1.1]',
+      },
+    ],
+
+    // --- tabindex-no-positive (в jsx-a11y правило называется tabindex-no-positive) ---
+    // "Avoid positive integer values for tabIndex."
+    // Постановление №102 п. а); WCAG 2.4.3
+    tabindexNoPositive: [
+      {
+        match: 'Avoid positive integer values for tabIndex',
+        replace:
+          'Атрибут tabIndex не должен иметь положительное значение. ' +
+          'Положительный tabIndex нарушает естественный порядок фокуса при навигации с клавиатуры. ' +
+          'Используйте tabIndex={0} или tabIndex={-1}. ' +
+          '[Постановление №102 п. а) — последовательность фокуса; WCAG 2.4.3]',
+      },
+    ],
+
+    // --- no-noninteractive-element-interactions ---
+    // "Non-interactive elements should not be assigned mouse or keyboard event listeners."
+    // WCAG 4.1.2
+    noNoninteractiveElementInteractions: [
+      {
+        match: 'Non-interactive elements should not be assigned mouse or keyboard event listeners',
+        replace:
+          'Неинтерактивный элемент не должен иметь обработчиков событий мыши или клавиатуры. ' +
+          'Используйте семантически правильный интерактивный элемент (<button>, <a>) или добавьте role. ' +
+          '[WCAG 4.1.2 — роль элемента должна соответствовать его поведению]',
+      },
+    ],
+
+    // --- no-noninteractive-tabindex ---
+    // "`tabIndex` should only be declared on interactive elements."
+    // WCAG 2.4.3
+    noNoninteractiveTabindex: [
+      {
+        match: 'tabIndex` should only be declared on interactive elements',
+        replace:
+          'Атрибут tabIndex не должен устанавливаться на неинтерактивных элементах. ' +
+          'Только интерактивные элементы должны быть в порядке табуляции. ' +
+          '[WCAG 2.4.3 — порядок фокуса; Постановление №102 п. а)]',
+      },
+    ],
+
+    // --- no-redundant-roles ---
+    // "The element X has an implicit role of Y. Defining this explicitly is redundant..."
+    // WCAG 4.1.2
+    noRedundantRoles: [
+      {
+        match: 'has an implicit role of',
+        replace:
+          'Элемент уже имеет подразумеваемую ARIA-роль — явно указывать её избыточно. ' +
+          '[WCAG 4.1.2 — не дублируйте семантику нативных HTML-элементов]',
+      },
+    ],
+
+    // --- no-access-key ---
+    // "No access key attribute allowed. Inconsistencies between keyboard shortcuts..."
+    // WCAG 2.1.4
+    noAccessKey: [
+      {
+        match: 'No access key attribute allowed',
+        replace:
+          'Атрибут accessKey не рекомендуется — сочетания клавиш могут конфликтовать ' +
+          'с горячими клавишами браузера, операционной системы и вспомогательных технологий. ' +
+          '[WCAG 2.1.4 — горячие клавиши не должны конфликтовать с системными]',
+      },
+    ],
+
+    // --- no-static-element-interactions ---
+    // "Avoid non-native interactive elements..."
+    // WCAG 4.1.2
+    noStaticElementInteractions: [
+      {
+        match: 'Avoid non-native interactive elements',
+        replace:
+          'Статичный элемент не должен иметь интерактивных обработчиков событий. ' +
+          'Добавьте подходящую role (например, role="button") или используйте семантический HTML. ' +
+          '[WCAG 4.1.2 — семантика элемента должна соответствовать его поведению]',
+      },
+    ],
+
+    // --- no-interactive-element-to-noninteractive-role ---
+    // "Interactive elements should not be assigned non-interactive roles."
+    // WCAG 4.1.2
+    noInteractiveElementToNoninteractiveRole: [
+      {
+        match: 'Interactive elements should not be assigned non-interactive roles',
+        replace:
+          'Интерактивный элемент не должен получать неинтерактивную роль. ' +
+          'Это скрывает нативную семантику от вспомогательных технологий. ' +
+          '[WCAG 4.1.2 — роль должна соответствовать нативной семантике элемента]',
+      },
+    ],
+
+    // --- scope ---
+    // "The scope prop can only be used on <th> elements."
+    // ГОСТ Р 52872-2019 §5.1.5
+    scope: [
+      {
+        match: 'The scope prop can only be used on',
+        replace:
+          'Атрибут scope может использоваться только на элементе <th>. ' +
+          '[ГОСТ Р 52872-2019 §5.1.5 — структура таблиц данных должна корректно определяться скринридерами]',
+      },
+    ],
+
+    // --- autocomplete-valid ---
+    // "the autocomplete attribute is incorrectly formatted"
+    // WCAG 1.3.5
+    autocompleteValid: [
+      {
+        match: 'autocomplete attribute is incorrectly formatted',
+        replace:
+          'Атрибут autoComplete содержит недопустимое значение. ' +
+          'Используйте значения из спецификации HTML: name, email, tel, address-line1 и др. ' +
+          '[WCAG 1.3.5 — поля ввода личных данных должны поддерживать автозаполнение]',
+      },
+    ],
+
+    // --- aria-activedescendant-has-tabindex ---
+    // "An element that manages focus with `aria-activedescendant` must have a tabindex"
+    // WCAG 4.1.2; Постановление №102 п. а)
+    ariaActivedescendantHasTabindex: [
+      {
+        match: 'manages focus with `aria-activedescendant` must have a tabindex',
+        replace:
+          'Элемент с атрибутом aria-activedescendant должен быть фокусируемым (иметь tabIndex). ' +
+          'Добавьте tabIndex={0} чтобы элемент мог получать фокус с клавиатуры. ' +
+          '[WCAG 4.1.2; Постановление №102 п. а) — составные виджеты должны поддерживать навигацию с клавиатуры]',
+      },
+    ],
+  },
 };
 
 module.exports = messages;

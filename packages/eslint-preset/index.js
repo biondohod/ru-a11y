@@ -47,6 +47,9 @@ const zoom200Warning = require('./rules/zoom-200-warning');
 const noFrameStructure = require('./rules/no-frame-structure');
 const tableRequiresTh = require('./rules/table-requires-th');
 
+// Обёрнутые правила eslint-plugin-jsx-a11y с русскоязычными сообщениями
+const jsxA11yRu = require('./rules/jsx-a11y-ru');
+
 // Импорт конфигураций
 const recommended = require('./configs/recommended');
 const gostAA = require('./configs/gost-aa');
@@ -71,6 +74,11 @@ const plugin = {
     'zoom-200-warning': zoom200Warning,
     'no-frame-structure': noFrameStructure,
     'table-requires-th': tableRequiresTh,
+    // Обёрнутые правила jsx-a11y с русскими сообщениями
+    // Доступны как @ru-a11y/gost-a11y/jsx-a11y/alt-text и т.д.
+    ...Object.fromEntries(
+      Object.entries(jsxA11yRu).map(([name, rule]) => [`jsx-a11y/${name}`, rule])
+    ),
   },
 };
 

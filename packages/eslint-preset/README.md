@@ -108,19 +108,36 @@ module.exports = {
 
 ### Правила из `eslint-plugin-jsx-a11y` (подключаются в `gost-aa` и `strict`)
 
-| Правило | ГОСТ / №102 | Описание |
-|---------|-------------|----------|
-| `jsx-a11y/alt-text` | §5.1.1; №102 п. г) | `alt` для изображений |
-| `jsx-a11y/anchor-has-content` | §5.2.4; №102 п. ж) | Ссылки должны иметь текст |
-| `jsx-a11y/anchor-is-valid` | №102 п. ж) | Корректный `href` у ссылок |
+Все 26 правил переведены на русский язык и содержат ссылки на нормативные документы. Перевод реализован через перехват `context.report()` в runtime — оригинальная логика проверки не изменяется.
+
+| Правило | ГОСТ / №102 / WCAG | Описание |
+|---------|--------------------|----------|
+| `jsx-a11y/alt-text` | §5.1.1; №102 п. г) | `alt` для `<img>`, `<area>`, `<input type="image">` |
+| `jsx-a11y/anchor-has-content` | §5.2.4; №102 п. ж) | Ссылки должны содержать текст |
+| `jsx-a11y/anchor-is-valid` | №102 п. ж) | Корректный `href`, не использовать `<a>` как кнопку |
+| `jsx-a11y/aria-activedescendant-has-tabindex` | WCAG 4.1.2; №102 п. а) | `tabIndex` для элементов с `aria-activedescendant` |
 | `jsx-a11y/aria-props` | WCAG 4.1.2 | Допустимые ARIA-атрибуты |
-| `jsx-a11y/click-events-have-key-events` | №102 п. а) | Клики → аналоги клавиатуры |
+| `jsx-a11y/aria-proptypes` | WCAG 4.1.2 | Корректные значения ARIA-атрибутов |
+| `jsx-a11y/aria-role` | WCAG 4.1.2 | Допустимые значения `role` |
+| `jsx-a11y/aria-unsupported-elements` | WCAG 4.1.2 | Запрет ARIA на неподдерживающих элементах |
+| `jsx-a11y/autocomplete-valid` | WCAG 1.3.5 | Корректные значения `autoComplete` |
+| `jsx-a11y/click-events-have-key-events` | №102 п. а); WCAG 2.1.1 | `onClick` → аналоги клавиатуры |
 | `jsx-a11y/heading-has-content` | §5.2.3; №102 п. е) | Заголовки не должны быть пустыми |
-| `jsx-a11y/html-has-lang` | §5.2.4 | `lang` на `<html>` |
+| `jsx-a11y/html-has-lang` | §5.2.4; №102 п. а) | `lang` на `<html>` |
 | `jsx-a11y/iframe-has-title` | §5.1.1; №102 п. а) | `title` для `<iframe>` |
-| `jsx-a11y/label-has-associated-control` | §5.1.3; №102 п. м) | `<label>` связан с полем |
-| `jsx-a11y/media-has-caption` | №102 п. г) | Субтитры для видео/аудио |
-| `jsx-a11y/no-positive-tabindex` | №102 п. а) | Запрет `tabindex > 0` |
+| `jsx-a11y/img-redundant-alt` | §5.1.1; №102 п. г) | Запрет слов «фото», «картинка» в `alt` |
+| `jsx-a11y/interactive-supports-focus` | №102 п. а); WCAG 2.1.1 | Интерактивные элементы должны принимать фокус |
+| `jsx-a11y/label-has-associated-control` | §5.1.3; №102 п. м) | `<label>` связан с полем ввода |
+| `jsx-a11y/media-has-caption` | №102 п. г); WCAG 1.2.2 | Субтитры для `<video>`/`<audio>` |
+| `jsx-a11y/mouse-events-have-key-events` | №102 п. а); WCAG 2.1.1 | `onMouseOver`/`onMouseOut` → `onFocus`/`onBlur` |
+| `jsx-a11y/no-access-key` | WCAG 2.1.4 | Запрет `accessKey` |
+| `jsx-a11y/no-interactive-element-to-noninteractive-role` | WCAG 4.1.2 | Запрет неинтерактивной роли на интерактивном элементе |
+| `jsx-a11y/no-noninteractive-element-interactions` | WCAG 4.1.2 | Обработчики событий только на интерактивных элементах |
+| `jsx-a11y/no-noninteractive-tabindex` | WCAG 2.4.3; №102 п. а) | `tabIndex` только на интерактивных элементах |
+| `jsx-a11y/no-redundant-roles` | WCAG 4.1.2 | Запрет явного дублирования неявной роли |
+| `jsx-a11y/no-static-element-interactions` | WCAG 4.1.2 | Запрет обработчиков на статичных элементах |
+| `jsx-a11y/scope` | §5.1.5 | `scope` только на `<th>` |
+| `jsx-a11y/tabindex-no-positive` | №102 п. а); WCAG 2.4.3 | Запрет `tabIndex > 0` |
 
 ---
 
@@ -198,9 +215,7 @@ function App() {
 
 **Опция `enforceRussian`** (для гос. сайтов, в пресете `strict`):
 ```js
-const config = {
     '@ru-a11y/gost-a11y/require-lang-attr': ['error', {enforceRussian: true}]
-}
 ```
 
 ---
@@ -347,6 +362,32 @@ const config = {
 
 ---
 
+## Как работает русификация jsx-a11y
+
+`eslint-plugin-jsx-a11y` репортит ошибки через `context.report({ message: '...' })` с английскими строками напрямую (не через `messageId`). Поэтому подмена `meta.messages` не работает.
+
+Пресет использует утилиту **`wrap-jsx-rule`**, которая:
+
+1. Оборачивает оригинальное правило из `eslint-plugin-jsx-a11y`
+2. Передаёт в `originalRule.create()` объект-обёртку над `context` с переопределённым `report`
+3. Перед вызовом оригинального `report` проверяет английское `message` по маппингу `{ match, replace }`
+4. Если нашли совпадение — заменяет на русский текст и передаёт дальше
+
+```js
+// Пример маппинга в messages.js
+anchorHasContent: [
+  {
+    match: 'Anchors must have content',       // подстрока английского сообщения
+    replace: 'Элемент <a> должен содержать текст...' +
+             ' [ГОСТ Р 52872-2019 §5.2.4; Постановление №102 п. ж)]',
+  },
+],
+```
+
+Оригинальная **логика проверки не изменяется** — только текст сообщения об ошибке.
+
+---
+
 ## Сравнение с `eslint-plugin-jsx-a11y`
 
 | Возможность | `eslint-plugin-jsx-a11y` | `@ru-a11y/eslint-preset` |
@@ -463,21 +504,31 @@ module.exports = {
 
 ```
 @ru-a11y/eslint-preset/
-├── index.js                  # Экспорт плагина и всех правил
+├── index.js                        # Экспорт плагина и всех правил
+├── messages.js                     # Русскоязычные сообщения об ошибках
 ├── configs/
-│   ├── recommended.js        # Уровень A — критические нарушения
-│   ├── gost-aa.js            # Уровень AA + Постановление №102
-│   └── strict.js             # Уровень AAA — максимальная строгость
+│   ├── recommended.js              # Уровень A — критические нарушения
+│   ├── gost-aa.js                  # Уровень AA + Постановление №102
+│   └── strict.js                   # Уровень AAA — максимальная строгость
 ├── rules/
-│   ├── require-skip-link.js
-│   ├── require-lang-attr.js
-│   ├── require-title-semantic.js
-│   ├── no-frame-structure.js
-│   ├── table-requires-th.js
-│   ├── no-table-layout.js
-│   └── zoom-200-warning.js
-├── messages.js               # Русскоязычные сообщения об ошибках
-└── tests/                    # Jest-тесты для каждого правила
+│   ├── require-skip-link.js        # Ссылка пропуска навигации
+│   ├── require-lang-attr.js        # Атрибут lang на <html>
+│   ├── require-title-semantic.js   # Информативный <title> и структура заголовков
+│   ├── no-frame-structure.js       # Запрет <frame>/<frameset>, title для <iframe>
+│   ├── table-requires-th.js        # <th scope> в таблицах данных
+│   ├── no-table-layout.js          # Запрет таблиц для вёрстки
+│   ├── zoom-200-warning.js         # Масштабирование 200%
+│   ├── jsx-a11y-ru.js              # 26 правил jsx-a11y с русскими сообщениями
+│   └── wrap-jsx-rule.js            # Утилита перехвата context.report для перевода
+└── tests/                          # Jest-тесты для каждого правила
+    ├── jsx-a11y-ru.test.js         # Тесты обёрток jsx-a11y и утилиты wrap-jsx-rule
+    ├── no-frame-structure.test.js
+    ├── no-table-layout.test.js
+    ├── require-lang-attr.test.js
+    ├── require-skip-link.test.js
+    ├── require-title-semantic.test.js
+    ├── table-requires-th.test.js
+    └── zoom-200-warning.test.js
 ```
 
 ---
@@ -500,7 +551,7 @@ npm test -- --watch
 
 ## Лицензия
 
-MIT © ru-a11y contributors
+MIT © biondohod
 
 ---
 

@@ -15,6 +15,9 @@
  *
  * Поддерживает как Flat Config (ESLint 9+, eslint.config.js),
  * так и Legacy Config (ESLint 8, .eslintrc.js).
+ *
+ * @example
+ * module.exports = { extends: ['@ru-a11y/eslint-preset/strict'] }
  */
 
 'use strict';
@@ -31,16 +34,16 @@ const rules = {
   // -----------------------------------------------------------------------
 
   // Медиаэлементы ОБЯЗАНЫ иметь субтитры (Постановление №102 п. г))
-  'jsx-a11y/media-has-caption': 'error',
+  '@ru-a11y/gost-a11y/jsx-a11y/media-has-caption': 'error',
 
-  // Неинтерактивные элементы не должны иметь интерактивные обработчики
-  'jsx-a11y/no-noninteractive-element-interactions': 'error',
+  // Неинтерактивные элементы не должны иметь интерактивные обработчики (WCAG 4.1.2)
+  '@ru-a11y/gost-a11y/jsx-a11y/no-noninteractive-element-interactions': 'error',
 
-  // Неинтерактивные элементы не должны получать tabIndex
-  'jsx-a11y/no-noninteractive-tabindex': 'error',
+  // Неинтерактивные элементы не должны получать tabIndex (WCAG 2.4.3)
+  '@ru-a11y/gost-a11y/jsx-a11y/no-noninteractive-tabindex': 'error',
 
-  // Избыточные ARIA-роли запрещены
-  'jsx-a11y/no-redundant-roles': 'error',
+  // Избыточные ARIA-роли запрещены (WCAG 4.1.2)
+  '@ru-a11y/gost-a11y/jsx-a11y/no-redundant-roles': 'error',
 
   // -----------------------------------------------------------------------
   // Дополнительные параметры для максимальной строгости
@@ -83,35 +86,30 @@ const rules = {
   ],
 
   // -----------------------------------------------------------------------
-  // Дополнительные правила jsx-a11y уровня AAA
+  // Дополнительные правила jsx-a11y уровня AAA (с русскими сообщениями)
   // -----------------------------------------------------------------------
 
   // Автодополнение для форм (WCAG 1.3.5)
-  'jsx-a11y/autocomplete-valid': 'error',
+  '@ru-a11y/gost-a11y/jsx-a11y/autocomplete-valid': 'error',
 
   // Не использовать accessKey (WCAG 2.1.4)
-  'jsx-a11y/no-access-key': 'error',
+  '@ru-a11y/gost-a11y/jsx-a11y/no-access-key': 'error',
 
   // Статичные элементы с обработчиками должны иметь роль (WCAG 4.1.2)
-  'jsx-a11y/no-static-element-interactions': 'error',
+  '@ru-a11y/gost-a11y/jsx-a11y/no-static-element-interactions': 'error',
 
-  // Интерактивные элементы не должны быть вложены
-  'jsx-a11y/no-interactive-element-to-noninteractive-role': 'error',
+  // Интерактивные элементы не должны получать неинтерактивную роль (WCAG 4.1.2)
+  '@ru-a11y/gost-a11y/jsx-a11y/no-interactive-element-to-noninteractive-role': 'error',
 
-  // aria-activedescendant должен указывать на существующий элемент (WCAG 4.1.2)
-  'jsx-a11y/aria-activedescendant-has-tabindex': 'error',
+  // aria-activedescendant требует tabIndex (WCAG 4.1.2; Постановление №102 п. а))
+  '@ru-a11y/gost-a11y/jsx-a11y/aria-activedescendant-has-tabindex': 'error',
 };
 
 /**
  * Legacy Config (ESLint 8): используется в .eslintrc.js
- * @example
- * module.exports = { extends: ['@ru-a11y/eslint-preset/strict'] }
  */
 const legacyConfig = {
-  plugins: [
-    '@ru-a11y/gost-a11y',
-    'jsx-a11y',
-  ],
+  plugins: ['@ru-a11y/gost-a11y'],
   reportUnusedDisableDirectives: true,
   rules,
 };

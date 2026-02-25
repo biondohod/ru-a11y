@@ -9,9 +9,9 @@ const { RuleTester } = require('eslint');
 const rule = require('../rules/no-table-layout');
 
 const ruleTester = new RuleTester({
-  parserOptions: {
+  languageOptions: {
     ecmaVersion: 2020,
-    ecmaFeatures: { jsx: true },
+    parserOptions: { ecmaFeatures: { jsx: true } },
     sourceType: 'module',
   },
 });

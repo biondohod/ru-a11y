@@ -9,9 +9,9 @@ const { RuleTester } = require('eslint');
 const rule = require('../rules/require-skip-link');
 
 const ruleTester = new RuleTester({
-  parserOptions: {
+  languageOptions: {
     ecmaVersion: 2020,
-    ecmaFeatures: { jsx: true },
+    parserOptions: { ecmaFeatures: { jsx: true } },
     sourceType: 'module',
   },
 });
