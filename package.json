@@ -13,7 +13,11 @@
     "build": "npm run build --workspaces --if-present"
   },
   "dependencies": {
-    "ru-a11y-toolkit-eslint": "1.0.2"
+    "ru-a11y-toolkit-eslint": "1.0.2",
+    "ru-a11y-toolkit-overlay": "0.1.0"
+  },
+  "peerDependencies": {
+    "eslint": "^9.0.0 || ^10.0.0"
   },
   "keywords": [
     "accessibility",

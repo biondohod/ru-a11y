@@ -4,19 +4,36 @@
  * ru-a11y-toolkit — umbrella-пакет
  *
  * Реэкспортирует все готовые модули toolkit.
- * По мере выхода CLI и React Overlay они будут добавлены сюда.
  *
  * Использование:
  *   const toolkit = require('ru-a11y-toolkit');
  *   // toolkit.eslint — ESLint-плагин
- *   // toolkit.eslint.configs['gost-aa'] — конфиг напрямую
+ *   // toolkit.overlay — React Overlay (только dev-режим)
  */
 
 const eslint = require('ru-a11y-toolkit-eslint');
 
+/**
+ * React Overlay — runtime-визуализатор нарушений доступности.
+ * Загружается лениво: не падает при отсутствии React в окружении.
+ * Для использования: import { RuA11yOverlay } from 'ru-a11y-toolkit-overlay'
+ */
+let overlay = {};
+try {
+  overlay = require('ru-a11y-toolkit-overlay');
+} catch {
+  // overlay недоступен (например, dist ещё не собран или нет React)
+}
+
 module.exports = {
   /** ESLint-плагин с правилами и конфигами */
   eslint,
+
+  /**
+   * React Overlay — runtime-визуализатор нарушений доступности.
+   * Используйте в dev-режиме: {process.env.NODE_ENV === 'development' && <toolkit.overlay.RuA11yOverlay />}
+   */
+  overlay,
 
   /**
    * Конфиги для прямого использования в eslint.config.js (Flat Config):
@@ -31,4 +48,3 @@ module.exports = {
    */
   rules: eslint.rules,
 };
-
