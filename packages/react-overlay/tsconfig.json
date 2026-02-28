@@ -17,7 +17,7 @@
     "outDir": "dist",
     "types": ["jest", "@testing-library/jest-dom"]
   },
-  "include": ["src", "tests"],
+  "include": ["src", "src/scss.d.ts", "tests"],
   "exclude": ["node_modules", "dist"]
 }
 

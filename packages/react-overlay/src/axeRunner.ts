@@ -234,15 +234,21 @@ export function createDomObserver(
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   const scheduleRun = () => {
-    // Если сканирование уже идёт — не планируем ещё одно до завершения
-    if (axeRunning) return;
-
     if (debounceTimer) clearTimeout(debounceTimer);
 
+    // Если сканирование уже идёт — планируем следующее на момент его завершения
+    // (ждём debounceMs после того, как axeRunning станет false)
+    const delay = axeRunning ? debounceMs + 500 : debounceMs;
+
     debounceTimer = setTimeout(async () => {
+      // На случай если предыдущий скан ещё не успел завершиться — ждём ещё
+      if (axeRunning) {
+        scheduleRun();
+        return;
+      }
       const result = await runAxeScan(config);
       onResult(result);
-    }, debounceMs);
+    }, delay);
   };
 
   const observer = new MutationObserver((mutations) => {

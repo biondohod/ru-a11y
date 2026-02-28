@@ -1,6 +1,8 @@
 node_modules/
 .idea/
 .vscode/
+**/build/
+**/dist/
 
 # Логи
 *.log

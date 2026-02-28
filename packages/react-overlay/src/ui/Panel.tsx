@@ -3,7 +3,20 @@
  */
 
 import React, { useRef, useState, useCallback, useEffect } from 'react';
-import { panelStyles, COLORS } from './styles';
+import {
+  panelConfig,
+  panelHeaderConfig,
+  panelTitleConfig,
+  panelHeaderActionsConfig,
+  iconButtonConfig,
+  iconButtonDisabledConfig,
+  panelBodyConfig,
+  panelFooterConfig,
+  badgeErrorConfig,
+  badgeWarningConfig,
+  loadingStateConfig,
+} from './styles/panelConfig';
+import { COLORS } from './styles/tokens';
 import { ErrorList } from './ErrorList';
 import type { ScanResult, A11yViolationNode } from '../axeRunner';
 
@@ -63,8 +76,8 @@ export function Panel({
   onRescan,
 }: PanelProps) {
   const { offset, onMouseDown } = useDraggable();
-  const totalErrors = result?.counts.error ?? 0;
-  const totalWarnings = result?.counts.warning ?? 0;
+  const totalErrors   = result?.counts.error   ?? 0;
+  const totalWarnings = result?.counts.warning  ?? 0;
 
   return (
     <div
@@ -72,39 +85,22 @@ export function Panel({
       aria-modal="false"
       aria-label="Панель проверки доступности ru-a11y-toolkit"
       data-ru-a11y-overlay
-      style={{
-        ...panelStyles.panel,
-        transform: `translate(${offset.x}px, ${offset.y}px)`,
-      }}
+      style={{ ...panelConfig, transform: `translate(${offset.x}px, ${offset.y}px)` }}
     >
-      {/* Шапка (также зона перетаскивания) */}
-      <div
-        style={{
-          ...panelStyles.panelHeader,
-          cursor: 'grab',
-          userSelect: 'none',
-        }}
-        onMouseDown={onMouseDown}
-        title="Перетащите панель"
-      >
-        <h2 style={panelStyles.panelTitle}>
+      {/* Шапка */}
+      <div style={panelHeaderConfig} onMouseDown={onMouseDown} title="Перетащите панель">
+        <h2 style={panelTitleConfig}>
           <span aria-hidden="true">♿ </span>
           Доступность
           {result && (
             <span aria-label={`${totalErrors} ошибок, ${totalWarnings} предупреждений`}>
               {totalErrors > 0 && (
-                <span
-                  style={{ ...panelStyles.badge, ...panelStyles.badgeError, marginLeft: '8px' }}
-                  aria-hidden="true"
-                >
+                <span style={{ ...badgeErrorConfig, marginLeft: '8px' }} aria-hidden="true">
                   {totalErrors}
                 </span>
               )}
               {totalWarnings > 0 && (
-                <span
-                  style={{ ...panelStyles.badge, ...panelStyles.badgeWarning, marginLeft: '4px' }}
-                  aria-hidden="true"
-                >
+                <span style={{ ...badgeWarningConfig, marginLeft: '4px' }} aria-hidden="true">
                   {totalWarnings}
                 </span>
               )}
@@ -112,38 +108,30 @@ export function Panel({
           )}
         </h2>
 
-        <div style={{ display: 'flex', gap: '4px' }}>
-          {/* Кнопка перезапуска сканирования */}
+        <div style={panelHeaderActionsConfig}>
           <button
             onClick={onRescan}
             disabled={isScanning}
             aria-label="Запустить проверку доступности заново"
             title="Перезапустить сканирование"
-            style={{
-              ...panelStyles.panelClose,
-              fontSize: '14px',
-              opacity: isScanning ? 0.4 : 0.7,
-              cursor: isScanning ? 'not-allowed' : 'pointer',
-            }}
+            style={isScanning ? iconButtonDisabledConfig : iconButtonConfig}
           >
             {isScanning ? '⟳' : '↺'}
           </button>
-
-          {/* Кнопка закрытия */}
           <button
             onClick={onClose}
             aria-label="Закрыть панель проверки доступности"
-            style={panelStyles.panelClose}
+            style={iconButtonConfig}
           >
             ✕
           </button>
         </div>
       </div>
 
-      {/* Тело панели */}
-      <div style={panelStyles.panelBody}>
+      {/* Тело */}
+      <div style={panelBodyConfig}>
         {isScanning && !result ? (
-          <div style={panelStyles.loadingState} role="status" aria-live="polite">
+          <div style={loadingStateConfig} role="status" aria-live="polite">
             <span aria-hidden="true">⟳</span>
             Идёт проверка доступности…
           </div>
@@ -157,7 +145,7 @@ export function Panel({
       </div>
 
       {/* Подвал */}
-      <div style={panelStyles.panelFooter}>
+      <div style={panelFooterConfig}>
         <span>
           {result
             ? `Проверено: ${result.scannedAt.toLocaleTimeString('ru-RU')}`
@@ -176,4 +164,3 @@ export function Panel({
     </div>
   );
 }
-

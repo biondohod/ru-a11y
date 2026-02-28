@@ -7,7 +7,5 @@ export default defineConfig({
   sourcemap: true,
   clean: true,
   external: ['react', 'react-dom'],
-  // Инлайним только зависимости из dependencies, а не peerDependencies
   noExternal: ['axe-core'],
 });
-

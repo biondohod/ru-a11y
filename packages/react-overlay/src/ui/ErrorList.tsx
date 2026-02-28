@@ -3,7 +3,17 @@
  */
 
 import React, { useMemo, useState } from 'react';
-import { panelStyles, COLORS } from './styles';
+import {
+  emptyStateConfig,
+  emptyIconConfig,
+  emptyTitleConfig,
+  emptySubtextConfig,
+  groupHeaderConfig,
+  groupHeaderRightConfig,
+  groupBadgeErrorConfig,
+  groupBadgeWarningConfig,
+} from './styles/errorConfig';
+import { COLORS } from './styles/tokens';
 import { ErrorItem } from './ErrorItem';
 import { WCAG_PRINCIPLES } from '../mapping/rulesMap';
 import type { A11yViolationNode } from '../axeRunner';
@@ -26,13 +36,9 @@ const GROUP_LABELS: Record<GroupKey, string> = {
 export function ErrorList({ violations, activeViolation, onSelect }: ErrorListProps) {
   const [collapsedGroups, setCollapsedGroups] = useState<Set<GroupKey>>(new Set());
 
-  // Группируем нарушения по принципу WCAG
   const groups = useMemo(() => {
     const map = new Map<GroupKey, A11yViolationNode[]>();
-
-    for (const group of GROUP_ORDER) {
-      map.set(group, []);
-    }
+    for (const group of GROUP_ORDER) map.set(group, []);
 
     for (const v of violations) {
       const principle = (v.meta.principle as GroupKey | undefined) ?? 'other';
@@ -40,22 +46,17 @@ export function ErrorList({ violations, activeViolation, onSelect }: ErrorListPr
       map.get(key)!.push(v);
     }
 
-    // Убираем пустые группы
-    return GROUP_ORDER.filter((g) => (map.get(g)?.length ?? 0) > 0).map((g) => ({
-      key: g,
-      label: GROUP_LABELS[g],
-      items: map.get(g)!,
-    }));
+    return GROUP_ORDER
+      .filter((g) => (map.get(g)?.length ?? 0) > 0)
+      .map((g) => ({ key: g, label: GROUP_LABELS[g], items: map.get(g)! }));
   }, [violations]);
 
   if (violations.length === 0) {
     return (
-      <div style={panelStyles.emptyState} role="status">
-        <div style={panelStyles.emptyIcon} aria-hidden="true">
-          ✅
-        </div>
-        <p style={panelStyles.emptyText}>Нарушений не обнаружено</p>
-        <p style={panelStyles.emptySubtext}>
+      <div style={emptyStateConfig} role="status">
+        <div style={emptyIconConfig} aria-hidden="true">✅</div>
+        <p style={emptyTitleConfig}>Нарушений не обнаружено</p>
+        <p style={emptySubtextConfig}>
           Это не означает полного отсутствия проблем — axe-core находит ~57% нарушений.
           Используйте ручное тестирование и{' '}
           <span style={{ color: COLORS.link }}>ru-a11y-toolkit-eslint</span> для полного покрытия.
@@ -78,38 +79,25 @@ export function ErrorList({ violations, activeViolation, onSelect }: ErrorListPr
       {groups.map(({ key, label, items }) => {
         const isCollapsed = collapsedGroups.has(key);
         const errorCount = items.filter((v) => v.meta.severity === 'error').length;
-        const warnCount = items.filter((v) => v.meta.severity === 'warning').length;
+        const warnCount  = items.filter((v) => v.meta.severity === 'warning').length;
 
         return (
           <div key={key} role="listitem">
-            {/* Заголовок группы */}
             <button
-              style={panelStyles.groupHeader}
+              style={groupHeaderConfig}
               onClick={() => toggleGroup(key)}
               aria-expanded={!isCollapsed}
               aria-controls={`group-${key}`}
             >
               <span>{label}</span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={groupHeaderRightConfig}>
                 {errorCount > 0 && (
-                  <span
-                    style={{
-                      ...panelStyles.badge,
-                      ...panelStyles.badgeError,
-                    }}
-                    aria-label={`${errorCount} ошибок`}
-                  >
+                  <span style={groupBadgeErrorConfig} aria-label={`${errorCount} ошибок`}>
                     {errorCount}
                   </span>
                 )}
                 {warnCount > 0 && (
-                  <span
-                    style={{
-                      ...panelStyles.badge,
-                      ...panelStyles.badgeWarning,
-                    }}
-                    aria-label={`${warnCount} предупреждений`}
-                  >
+                  <span style={groupBadgeWarningConfig} aria-label={`${warnCount} предупреждений`}>
                     {warnCount}
                   </span>
                 )}
@@ -119,7 +107,6 @@ export function ErrorList({ violations, activeViolation, onSelect }: ErrorListPr
               </span>
             </button>
 
-            {/* Элементы группы */}
             {!isCollapsed && (
               <div id={`group-${key}`}>
                 {items.map((v) => (
@@ -138,4 +125,3 @@ export function ErrorList({ violations, activeViolation, onSelect }: ErrorListPr
     </div>
   );
 }
-
