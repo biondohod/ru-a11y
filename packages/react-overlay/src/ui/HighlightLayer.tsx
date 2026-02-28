@@ -1,138 +1,125 @@
 /**
- * HighlightLayer.tsx — слой подсветки проблемных элементов на странице
+ * HighlightLayer.tsx — подсветка проблемных элементов через CSS-анимацию
  *
- * Рисует цветные обводки вокруг элементов с нарушениями доступности.
- * Использует React-портал для рендеринга поверх всего содержимого.
- * Позиции обновляются при изменении активного элемента и при ресайзе окна.
+ * При выборе нарушения: плавный скролл до элемента + временная CSS-анимация
+ * через outline/box-shadow прямо на DOM-элементе. Не использует fixed-позиционирование,
+ * поэтому корректно работает при скролле.
  */
 
-import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { createPortal } from 'react-dom';
-import { COLORS, Z_INDEX } from './styles';
+import { useEffect, useRef } from 'react';
+import { COLORS } from './styles';
 import type { A11yViolationNode } from '../axeRunner';
 
-interface HighlightRect {
-  top: number;
-  left: number;
-  width: number;
-  height: number;
-  severity: 'error' | 'warning';
-  key: string;
+const STYLE_ID = 'ru-a11y-highlight-styles';
+const HIGHLIGHT_CLASS_ERROR = 'ru-a11y-highlight-error';
+const HIGHLIGHT_CLASS_WARNING = 'ru-a11y-highlight-warning';
+const HIGHLIGHT_DURATION_MS = 2000;
+
+function injectStyles() {
+  if (document.getElementById(STYLE_ID)) return;
+  const style = document.createElement('style');
+  style.id = STYLE_ID;
+  style.textContent = `
+    @keyframes ru-a11y-pulse-error {
+      0%   { outline: 3px solid ${COLORS.highlightErrorBorder}; box-shadow: 0 0 0 4px ${COLORS.highlightError}, 0 0 12px 4px ${COLORS.highlightErrorBorder}88; }
+      50%  { outline: 3px solid ${COLORS.highlightErrorBorder}; box-shadow: 0 0 0 6px ${COLORS.highlightError}, 0 0 20px 6px ${COLORS.highlightErrorBorder}88; }
+      100% { outline: 3px solid transparent; box-shadow: none; }
+    }
+    @keyframes ru-a11y-pulse-warning {
+      0%   { outline: 3px solid ${COLORS.highlightWarningBorder}; box-shadow: 0 0 0 4px ${COLORS.highlightWarning}, 0 0 12px 4px ${COLORS.highlightWarningBorder}88; }
+      50%  { outline: 3px solid ${COLORS.highlightWarningBorder}; box-shadow: 0 0 0 6px ${COLORS.highlightWarning}, 0 0 20px 6px ${COLORS.highlightWarningBorder}88; }
+      100% { outline: 3px solid transparent; box-shadow: none; }
+    }
+    .${HIGHLIGHT_CLASS_ERROR} {
+      animation: ru-a11y-pulse-error ${HIGHLIGHT_DURATION_MS}ms ease-out forwards !important;
+      outline-offset: 3px !important;
+    }
+    .${HIGHLIGHT_CLASS_WARNING} {
+      animation: ru-a11y-pulse-warning ${HIGHLIGHT_DURATION_MS}ms ease-out forwards !important;
+      outline-offset: 3px !important;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+function findElement(violation: A11yViolationNode): Element | null {
+  // Пробуем все варианты селекторов по очереди
+  const selectors = [
+    violation.targets[0]?.[0],
+    violation.selector,
+  ].filter(Boolean) as string[];
+
+  for (const sel of selectors) {
+    try {
+      const el = document.querySelector(sel);
+      if (el) return el;
+    } catch {
+      // невалидный селектор — пропускаем
+    }
+  }
+  return null;
+}
+
+export function scrollAndHighlight(violation: A11yViolationNode | null) {
+  if (!violation) return;
+
+  injectStyles();
+
+  const el = findElement(violation);
+  if (!el) return;
+
+  // Убираем классы со всех элементов (на случай предыдущей подсветки)
+  document.querySelectorAll(`.${HIGHLIGHT_CLASS_ERROR}, .${HIGHLIGHT_CLASS_WARNING}`)
+    .forEach(e => {
+      e.classList.remove(HIGHLIGHT_CLASS_ERROR, HIGHLIGHT_CLASS_WARNING);
+    });
+
+  // Плавный скролл до элемента
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  // Небольшая задержка чтобы скролл начался раньше подсветки
+  setTimeout(() => {
+    // Убираем снова на случай если за время задержки что-то изменилось
+    document.querySelectorAll(`.${HIGHLIGHT_CLASS_ERROR}, .${HIGHLIGHT_CLASS_WARNING}`)
+      .forEach(e => e.classList.remove(HIGHLIGHT_CLASS_ERROR, HIGHLIGHT_CLASS_WARNING));
+
+    const cls = violation.meta.severity === 'error' ? HIGHLIGHT_CLASS_ERROR : HIGHLIGHT_CLASS_WARNING;
+    el.classList.add(cls);
+
+    // Убираем класс после завершения анимации
+    setTimeout(() => {
+      el.classList.remove(cls);
+    }, HIGHLIGHT_DURATION_MS + 100);
+  }, 300);
 }
 
 interface HighlightLayerProps {
-  /** Нарушение, которое нужно подсветить (null — снять все подсветки) */
   activeViolation: A11yViolationNode | null;
-  /** Все нарушения для показа всех меток одновременно */
   allViolations?: A11yViolationNode[];
-  /** Показывать все нарушения одновременно или только активное */
-  showAll?: boolean;
 }
 
 /**
- * Находит DOM-элемент по CSS-селектору и возвращает его bounding rect
+ * Компонент-наблюдатель: реагирует на смену activeViolation и запускает scroll+highlight.
+ * Не рендерит никаких DOM-элементов.
  */
-function getElementRect(selector: string): DOMRect | null {
-  try {
-    const el = document.querySelector(selector);
-    if (!el) return null;
-    return el.getBoundingClientRect();
-  } catch {
-    return null;
-  }
-}
-
-function HighlightBox({ rect }: { rect: HighlightRect }) {
-  const isError = rect.severity === 'error';
-  const color = isError ? COLORS.highlightErrorBorder : COLORS.highlightWarningBorder;
-  const bg = isError ? COLORS.highlightError : COLORS.highlightWarning;
-
-  return (
-    <div
-      style={{
-        position: 'fixed',
-        top: rect.top - 2,
-        left: rect.left - 2,
-        width: rect.width + 4,
-        height: rect.height + 4,
-        border: `2px solid ${color}`,
-        backgroundColor: bg,
-        zIndex: Z_INDEX.highlight,
-        pointerEvents: 'none',
-        borderRadius: '3px',
-        boxShadow: `0 0 0 1px ${color}33`,
-        transition: 'all 0.2s ease',
-      }}
-      aria-hidden="true"
-    />
-  );
-}
-
-export function HighlightLayer({ activeViolation, allViolations = [], showAll = false }: HighlightLayerProps) {
-  const [rects, setRects] = useState<HighlightRect[]>([]);
-  const rafRef = useRef<number | null>(null);
-
-  const updateRects = useCallback(() => {
-    const violations = showAll
-      ? allViolations
-      : activeViolation
-        ? [activeViolation]
-        : [];
-
-    const newRects: HighlightRect[] = [];
-
-    for (const v of violations) {
-      // Берём первый селектор из targets (обычно это основной элемент)
-      const selector = v.targets[0]?.[0] ?? v.selector;
-      const domRect = getElementRect(selector);
-
-      if (domRect && domRect.width > 0 && domRect.height > 0) {
-        newRects.push({
-          top: domRect.top + window.scrollY,
-          left: domRect.left + window.scrollX,
-          width: domRect.width,
-          height: domRect.height,
-          severity: v.meta.severity,
-          key: v.key,
-        });
-      }
-    }
-
-    setRects(newRects);
-  }, [activeViolation, allViolations, showAll]);
+export function HighlightLayer({ activeViolation }: HighlightLayerProps) {
+  const prevKeyRef = useRef<string | null>(null);
 
   useEffect(() => {
-    rafRef.current = requestAnimationFrame(updateRects);
-    return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-  }, [updateRects]);
+    if (!activeViolation) return;
+    // Не повторяем если кликнули на то же нарушение
+    if (activeViolation.key === prevKeyRef.current) return;
+    prevKeyRef.current = activeViolation.key;
+    scrollAndHighlight(activeViolation);
+  }, [activeViolation]);
 
-  // Обновляем позиции при ресайзе и скролле
+  // Чистим подсветку при размонтировании
   useEffect(() => {
-    const handleResize = () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      rafRef.current = requestAnimationFrame(updateRects);
-    };
-
-    window.addEventListener('resize', handleResize);
-    window.addEventListener('scroll', handleResize, { passive: true });
-
     return () => {
-      window.removeEventListener('resize', handleResize);
-      window.removeEventListener('scroll', handleResize);
+      document.querySelectorAll(`.${HIGHLIGHT_CLASS_ERROR}, .${HIGHLIGHT_CLASS_WARNING}`)
+        .forEach(e => e.classList.remove(HIGHLIGHT_CLASS_ERROR, HIGHLIGHT_CLASS_WARNING));
     };
-  }, [updateRects]);
+  }, []);
 
-  if (rects.length === 0) return null;
-
-  return createPortal(
-    <>
-      {rects.map((rect) => (
-        <HighlightBox key={rect.key} rect={rect} />
-      ))}
-    </>,
-    document.body,
-  );
+  return null;
 }
-

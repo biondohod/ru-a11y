@@ -33009,6 +33009,7 @@ var require_axe = __commonJS({
 // src/index.ts
 var index_exports = {};
 __export(index_exports, {
+  PRESET_TAGS: () => PRESET_TAGS,
   RU_A11Y_RULES: () => RU_A11Y_RULES,
   RuA11yOverlay: () => RuA11yOverlay,
   WCAG_PRINCIPLES: () => WCAG_PRINCIPLES,
@@ -33019,7 +33020,7 @@ module.exports = __toCommonJS(index_exports);
 
 // src/RuA11yOverlay.tsx
 var import_react5 = require("react");
-var import_react_dom2 = require("react-dom");
+var import_react_dom = require("react-dom");
 
 // src/axeRunner.ts
 var import_axe_core = __toESM(require_axe());
@@ -33394,11 +33395,23 @@ function getRuleMeta(ruleId) {
 }
 
 // src/axeRunner.ts
+var PRESET_TAGS = {
+  "recommended": ["wcag2a", "wcag21a", "wcag2aa", "wcag21aa"],
+  "gost-aa": ["wcag2a", "wcag21a", "wcag2aa", "wcag21aa", "best-practice"],
+  "strict": ["wcag2a", "wcag21a", "wcag2aa", "wcag21aa", "wcag2aaa", "wcag21aaa", "best-practice"]
+};
 var DEFAULT_CONFIG = {
   excludeSelector: "[data-ru-a11y-overlay]",
-  tags: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"],
+  preset: "recommended",
   debounceMs: 1e3
 };
+function resolveTags(config) {
+  var _a;
+  if (config.tags && config.tags.length > 0) return config.tags;
+  const preset = (_a = config.preset) != null ? _a : DEFAULT_CONFIG.preset;
+  return PRESET_TAGS[preset];
+}
+var axeRunning = false;
 function mapAxeViolations(violations) {
   var _a, _b;
   const result = [];
@@ -33431,53 +33444,84 @@ function countViolations(violations) {
   );
 }
 async function runAxeScan(config = {}) {
-  const cfg = { ...DEFAULT_CONFIG, ...config };
+  var _a;
+  console.log("[ru-a11y-overlay] runAxeScan \u0432\u044B\u0437\u0432\u0430\u043D, axeRunning =", axeRunning);
+  if (axeRunning) {
+    console.warn("[ru-a11y-overlay] \u26A0\uFE0F axeRunning=true \u2014 \u043F\u0440\u043E\u043F\u0443\u0441\u043A\u0430\u0435\u043C \u0437\u0430\u043F\u0443\u0441\u043A");
+    return { violations: [], scannedAt: /* @__PURE__ */ new Date(), counts: { error: 0, warning: 0 } };
+  }
+  axeRunning = true;
   try {
+    const tags = resolveTags(config);
+    const excludeSelector = (_a = config.excludeSelector) != null ? _a : DEFAULT_CONFIG.excludeSelector;
     const runOptions = {
       runOnly: {
         type: "tag",
-        values: cfg.tags
-      }
+        values: tags
+      },
+      // Отключаем сканирование iframes — предотвращает ошибки с cross-origin фреймами
+      iframes: false
     };
-    const context = cfg.excludeSelector ? { include: [["html"]], exclude: [[cfg.excludeSelector]] } : document;
+    const context = excludeSelector ? { exclude: [[excludeSelector]] } : document;
     const results = await import_axe_core.default.run(context, runOptions);
+    console.group("[ru-a11y-overlay] \u{1F50D} \u0420\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442\u044B axe-core");
+    console.log("\u0422\u0435\u0433\u0438:", tags);
+    console.log("\u041A\u043E\u043D\u0442\u0435\u043A\u0441\u0442:", context);
+    console.log("\u0412\u0441\u0435\u0433\u043E \u043D\u0430\u0440\u0443\u0448\u0435\u043D\u0438\u0439 (violations):", results.violations.length);
+    console.log("\u041F\u0440\u043E\u0448\u043B\u043E (passes):", results.passes.length);
+    console.log("\u041D\u0435\u043F\u0440\u0438\u043C\u0435\u043D\u0438\u043C\u043E (inapplicable):", results.inapplicable.length);
+    console.log("\u041D\u0435\u043F\u043E\u043B\u043D\u044B\u0435 (incomplete):", results.incomplete.length);
+    if (results.violations.length > 0) {
+      console.table(results.violations.map((v) => ({
+        id: v.id,
+        impact: v.impact,
+        description: v.description,
+        nodes: v.nodes.length
+      })));
+      console.log("\u041F\u043E\u043B\u043D\u044B\u0435 \u0434\u0430\u043D\u043D\u044B\u0435 violations:", results.violations);
+    } else {
+      console.warn("\u26A0\uFE0F violations \u043F\u0443\u0441\u0442\u043E\u0439! \u041F\u0440\u043E\u0432\u0435\u0440\u044C \u0442\u0435\u0433\u0438 \u0438 \u043A\u043E\u043D\u0442\u0435\u043A\u0441\u0442 \u0432\u044B\u0448\u0435.");
+    }
+    console.groupEnd();
     const violations = mapAxeViolations(results.violations);
+    console.log("[ru-a11y-overlay] \u041F\u043E\u0441\u043B\u0435 mapAxeViolations:", violations.length, "\u043D\u0430\u0440\u0443\u0448\u0435\u043D\u0438\u0439");
+    violations.forEach((v) => {
+      console.log(`  \u2192 [${v.meta.severity}] ${v.ruleId}: ${v.meta.title} | selector: ${v.selector}`);
+    });
     return {
       violations,
       scannedAt: /* @__PURE__ */ new Date(),
       counts: countViolations(violations)
     };
   } catch (error) {
-    console.error("[ru-a11y-overlay] \u041E\u0448\u0438\u0431\u043A\u0430 \u043F\u0440\u0438 \u0437\u0430\u043F\u0443\u0441\u043A\u0435 axe-core:", error);
+    console.error("[ru-a11y-overlay] \u274C axe.run \u0443\u043F\u0430\u043B \u0441 \u043E\u0448\u0438\u0431\u043A\u043E\u0439:", error);
     return {
       violations: [],
       scannedAt: /* @__PURE__ */ new Date(),
       counts: { error: 0, warning: 0 }
     };
+  } finally {
+    axeRunning = false;
   }
 }
 function createDomObserver(onResult, config = {}) {
-  const cfg = { ...DEFAULT_CONFIG, ...config };
+  var _a, _b;
+  const excludeSelector = (_a = config.excludeSelector) != null ? _a : DEFAULT_CONFIG.excludeSelector;
+  const debounceMs = (_b = config.debounceMs) != null ? _b : DEFAULT_CONFIG.debounceMs;
   let debounceTimer = null;
-  let isRunning = false;
   const scheduleRun = () => {
-    if (isRunning) return;
+    if (axeRunning) return;
     if (debounceTimer) clearTimeout(debounceTimer);
     debounceTimer = setTimeout(async () => {
-      isRunning = true;
-      try {
-        const result = await runAxeScan(config);
-        onResult(result);
-      } finally {
-        isRunning = false;
-      }
-    }, cfg.debounceMs);
+      const result = await runAxeScan(config);
+      onResult(result);
+    }, debounceMs);
   };
   const observer = new MutationObserver((mutations) => {
     const isOverlayMutation = mutations.every((m) => {
-      var _a;
+      var _a2;
       const target = m.target;
-      return ((_a = target.closest) == null ? void 0 : _a.call(target, cfg.excludeSelector)) !== null;
+      return ((_a2 = target.closest) == null ? void 0 : _a2.call(target, excludeSelector)) !== null;
     });
     if (!isOverlayMutation) {
       scheduleRun();
@@ -33565,7 +33609,7 @@ var panelStyles = {
     border: `1px solid ${COLORS.panelBorder}`,
     borderRadius: "9999px",
     cursor: "pointer",
-    fontSize: "13px",
+    fontSize: "14px",
     fontFamily: "system-ui, -apple-system, sans-serif",
     fontWeight: 600,
     boxShadow: "0 4px 24px rgba(0, 0, 0, 0.5)",
@@ -33591,7 +33635,7 @@ var panelStyles = {
     flexDirection: "column",
     overflow: "hidden",
     fontFamily: "system-ui, -apple-system, sans-serif",
-    fontSize: "13px"
+    fontSize: "14px"
   },
   /** Шапка панели */
   panelHeader: {
@@ -33605,7 +33649,7 @@ var panelStyles = {
   },
   panelTitle: {
     margin: 0,
-    fontSize: "14px",
+    fontSize: "16px",
     fontWeight: 700,
     color: COLORS.panelText
   },
@@ -33634,7 +33678,7 @@ var panelStyles = {
     justifyContent: "space-between",
     alignItems: "center",
     flexShrink: 0,
-    fontSize: "11px",
+    fontSize: "12px",
     color: COLORS.separator
   },
   /** Бейдж с числом ошибок */
@@ -33646,7 +33690,7 @@ var panelStyles = {
     height: "20px",
     padding: "0 6px",
     borderRadius: "9999px",
-    fontSize: "11px",
+    fontSize: "12px",
     fontWeight: 700,
     lineHeight: 1
   },
@@ -33669,7 +33713,7 @@ var panelStyles = {
     fontWeight: 700,
     letterSpacing: "0.05em",
     textTransform: "uppercase",
-    color: COLORS.separator,
+    color: COLORS.panelText,
     cursor: "pointer",
     border: "none",
     width: "100%",
@@ -33699,11 +33743,11 @@ var panelStyles = {
   },
   errorTitle: {
     fontWeight: 600,
-    fontSize: "13px",
+    fontSize: "16px",
     color: COLORS.panelText
   },
   errorDescription: {
-    fontSize: "12px",
+    fontSize: "14px",
     color: "#a6adc8",
     lineHeight: 1.5,
     marginBottom: "6px"
@@ -33718,7 +33762,7 @@ var panelStyles = {
     display: "inline-block",
     padding: "1px 6px",
     borderRadius: "4px",
-    fontSize: "10px",
+    fontSize: "12px",
     fontWeight: 600,
     backgroundColor: COLORS.groupHeader,
     color: COLORS.link,
@@ -33730,7 +33774,7 @@ var panelStyles = {
     padding: "3px 6px",
     backgroundColor: COLORS.panelHeader,
     borderRadius: "4px",
-    fontSize: "11px",
+    fontSize: "13px",
     color: "#89b4fa",
     fontFamily: '"Fira Code", "Consolas", monospace',
     wordBreak: "break-all",
@@ -34169,96 +34213,90 @@ function Panel({
 
 // src/ui/HighlightLayer.tsx
 var import_react4 = require("react");
-var import_react_dom = require("react-dom");
-var import_jsx_runtime4 = require("react/jsx-runtime");
-function getElementRect(selector) {
-  try {
-    const el = document.querySelector(selector);
-    if (!el) return null;
-    return el.getBoundingClientRect();
-  } catch (e) {
-    return null;
+var STYLE_ID = "ru-a11y-highlight-styles";
+var HIGHLIGHT_CLASS_ERROR = "ru-a11y-highlight-error";
+var HIGHLIGHT_CLASS_WARNING = "ru-a11y-highlight-warning";
+var HIGHLIGHT_DURATION_MS = 2e3;
+function injectStyles() {
+  if (document.getElementById(STYLE_ID)) return;
+  const style = document.createElement("style");
+  style.id = STYLE_ID;
+  style.textContent = `
+    @keyframes ru-a11y-pulse-error {
+      0%   { outline: 3px solid ${COLORS.highlightErrorBorder}; box-shadow: 0 0 0 4px ${COLORS.highlightError}, 0 0 12px 4px ${COLORS.highlightErrorBorder}88; }
+      50%  { outline: 3px solid ${COLORS.highlightErrorBorder}; box-shadow: 0 0 0 6px ${COLORS.highlightError}, 0 0 20px 6px ${COLORS.highlightErrorBorder}88; }
+      100% { outline: 3px solid transparent; box-shadow: none; }
+    }
+    @keyframes ru-a11y-pulse-warning {
+      0%   { outline: 3px solid ${COLORS.highlightWarningBorder}; box-shadow: 0 0 0 4px ${COLORS.highlightWarning}, 0 0 12px 4px ${COLORS.highlightWarningBorder}88; }
+      50%  { outline: 3px solid ${COLORS.highlightWarningBorder}; box-shadow: 0 0 0 6px ${COLORS.highlightWarning}, 0 0 20px 6px ${COLORS.highlightWarningBorder}88; }
+      100% { outline: 3px solid transparent; box-shadow: none; }
+    }
+    .${HIGHLIGHT_CLASS_ERROR} {
+      animation: ru-a11y-pulse-error ${HIGHLIGHT_DURATION_MS}ms ease-out forwards !important;
+      outline-offset: 3px !important;
+    }
+    .${HIGHLIGHT_CLASS_WARNING} {
+      animation: ru-a11y-pulse-warning ${HIGHLIGHT_DURATION_MS}ms ease-out forwards !important;
+      outline-offset: 3px !important;
+    }
+  `;
+  document.head.appendChild(style);
+}
+function findElement(violation) {
+  var _a;
+  const selectors = [
+    (_a = violation.targets[0]) == null ? void 0 : _a[0],
+    violation.selector
+  ].filter(Boolean);
+  for (const sel of selectors) {
+    try {
+      const el = document.querySelector(sel);
+      if (el) return el;
+    } catch (e) {
+    }
   }
+  return null;
 }
-function HighlightBox({ rect }) {
-  const isError = rect.severity === "error";
-  const color = isError ? COLORS.highlightErrorBorder : COLORS.highlightWarningBorder;
-  const bg = isError ? COLORS.highlightError : COLORS.highlightWarning;
-  return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-    "div",
-    {
-      style: {
-        position: "fixed",
-        top: rect.top - 2,
-        left: rect.left - 2,
-        width: rect.width + 4,
-        height: rect.height + 4,
-        border: `2px solid ${color}`,
-        backgroundColor: bg,
-        zIndex: Z_INDEX.highlight,
-        pointerEvents: "none",
-        borderRadius: "3px",
-        boxShadow: `0 0 0 1px ${color}33`,
-        transition: "all 0.2s ease"
-      },
-      "aria-hidden": "true"
-    }
-  );
+function scrollAndHighlight(violation) {
+  if (!violation) return;
+  injectStyles();
+  const el = findElement(violation);
+  if (!el) return;
+  document.querySelectorAll(`.${HIGHLIGHT_CLASS_ERROR}, .${HIGHLIGHT_CLASS_WARNING}`).forEach((e) => {
+    e.classList.remove(HIGHLIGHT_CLASS_ERROR, HIGHLIGHT_CLASS_WARNING);
+  });
+  el.scrollIntoView({ behavior: "smooth", block: "center" });
+  setTimeout(() => {
+    document.querySelectorAll(`.${HIGHLIGHT_CLASS_ERROR}, .${HIGHLIGHT_CLASS_WARNING}`).forEach((e) => e.classList.remove(HIGHLIGHT_CLASS_ERROR, HIGHLIGHT_CLASS_WARNING));
+    const cls = violation.meta.severity === "error" ? HIGHLIGHT_CLASS_ERROR : HIGHLIGHT_CLASS_WARNING;
+    el.classList.add(cls);
+    setTimeout(() => {
+      el.classList.remove(cls);
+    }, HIGHLIGHT_DURATION_MS + 100);
+  }, 300);
 }
-function HighlightLayer({ activeViolation, allViolations = [], showAll = false }) {
-  const [rects, setRects] = (0, import_react4.useState)([]);
-  const rafRef = (0, import_react4.useRef)(null);
-  const updateRects = (0, import_react4.useCallback)(() => {
-    var _a, _b;
-    const violations = showAll ? allViolations : activeViolation ? [activeViolation] : [];
-    const newRects = [];
-    for (const v of violations) {
-      const selector = (_b = (_a = v.targets[0]) == null ? void 0 : _a[0]) != null ? _b : v.selector;
-      const domRect = getElementRect(selector);
-      if (domRect && domRect.width > 0 && domRect.height > 0) {
-        newRects.push({
-          top: domRect.top + window.scrollY,
-          left: domRect.left + window.scrollX,
-          width: domRect.width,
-          height: domRect.height,
-          severity: v.meta.severity,
-          key: v.key
-        });
-      }
-    }
-    setRects(newRects);
-  }, [activeViolation, allViolations, showAll]);
+function HighlightLayer({ activeViolation }) {
+  const prevKeyRef = (0, import_react4.useRef)(null);
   (0, import_react4.useEffect)(() => {
-    rafRef.current = requestAnimationFrame(updateRects);
-    return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-  }, [updateRects]);
+    if (!activeViolation) return;
+    if (activeViolation.key === prevKeyRef.current) return;
+    prevKeyRef.current = activeViolation.key;
+    scrollAndHighlight(activeViolation);
+  }, [activeViolation]);
   (0, import_react4.useEffect)(() => {
-    const handleResize = () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      rafRef.current = requestAnimationFrame(updateRects);
-    };
-    window.addEventListener("resize", handleResize);
-    window.addEventListener("scroll", handleResize, { passive: true });
     return () => {
-      window.removeEventListener("resize", handleResize);
-      window.removeEventListener("scroll", handleResize);
+      document.querySelectorAll(`.${HIGHLIGHT_CLASS_ERROR}, .${HIGHLIGHT_CLASS_WARNING}`).forEach((e) => e.classList.remove(HIGHLIGHT_CLASS_ERROR, HIGHLIGHT_CLASS_WARNING));
     };
-  }, [updateRects]);
-  if (rects.length === 0) return null;
-  return (0, import_react_dom.createPortal)(
-    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_jsx_runtime4.Fragment, { children: rects.map((rect) => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(HighlightBox, { rect }, rect.key)) }),
-    document.body
-  );
+  }, []);
+  return null;
 }
 
 // src/RuA11yOverlay.tsx
-var import_jsx_runtime5 = require("react/jsx-runtime");
+var import_jsx_runtime4 = require("react/jsx-runtime");
 function RuA11yOverlay({
   excludeSelector,
-  highlightAll = false,
-  axeTags,
+  preset = "recommended",
   debounceMs = 1e3,
   autoScan = true
 } = {}) {
@@ -34270,7 +34308,7 @@ function RuA11yOverlay({
   const isMountedRef = (0, import_react5.useRef)(true);
   const axeConfig = {
     excludeSelector: excludeSelector != null ? excludeSelector : "[data-ru-a11y-overlay]",
-    tags: axeTags,
+    preset,
     debounceMs
   };
   const handleScanResult = (0, import_react5.useCallback)((scanResult) => {
@@ -34290,36 +34328,33 @@ function RuA11yOverlay({
     handleScanResult(scanResult);
   }, [axeConfig, handleScanResult]);
   (0, import_react5.useEffect)(() => {
+    isMountedRef.current = true;
     const timer = setTimeout(() => {
       runScan();
-    }, 300);
-    return () => clearTimeout(timer);
-  }, []);
-  (0, import_react5.useEffect)(() => {
-    if (!autoScan) return;
-    const disconnect = createDomObserver(handleScanResult, axeConfig);
-    return disconnect;
-  }, [autoScan]);
-  (0, import_react5.useEffect)(() => {
+    }, 800);
     return () => {
+      clearTimeout(timer);
       isMountedRef.current = false;
     };
   }, []);
+  (0, import_react5.useEffect)(() => {
+    if (!autoScan) return;
+    return createDomObserver(handleScanResult, axeConfig);
+  }, [autoScan]);
   const totalIssues = ((_a = result == null ? void 0 : result.counts.error) != null ? _a : 0) + ((_b = result == null ? void 0 : result.counts.warning) != null ? _b : 0);
   const errorCount = (_c = result == null ? void 0 : result.counts.error) != null ? _c : 0;
   const warningCount = (_d = result == null ? void 0 : result.counts.warning) != null ? _d : 0;
   const toggleColor = errorCount > 0 ? COLORS.badgeError : warningCount > 0 ? COLORS.badgeWarning : COLORS.btnPrimary;
-  return (0, import_react_dom2.createPortal)(
-    /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_jsx_runtime5.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+  return (0, import_react_dom.createPortal)(
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_jsx_runtime4.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
         HighlightLayer,
         {
           activeViolation,
-          allViolations: (_e = result == null ? void 0 : result.violations) != null ? _e : [],
-          showAll: highlightAll
+          allViolations: (_e = result == null ? void 0 : result.violations) != null ? _e : []
         }
       ),
-      isOpen && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+      isOpen && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
         Panel,
         {
           result,
@@ -34330,7 +34365,7 @@ function RuA11yOverlay({
           onRescan: runScan
         }
       ),
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
         "button",
         {
           onClick: () => setIsOpen((v) => !v),
@@ -34342,16 +34377,16 @@ function RuA11yOverlay({
             borderColor: totalIssues > 0 ? toggleColor : COLORS.panelBorder
           },
           children: [
-            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { "aria-hidden": "true", children: "\u267F" }),
-            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { children: "\u0414\u043E\u0441\u0442\u0443\u043F\u043D\u043E\u0441\u0442\u044C" }),
-            isScanning ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { "aria-hidden": "true", children: "\u267F" }),
+            /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { children: "\u0414\u043E\u0441\u0442\u0443\u043F\u043D\u043E\u0441\u0442\u044C" }),
+            isScanning ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
               "span",
               {
                 "aria-hidden": "true",
                 style: { fontSize: "11px", opacity: 0.7 },
                 children: "\u27F3"
               }
-            ) : totalIssues > 0 ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+            ) : totalIssues > 0 ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
               "span",
               {
                 style: {
@@ -34372,6 +34407,7 @@ function RuA11yOverlay({
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  PRESET_TAGS,
   RU_A11Y_RULES,
   RuA11yOverlay,
   WCAG_PRINCIPLES,

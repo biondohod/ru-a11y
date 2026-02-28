@@ -23,7 +23,7 @@ npm install --save-dev ru-a11y-toolkit
 ```bash
 npm install --save-dev ru-a11y-toolkit-eslint   # только ESLint-плагин
 npm install --save-dev ru-a11y-toolkit-cli       # только CLI (скоро)
-npm install --save-dev ru-a11y-toolkit-overlay   # только React Overlay (скоро)
+npm install --save-dev ru-a11y-toolkit-overlay   # только React Overlay
 ```
 
 ---
@@ -33,8 +33,8 @@ npm install --save-dev ru-a11y-toolkit-overlay   # только React Overlay (�
 | Пакет | Статус | Назначение |
 |-------|--------|------------|
 | [`ru-a11y-toolkit-eslint`](#-eslint-плагин) | ✅ Готов | Статическая проверка JSX/HTML в процессе разработки |
-| [`ru-a11y-toolkit-cli`](#-cli-сканер-в-разработке) | 🚧 В разработке | Проверка готовых страниц по URL |
-| [`ru-a11y-toolkit-overlay`](#-react-overlay-в-разработке) | 🚧 В разработке | Runtime-визуализация ошибок в браузере |
+| [`ru-a11y-toolkit-overlay`](#-react-overlay) | ✅ Готов | Runtime-визуализация ошибок в браузере |
+| [`ru-a11y-toolkit-cli`](#-cli-сканер) | 🚧 В разработке | Проверка готовых страниц по URL |
 
 ---
 
@@ -107,7 +107,7 @@ module.exports = {
 
 **26 правил jsx-a11y** — переведены на русский с привязкой к нормативам.
 
-→ [Подробная документация ESLint-плагина](./packages/eslint-preset/README.md)
+→ [Подробная документация ESLint-плагина](https://www.npmjs.com/package/ru-a11y-toolkit-eslint)
 
 ---
 
@@ -124,25 +124,66 @@ npx ru-a11y-toolkit-cli scan https://example.gov.ru --format html --out report.h
 
 ---
 
-## 🖥 React Overlay _(в разработке)_
+## 🖥 React Overlay
 
-Планируется: runtime-визуализация нарушений доступности прямо на странице — подсветка элементов, всплывающие подсказки с описанием на русском языке и ссылками на нормативные документы.
+React-компонент, который в **dev-режиме** добавляет поверх приложения панель с отчётом о нарушениях доступности, найденных через [axe-core](https://github.com/dequelabs/axe-core).
+
+### Установка
+
+```bash
+npm install --save-dev ru-a11y-toolkit-overlay
+```
+
+### Подключение
 
 ```jsx
-// Будущий API:
-import { A11yOverlay } from 'ru-a11y-toolkit-overlay';
+import { RuA11yOverlay } from 'ru-a11y-toolkit-overlay';
 
 function App() {
   return (
     <>
-      {process.env.NODE_ENV === 'development' && <A11yOverlay />}
+      {process.env.NODE_ENV === 'development' && <RuA11yOverlay />}
       <YourApp />
     </>
   );
 }
 ```
 
-→ [README](./packages/react-overlay/README.md)
+### Пропсы
+
+| Проп | Тип | По умолчанию | Описание |
+|------|-----|-------------|----------|
+| `preset` | `'recommended' \| 'gost-aa' \| 'strict'` | `'recommended'` | Набор правил проверки (см. ниже) |
+| `autoScan` | `boolean` | `true` | Отслеживать изменения DOM и пересканировать автоматически |
+| `debounceMs` | `number` | `1000` | Задержка в мс перед повторным сканированием после изменений DOM |
+| `excludeSelector` | `string` | — | CSS-селектор элементов, которые нужно исключить из сканирования |
+
+#### Пресеты (`preset`)
+
+Соответствуют уровням ESLint-плагина:
+
+| Пресет | Уровень | Для кого |
+|--------|---------|----------|
+| `recommended` | WCAG 2.1 AA | Все проекты — базовые критические проверки |
+| `gost-aa` | WCAG 2.1 AA + best-practice | Гос. органы, порталы под Постановление №102 |
+| `strict` | WCAG 2.1 AAA | Максимальная строгость, включая экспериментальные правила |
+
+```jsx
+// Пример с пресетом под Постановление №102
+<RuA11yOverlay preset="gost-aa" debounceMs={500} />
+```
+
+### Что делает
+
+- 🔍 **Автоматическое сканирование** — запускается при загрузке и при изменениях DOM (MutationObserver)
+- 🇷🇺 **Русскоязычные описания** — что нарушено, почему это проблема, как исправить
+- 📋 **Нормативные ссылки** — ГОСТ Р 52872-2019, Постановление №102, WCAG 2.1
+- 📊 **Группировка по принципам WCAG**: Воспринимаемость / Управляемость / Понятность / Надёжность
+- 🎯 **Навигация по ошибкам** — клик на ошибку плавно прокручивает к элементу и кратко подсвечивает его
+- 🖱️ **Перетаскиваемая панель** — не мешает работе с приложением
+- ⚡ **Только dev-режим** — никакого влияния на production-бандл
+
+→ [Подробная документация Overlay](https://www.npmjs.com/package/ru-a11y-toolkit-overlay)
 
 ---
 
@@ -185,7 +226,7 @@ ru-a11y/
 ├── packages/
 │   ├── eslint-preset/          # ru-a11y-toolkit-eslint  ✅
 │   ├── cli/                    # ru-a11y-toolkit-cli     🚧
-│   └── react-overlay/          # ru-a11y-toolkit-overlay 🚧
+│   └── react-overlay/          # ru-a11y-toolkit-overlay ✅
 ├── README.md                   # этот файл
 └── LICENSE
 ```

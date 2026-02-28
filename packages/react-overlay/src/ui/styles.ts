@@ -57,7 +57,7 @@ export const panelStyles: Record<string, CSSProperties> = {
     border: `1px solid ${COLORS.panelBorder}`,
     borderRadius: '9999px',
     cursor: 'pointer',
-    fontSize: '13px',
+    fontSize: '14px',
     fontFamily: 'system-ui, -apple-system, sans-serif',
     fontWeight: 600,
     boxShadow: '0 4px 24px rgba(0, 0, 0, 0.5)',
@@ -84,7 +84,7 @@ export const panelStyles: Record<string, CSSProperties> = {
     flexDirection: 'column',
     overflow: 'hidden',
     fontFamily: 'system-ui, -apple-system, sans-serif',
-    fontSize: '13px',
+    fontSize: '14px',
   },
 
   /** Шапка панели */
@@ -100,7 +100,7 @@ export const panelStyles: Record<string, CSSProperties> = {
 
   panelTitle: {
     margin: 0,
-    fontSize: '14px',
+    fontSize: '16px',
     fontWeight: 700,
     color: COLORS.panelText,
   },
@@ -132,7 +132,7 @@ export const panelStyles: Record<string, CSSProperties> = {
     justifyContent: 'space-between',
     alignItems: 'center',
     flexShrink: 0,
-    fontSize: '11px',
+    fontSize: '12px',
     color: COLORS.separator,
   },
 
@@ -145,7 +145,7 @@ export const panelStyles: Record<string, CSSProperties> = {
     height: '20px',
     padding: '0 6px',
     borderRadius: '9999px',
-    fontSize: '11px',
+    fontSize: '12px',
     fontWeight: 700,
     lineHeight: 1,
   },
@@ -171,7 +171,7 @@ export const panelStyles: Record<string, CSSProperties> = {
     fontWeight: 700,
     letterSpacing: '0.05em',
     textTransform: 'uppercase',
-    color: COLORS.separator,
+    color: COLORS.panelText,
     cursor: 'pointer',
     border: 'none',
     width: '100%',
@@ -206,12 +206,12 @@ export const panelStyles: Record<string, CSSProperties> = {
 
   errorTitle: {
     fontWeight: 600,
-    fontSize: '13px',
+    fontSize: '16px',
     color: COLORS.panelText,
   },
 
   errorDescription: {
-    fontSize: '12px',
+    fontSize: '14px',
     color: '#a6adc8',
     lineHeight: 1.5,
     marginBottom: '6px',
@@ -228,7 +228,7 @@ export const panelStyles: Record<string, CSSProperties> = {
     display: 'inline-block',
     padding: '1px 6px',
     borderRadius: '4px',
-    fontSize: '10px',
+    fontSize: '12px',
     fontWeight: 600,
     backgroundColor: COLORS.groupHeader,
     color: COLORS.link,
@@ -241,7 +241,7 @@ export const panelStyles: Record<string, CSSProperties> = {
     padding: '3px 6px',
     backgroundColor: COLORS.panelHeader,
     borderRadius: '4px',
-    fontSize: '11px',
+    fontSize: '13px',
     color: '#89b4fa',
     fontFamily: '"Fira Code", "Consolas", monospace',
     wordBreak: 'break-all' as const,

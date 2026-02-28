@@ -2,62 +2,6 @@ import React from 'react';
 import axe from 'axe-core';
 
 /**
- * RuA11yOverlay.tsx — главный компонент оверлея проверки доступности
- *
- * Интеграция:
- * ```tsx
- * import { RuA11yOverlay } from 'ru-a11y-toolkit-overlay';
- *
- * root.render(
- *   <React.StrictMode>
- *     <App />
- *     {process.env.NODE_ENV === 'development' && <RuA11yOverlay />}
- *   </React.StrictMode>
- * );
- * ```
- *
- * Компонент НЕ рендерится в production-сборке — проверка process.env.NODE_ENV
- * гарантирует это при бандлинге (tree-shaking).
- */
-
-interface RuA11yOverlayProps {
-    /**
-     * Дополнительный CSS-селектор для исключения из сканирования.
-     * По умолчанию исключается сам оверлей ([data-ru-a11y-overlay]).
-     */
-    excludeSelector?: string;
-    /**
-     * Показывать ли подсветку всех нарушений одновременно (не только активного).
-     * По умолчанию: false (подсвечивается только выбранный элемент).
-     */
-    highlightAll?: boolean;
-    /**
-     * Теги axe-core для запуска.
-     * По умолчанию: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']
-     */
-    axeTags?: string[];
-    /**
-     * Задержка дебаунса в мс перед повторным сканированием после изменений DOM.
-     * По умолчанию: 1000 мс.
-     */
-    debounceMs?: number;
-    /**
-     * Автоматически запускать сканирование при изменениях DOM через MutationObserver.
-     * По умолчанию: true.
-     */
-    autoScan?: boolean;
-}
-/**
- * Главный компонент оверлея.
- *
- * Жизненный цикл:
- * 1. При монтировании — запускает первоначальное сканирование axe-core
- * 2. Если autoScan=true — подключает MutationObserver для реактивного ресканирования
- * 3. При размонтировании — отключает наблюдатель и отменяет ожидающие операции
- */
-declare function RuA11yOverlay({ excludeSelector, highlightAll, axeTags, debounceMs, autoScan, }?: RuA11yOverlayProps): React.ReactPortal;
-
-/**
  * Маппинг правил axe-core на русскоязычные описания с привязкой к нормативным документам:
  *   - ГОСТ Р 52872-2019 «Интернет-ресурсы и другая информация, представленная в электронно-цифровой форме»
  *   - Постановление Правительства РФ №102 от 07.02.2026
@@ -154,14 +98,82 @@ interface ScanResult {
         warning: number;
     };
 }
+/**
+ * Пресеты проверки — соответствуют пресетам eslint-preset:
+ * - recommended: базовый уровень WCAG 2.1 AA (wcag2a + wcag21a + wcag2aa + wcag21aa)
+ * - gost-aa: уровень AA + best-practice, ориентирован на ГОСТ/Постановление №102
+ * - strict: максимально строгий, включает AAA и experimental
+ */
+type AxePreset = 'recommended' | 'gost-aa' | 'strict';
+/** Маппинг пресетов на теги axe-core */
+declare const PRESET_TAGS: Record<AxePreset, string[]>;
 /** Конфигурация axe-runner */
 interface AxeRunnerConfig {
     /** Элемент, который нужно исключить из сканирования (сам оверлей) */
     excludeSelector?: string;
-    /** Теги axe-core для запуска (по умолчанию wcag2a + wcag2aa) */
+    /**
+     * Пресет правил: 'recommended' | 'gost-aa' | 'strict'.
+     * Если не указан — используется 'recommended'.
+     * Если указаны явные tags — они имеют приоритет над пресетом.
+     */
+    preset?: AxePreset;
+    /** Явный список тегов axe-core (переопределяет preset) */
     tags?: string[];
     /** Дебаунс в мс перед повторным запуском после изменений DOM */
     debounceMs?: number;
 }
 
-export { type A11yViolationNode, type AxeRunnerConfig, RU_A11Y_RULES, RuA11yOverlay, type RuA11yOverlayProps, type RuA11yRuleMeta, type ScanResult, WCAG_PRINCIPLES, RuA11yOverlay as default, getRuleMeta };
+/**
+ * RuA11yOverlay.tsx — главный компонент оверлея проверки доступности
+ *
+ * Интеграция:
+ * ```tsx
+ * import { RuA11yOverlay } from 'ru-a11y-toolkit-overlay';
+ *
+ * root.render(
+ *   <React.StrictMode>
+ *     <App />
+ *     {process.env.NODE_ENV === 'development' && <RuA11yOverlay />}
+ *   </React.StrictMode>
+ * );
+ * ```
+ *
+ * Компонент НЕ рендерится в production-сборке — проверка process.env.NODE_ENV
+ * гарантирует это при бандлинге (tree-shaking).
+ */
+
+interface RuA11yOverlayProps {
+    /**
+     * Дополнительный CSS-селектор для исключения из сканирования.
+     * По умолчанию исключается сам оверлей ([data-ru-a11y-overlay]).
+     */
+    excludeSelector?: string;
+    /**
+     * Пресет правил проверки. Соответствует пресетам eslint-preset:
+     * - 'recommended' (по умолчанию): WCAG 2.1 AA — базовые критические проверки
+     * - 'gost-aa': WCAG 2.1 AA + best-practice, ориентирован на ГОСТ/Постановление №102
+     * - 'strict': максимальный — включает AAA и экспериментальные правила
+     */
+    preset?: AxePreset;
+    /**
+     * Задержка дебаунса в мс перед повторным сканированием после изменений DOM.
+     * По умолчанию: 1000 мс.
+     */
+    debounceMs?: number;
+    /**
+     * Автоматически запускать сканирование при изменениях DOM через MutationObserver.
+     * По умолчанию: true.
+     */
+    autoScan?: boolean;
+}
+/**
+ * Главный компонент оверлея.
+ *
+ * Жизненный цикл:
+ * 1. При монтировании — запускает первоначальное сканирование axe-core
+ * 2. Если autoScan=true — подключает MutationObserver для реактивного ресканирования
+ * 3. При размонтировании — отключает наблюдатель и отменяет ожидающие операции
+ */
+declare function RuA11yOverlay({ excludeSelector, preset, debounceMs, autoScan, }?: RuA11yOverlayProps): React.ReactPortal;
+
+export { type A11yViolationNode, type AxePreset, type AxeRunnerConfig, PRESET_TAGS, RU_A11Y_RULES, RuA11yOverlay, type RuA11yOverlayProps, type RuA11yRuleMeta, type ScanResult, WCAG_PRINCIPLES, RuA11yOverlay as default, getRuleMeta };

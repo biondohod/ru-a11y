@@ -17,12 +17,12 @@
  * гарантирует это при бандлинге (tree-shaking).
  */
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { runAxeScan, createDomObserver, type ScanResult, type A11yViolationNode } from './axeRunner';
-import { Panel } from './ui/Panel';
-import { HighlightLayer } from './ui/HighlightLayer';
-import { panelStyles, COLORS } from './ui/styles';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {createPortal} from 'react-dom';
+import {type A11yViolationNode, type AxePreset, createDomObserver, runAxeScan, type ScanResult} from './axeRunner';
+import {Panel} from './ui/Panel';
+import {HighlightLayer} from './ui/HighlightLayer';
+import {COLORS, panelStyles} from './ui/styles';
 
 export interface RuA11yOverlayProps {
   /**
@@ -32,16 +32,12 @@ export interface RuA11yOverlayProps {
   excludeSelector?: string;
 
   /**
-   * Показывать ли подсветку всех нарушений одновременно (не только активного).
-   * По умолчанию: false (подсвечивается только выбранный элемент).
+   * Пресет правил проверки. Соответствует пресетам eslint-preset:
+   * - 'recommended' (по умолчанию): WCAG 2.1 AA — базовые критические проверки
+   * - 'gost-aa': WCAG 2.1 AA + best-practice, ориентирован на ГОСТ/Постановление №102
+   * - 'strict': максимальный — включает AAA и экспериментальные правила
    */
-  highlightAll?: boolean;
-
-  /**
-   * Теги axe-core для запуска.
-   * По умолчанию: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']
-   */
-  axeTags?: string[];
+  preset?: AxePreset;
 
   /**
    * Задержка дебаунса в мс перед повторным сканированием после изменений DOM.
@@ -66,8 +62,7 @@ export interface RuA11yOverlayProps {
  */
 export function RuA11yOverlay({
   excludeSelector,
-  highlightAll = false,
-  axeTags,
+  preset = 'recommended',
   debounceMs = 1000,
   autoScan = true,
 }: RuA11yOverlayProps = {}) {
@@ -79,7 +74,7 @@ export function RuA11yOverlay({
 
   const axeConfig = {
     excludeSelector: excludeSelector ?? '[data-ru-a11y-overlay]',
-    tags: axeTags,
+    preset,
     debounceMs,
   };
 
@@ -104,28 +99,28 @@ export function RuA11yOverlay({
 
   // Первоначальное сканирование после монтирования компонента
   useEffect(() => {
-    // Небольшая задержка, чтобы дать React полностью отрендерить дерево
+    // Сбрасываем флаг при каждом монтировании (важно для React StrictMode)
+    isMountedRef.current = true;
+
+    // Задержка 800мс даёт React (включая StrictMode double-mount) и браузеру
+    // завершить рендер перед первым сканированием.
     const timer = setTimeout(() => {
       runScan();
-    }, 300);
+    }, 800);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      isMountedRef.current = false;
+    };
   }, []);  // eslint-disable-line react-hooks/exhaustive-deps
 
   // Подключение MutationObserver для автоматического ресканирования
   useEffect(() => {
     if (!autoScan) return;
 
-    const disconnect = createDomObserver(handleScanResult, axeConfig);
-    return disconnect;
+    return createDomObserver(handleScanResult, axeConfig);
   }, [autoScan]);  // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Очистка при размонтировании
-  useEffect(() => {
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
 
   const totalIssues = (result?.counts.error ?? 0) + (result?.counts.warning ?? 0);
   const errorCount = result?.counts.error ?? 0;
@@ -145,7 +140,6 @@ export function RuA11yOverlay({
       <HighlightLayer
         activeViolation={activeViolation}
         allViolations={result?.violations ?? []}
-        showAll={highlightAll}
       />
 
       {/* Панель с нарушениями */}
