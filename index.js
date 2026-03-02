@@ -25,6 +25,18 @@ try {
   // overlay недоступен (например, dist ещё не собран или нет React)
 }
 
+/**
+ * Visually Impaired — режим повышенной читабельности для слабовидящих.
+ * Загружается лениво: не падает при отсутствии React в окружении.
+ * Для использования: import { useVisuallyImpaired } from 'ru-a11y-toolkit-visually-impaired'
+ */
+let visuallyImpaired = {};
+try {
+  visuallyImpaired = require('ru-a11y-toolkit-visually-impaired');
+} catch {
+  // visuallyImpaired недоступен (например, dist ещё не собран или нет React)
+}
+
 module.exports = {
   /** ESLint-плагин с правилами и конфигами */
   eslint,
@@ -34,6 +46,12 @@ module.exports = {
    * Используйте в dev-режиме: {process.env.NODE_ENV === 'development' && <toolkit.overlay.RuA11yOverlay />}
    */
   overlay,
+
+  /**
+   * Режим повышенной читабельности для слабовидящих.
+   * Используйте хук: const { toggle, isEnabled } = toolkit.visuallyImpaired.useVisuallyImpaired()
+   */
+  visuallyImpaired,
 
   /**
    * Конфиги для прямого использования в eslint.config.js (Flat Config):

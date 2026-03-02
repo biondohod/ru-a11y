@@ -1,0 +1,147 @@
+/*
+ * ru-a11y-toolkit-visually-impaired — стили режима повышенной читабельности
+ *
+ * Активируются добавлением класса `ru-a11y-visually-impaired` на элемент <html>.
+ * Используйте хук useVisuallyImpaired() для управления классом.
+ *
+ * Стили реализуют требования к режиму для слабовидящих согласно:
+ * — ГОСТ Р 52872-2019 (раздел 7.2: цветовой контраст, размер шрифта)
+ * — Постановление Правительства РФ №102 (требования к версии для слабовидящих)
+ *
+ * Три уровня стилей:
+ * 1. Глобальный сброс оформления (цвета, тени, анимации)
+ * 2. Типографика через rem (по семантическим элементам)
+ * 3. Интерактивные элементы и формы
+ */
+
+/* =============================================================================
+   УРОВЕНЬ 1: Глобальный сброс оформления
+   Убирает все фоновые цвета, тени и анимации.
+   Обеспечивает высококонтрастный режим: чёрный текст на белом фоне.
+   ============================================================================= */
+
+.ru-a11y-visually-impaired *,
+.ru-a11y-visually-impaired *::before,
+.ru-a11y-visually-impaired *::after {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+  background-image: none !important;
+  /* Отключаем анимации — ГОСТ Р 52872, п. 6.11: контент не должен мигать */
+  transition-duration: 0.001ms !important;
+  animation-duration: 0.001ms !important;
+}
+
+/* =============================================================================
+   УРОВЕНЬ 2: Типографика через rem
+   Увеличенный шрифт для читабельности.
+   rem гарантирует масштабирование относительно системного размера шрифта браузера.
+   ============================================================================= */
+
+/* Основной текст — минимум 1.5rem (≈24px при базе 16px) */
+.ru-a11y-visually-impaired p,
+.ru-a11y-visually-impaired span,
+.ru-a11y-visually-impaired li,
+.ru-a11y-visually-impaired td,
+.ru-a11y-visually-impaired th,
+.ru-a11y-visually-impaired label,
+.ru-a11y-visually-impaired caption {
+  font-size: 1.5rem !important;
+  /* Межстрочный интервал 1.6 — рекомендация WCAG 1.4.12 (Text Spacing) */
+  line-height: 1.6 !important;
+}
+
+/* Заголовки — иерархия размеров для чёткой структуры страницы */
+.ru-a11y-visually-impaired h1 {
+  font-size: 3rem !important;
+  font-weight: bold !important;
+}
+
+.ru-a11y-visually-impaired h2 {
+  font-size: 2.5rem !important;
+  font-weight: bold !important;
+}
+
+.ru-a11y-visually-impaired h3 {
+  font-size: 2rem !important;
+  font-weight: bold !important;
+}
+
+.ru-a11y-visually-impaired h4,
+.ru-a11y-visually-impaired h5,
+.ru-a11y-visually-impaired h6 {
+  font-size: 1.75rem !important;
+  font-weight: bold !important;
+}
+
+/* Ссылки — крупный шрифт с явным подчёркиванием (WCAG 1.4.1: Use of Color) */
+.ru-a11y-visually-impaired a {
+  font-size: 1.5rem !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px !important;
+  font-weight: 500 !important;
+}
+
+/* =============================================================================
+   УРОВЕНЬ 3: Интерактивные элементы и формы
+   Увеличенные touch-цели, чёткие границы, усиленный фокус.
+   Требования к минимальному размеру интерактивных элементов: WCAG 2.5.5 (Target Size).
+   ============================================================================= */
+
+/* Кнопки — минимальный размер 3rem × 3rem (≈48px × 48px) */
+.ru-a11y-visually-impaired button {
+  font-size: 1.5rem !important;
+  border: 2px solid #000 !important;
+  padding: 0.5rem 1rem !important;
+  min-height: 3rem !important;
+  min-width: 3rem !important;
+}
+
+/* Поля форм — минимальная высота 3rem для удобного взаимодействия */
+.ru-a11y-visually-impaired input,
+.ru-a11y-visually-impaired textarea,
+.ru-a11y-visually-impaired select {
+  font-size: 1.5rem !important;
+  border: 2px solid #000 !important;
+  min-height: 3rem !important;
+}
+
+/*
+ * Изображения — обесцветить и усилить контраст.
+ * Монохромный режим снижает нагрузку при нарушениях цветовосприятия.
+ */
+.ru-a11y-visually-impaired img {
+  filter: grayscale(100%) contrast(120%) !important;
+}
+
+/*
+ * SVG-иконки в кнопках и ссылках с aria-label — скрыть иконку, показать текстовую метку.
+ * Работает ТОЛЬКО при наличии атрибута aria-label на родительском элементе.
+ * Для корректной работы убедитесь, что используется ru-a11y-toolkit-eslint
+ * (правило jsx-a11y/aria-label проверяет наличие aria-label у кнопок с иконками).
+ */
+.ru-a11y-visually-impaired button[aria-label] svg,
+.ru-a11y-visually-impaired a[aria-label] svg {
+  display: none !important;
+}
+
+.ru-a11y-visually-impaired button[aria-label]::before,
+.ru-a11y-visually-impaired a[aria-label]::before {
+  content: attr(aria-label) !important;
+  font-size: 1.25rem !important;
+  display: inline-block !important;
+}
+
+/*
+ * Индикатор фокуса — жирный контур 3px.
+ * WCAG 2.4.11 (Focus Appearance): минимальная видимость фокуса.
+ * ГОСТ Р 52872, п. 6.6: все интерактивные элементы должны иметь видимый фокус.
+ */
+.ru-a11y-visually-impaired *:focus,
+.ru-a11y-visually-impaired *:focus-visible {
+  outline: 3px solid #000 !important;
+  outline-offset: 2px !important;
+}
+

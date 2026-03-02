@@ -1,0 +1,96 @@
+{
+  "name": "ru-a11y-toolkit-visually-impaired",
+  "version": "1.0.0",
+  "description": "Модуль повышенной читабельности для пользователей с нарушениями зрения — часть ru-a11y-toolkit",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./styles/visually-impaired.css": "./styles/visually-impaired.css"
+  },
+  "files": [
+    "dist",
+    "styles",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "jest",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "accessibility",
+    "a11y",
+    "слабовидящие",
+    "ГОСТ",
+    "доступность",
+    "React",
+    "ru-a11y",
+    "visually-impaired",
+    "wcag"
+  ],
+  "author": {
+    "name": "biondohod",
+    "url": "https://github.com/biondohod"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/biondohod/ru-a11y.git",
+    "directory": "packages/visually-impaired"
+  },
+  "homepage": "https://github.com/biondohod/ru-a11y/tree/main/packages/visually-impaired#readme",
+  "bugs": {
+    "url": "https://github.com/biondohod/ru-a11y/issues"
+  },
+  "peerDependencies": {
+    "react": "^17.0.0 || ^18.0.0 || ^19.0.0",
+    "react-dom": "^17.0.0 || ^18.0.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.4.0",
+    "@testing-library/react": "^16.0.0",
+    "@types/jest": "^30.0.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "ts-jest": "^29.2.0",
+    "tsup": "^8.3.0",
+    "typescript": "^5.5.0"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "jsdom",
+    "testMatch": [
+      "**/tests/**/*.test.ts",
+      "**/tests/**/*.test.tsx"
+    ],
+    "setupFilesAfterEnv": [
+      "@testing-library/jest-dom"
+    ],
+    "transform": {
+      "^.+\\.(ts|tsx)$": [
+        "ts-jest",
+        {
+          "tsconfig": {
+            "types": [
+              "jest",
+              "@testing-library/jest-dom"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
+
+

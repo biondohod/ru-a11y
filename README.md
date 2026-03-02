@@ -24,6 +24,7 @@ npm install --save-dev ru-a11y-toolkit
 npm install --save-dev ru-a11y-toolkit-eslint   # только ESLint-плагин
 npm install --save-dev ru-a11y-toolkit-cli       # только CLI (скоро)
 npm install --save-dev ru-a11y-toolkit-overlay   # только React Overlay
+npm install ru-a11y-toolkit-visually-impaired    # только режим для слабовидящих
 ```
 
 ---
@@ -34,6 +35,7 @@ npm install --save-dev ru-a11y-toolkit-overlay   # только React Overlay
 |-------|--------|------------|
 | [`ru-a11y-toolkit-eslint`](#-eslint-плагин) | ✅ Готов | Статическая проверка JSX/HTML в процессе разработки |
 | [`ru-a11y-toolkit-overlay`](#-react-overlay) | ✅ Готов | Runtime-визуализация ошибок в браузере |
+| [`ru-a11y-toolkit-visually-impaired`](#-режим-для-слабовидящих) | ✅ Готов | Режим повышенной читабельности для конечного пользователя |
 | [`ru-a11y-toolkit-cli`](#-cli-сканер) | 🚧 В разработке | Проверка готовых страниц по URL |
 
 ---
@@ -187,6 +189,63 @@ function App() {
 
 ---
 
+## 👁 Режим для слабовидящих
+
+React-хук + CSS-файл, которые позволяют добавить на сайт кнопку «Версия для слабовидящих». При активации на `<html>` добавляется класс `ru-a11y-visually-impaired`, переключающий страницу в высококонтрастный режим с увеличенным шрифтом.
+
+> **Важно:** модуль не заменяет соответствие ГОСТ/WCAG на уровне вёрстки. Используйте совместно с `ru-a11y-toolkit-eslint` и `ru-a11y-toolkit-overlay` для полноценного покрытия.
+
+### Установка
+
+```bash
+npm install ru-a11y-toolkit-visually-impaired
+```
+
+### Подключение
+
+```tsx
+import { useVisuallyImpaired } from 'ru-a11y-toolkit-visually-impaired';
+import 'ru-a11y-toolkit-visually-impaired/styles/visually-impaired.css';
+
+function Header() {
+  const { toggle, isEnabled } = useVisuallyImpaired();
+  return (
+    <button onClick={toggle} aria-pressed={isEnabled}>
+      {isEnabled ? 'Обычная версия' : 'Версия для слабовидящих'}
+    </button>
+  );
+}
+```
+
+CSS импортируется отдельно и не инжектируется через JS — для совместимости с SSR и явного контроля над стилями.
+
+### Что делает режим
+
+| Что меняется | Нормативная база |
+|---|---|
+| Белый фон, чёрный текст (контраст 21:1) | ГОСТ Р 52872, п. 7.2; WCAG 1.4.3 |
+| Шрифт от 1.5rem, межстрочный интервал 1.6 | Постановление №102; WCAG 1.4.12 |
+| Заголовки от 1.75rem до 3rem | WCAG 1.4.4 |
+| Кнопки и поля форм min-height 3rem | WCAG 2.5.5 |
+| Outline 3px на элементах в фокусе | ГОСТ Р 52872, п. 6.6; WCAG 2.4.7 |
+| Изображения: grayscale + контраст 120% | WCAG 1.4.11 |
+| SVG-иконки заменяются текстом `aria-label` | WCAG 1.1.1 |
+| Анимации и переходы отключены | ГОСТ Р 52872, п. 6.11; WCAG 2.3.1 |
+
+### API
+
+```ts
+const { toggle, isEnabled } = useVisuallyImpaired();
+// toggle()    — переключает режим
+// isEnabled   — текущее состояние (boolean)
+```
+
+Состояние не сохраняется в localStorage по умолчанию — разработчик решает механизм хранения самостоятельно (пример с localStorage есть в документации пакета).
+
+→ [Подробная документация visually-impaired](https://www.npmjs.com/package/ru-a11y-toolkit-visually-impaired)
+
+---
+
 ## Нормативная база
 
 ### ГОСТ Р 52872-2019
@@ -224,9 +283,10 @@ ru-a11y/
 ├── index.js                    # umbrella-реэкспорт (ru-a11y-toolkit)
 ├── package.json                # ru-a11y-toolkit
 ├── packages/
-│   ├── eslint-preset/          # ru-a11y-toolkit-eslint  ✅
-│   ├── cli/                    # ru-a11y-toolkit-cli     🚧
-│   └── react-overlay/          # ru-a11y-toolkit-overlay ✅
+│   ├── eslint-preset/          # ru-a11y-toolkit-eslint            ✅
+│   ├── cli/                    # ru-a11y-toolkit-cli               🚧
+│   ├── react-overlay/          # ru-a11y-toolkit-overlay           ✅
+│   └── visually-impaired/      # ru-a11y-toolkit-visually-impaired ✅
 ├── README.md                   # этот файл
 └── LICENSE
 ```
