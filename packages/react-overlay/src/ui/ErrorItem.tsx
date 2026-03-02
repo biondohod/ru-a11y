@@ -38,13 +38,18 @@ const IMPACT_LABELS: Record<string, string> = {
 };
 
 /**
- * Извлекает число контрастности из failureSummary axe-core для правила color-contrast.
- * Формат строки: "...color contrast of 3.76 (foreground..."
+ * Извлекает фактическое и требуемое соотношения контрастности из failureSummary axe-core.
+ * Формат строки: "...color contrast of 3.76 (foreground... Expected contrast ratio of 4.5:1"
  */
-function parseContrastRatio(failureSummary?: string): string | null {
+function parseContrastData(failureSummary?: string): { actual: string; required: string } | null {
   if (!failureSummary) return null;
-  const match = failureSummary.match(/contrast of ([\d.]+)/);
-  return match ? match[1] : null;
+  const actualMatch = failureSummary.match(/contrast of ([\d.]+)/);
+  const requiredMatch = failureSummary.match(/Expected contrast ratio of ([\d.]+)/);
+  if (!actualMatch) return null;
+  return {
+    actual: actualMatch[1],
+    required: requiredMatch ? requiredMatch[1] : '',
+  };
 }
 
 export function ErrorItem({ violation, isActive, onSelect }: ErrorItemProps) {
@@ -53,8 +58,8 @@ export function ErrorItem({ violation, isActive, onSelect }: ErrorItemProps) {
   const isError = meta.severity === 'error';
 
   const dotColor = isError ? COLORS.errorBorder : COLORS.warningBorder;
-  const contrastRatio = violation.ruleId === 'color-contrast'
-    ? parseContrastRatio(violation.failureSummary)
+  const contrastData = (violation.ruleId === 'color-contrast' || violation.ruleId === 'color-contrast-enhanced')
+    ? parseContrastData(violation.failureSummary)
     : null;
 
   const handleClick = () => {
@@ -90,14 +95,23 @@ export function ErrorItem({ violation, isActive, onSelect }: ErrorItemProps) {
           aria-hidden="true"
         />
         <span style={itemTitleConfig}>{meta.title}</span>
-        {contrastRatio && (
+        {contrastData && (
           <span style={{
             fontSize: FONTS.sizeSm,
             fontWeight: 700,
             color: COLORS.badgeError,
             flexShrink: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-end',
+            gap: '1px',
           }}>
-            {contrastRatio}:1
+            <span title="Фактический контраст">факт: {contrastData.actual}:1</span>
+            {contrastData.required && (
+              <span title="Требуемый минимальный контраст" style={{ color: COLORS.mutedText, fontWeight: 400 }}>
+                нужно: {contrastData.required}:1
+              </span>
+            )}
           </span>
         )}
         {violation.impact && (

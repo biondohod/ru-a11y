@@ -143,7 +143,6 @@ function countViolations(violations: A11yViolationNode[]): ScanResult['counts'] 
  * нескольких экземпляров. Если сканирование уже идёт — возвращаем пустой результат.
  */
 export async function runAxeScan(config: AxeRunnerConfig = {}): Promise<ScanResult> {
-  console.log('[ru-a11y-overlay] runAxeScan вызван, axeRunning =', axeRunning);
   // Защита от параллельных запусков (React StrictMode монтирует дважды)
   if (axeRunning) {
     console.warn('[ru-a11y-overlay] ⚠️ axeRunning=true — пропускаем запуск');
@@ -173,13 +172,6 @@ export async function runAxeScan(config: AxeRunnerConfig = {}): Promise<ScanResu
 
     const results = await axe.run(context, runOptions);
 
-    console.group('[ru-a11y-overlay] 🔍 Результаты axe-core');
-    console.log('Теги:', tags);
-    console.log('Контекст:', context);
-    console.log('Всего нарушений (violations):', results.violations.length);
-    console.log('Прошло (passes):', results.passes.length);
-    console.log('Неприменимо (inapplicable):', results.inapplicable.length);
-    console.log('Неполные (incomplete):', results.incomplete.length);
     if (results.violations.length > 0) {
       console.table(results.violations.map(v => ({
         id: v.id,
@@ -187,7 +179,6 @@ export async function runAxeScan(config: AxeRunnerConfig = {}): Promise<ScanResu
         description: v.description,
         nodes: v.nodes.length,
       })));
-      console.log('Полные данные violations:', results.violations);
     } else {
       console.warn('⚠️ violations пустой! Проверь теги и контекст выше.');
     }
@@ -195,7 +186,6 @@ export async function runAxeScan(config: AxeRunnerConfig = {}): Promise<ScanResu
 
     const violations = mapAxeViolations(results.violations);
 
-    console.log('[ru-a11y-overlay] После mapAxeViolations:', violations.length, 'нарушений');
     violations.forEach(v => {
       console.log(`  → [${v.meta.severity}] ${v.ruleId}: ${v.meta.title} | selector: ${v.selector}`);
     });
