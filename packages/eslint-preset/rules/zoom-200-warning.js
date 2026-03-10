@@ -21,7 +21,10 @@ const messages = require('../messages');
 function parseViewportContent(content) {
   const result = {};
   content.split(',').forEach((part) => {
-    const [key, value] = part.trim().split('=').map((s) => s.trim());
+    const [key, value] = part
+      .trim()
+      .split('=')
+      .map((s) => s.trim());
     if (key && value !== undefined) {
       result[key] = value;
     }
@@ -128,8 +131,7 @@ module.exports = {
 
     return {
       JSXOpeningElement(node) {
-        const tagName =
-          node.name && node.name.type === 'JSXIdentifier' ? node.name.name : null;
+        const tagName = node.name && node.name.type === 'JSXIdentifier' ? node.name.name : null;
 
         // --- Проверка мета-тега viewport ---
         if (tagName === 'meta') {
@@ -140,8 +142,7 @@ module.exports = {
 
           if (nameValue === 'viewport') {
             const contentAttr = node.attributes.find(
-              (attr) =>
-                attr.type === 'JSXAttribute' && attr.name && attr.name.name === 'content',
+              (attr) => attr.type === 'JSXAttribute' && attr.name && attr.name.name === 'content',
             );
             const contentValue = getAttrStringValue(contentAttr);
 
@@ -202,8 +203,7 @@ module.exports = {
 
             if (!propName) continue;
 
-            const propValue =
-              prop.value.type === 'Literal' ? prop.value.value : null;
+            const propValue = prop.value.type === 'Literal' ? prop.value.value : null;
 
             // Проверяем fontSize
             if (propName === 'fontSize' && propValue !== null) {
@@ -218,11 +218,7 @@ module.exports = {
             }
 
             // Проверяем фиксированную ширину > 200px
-            if (
-              propName === 'width' &&
-              typeof propValue === 'number' &&
-              propValue > 200
-            ) {
+            if (propName === 'width' && typeof propValue === 'number' && propValue > 200) {
               context.report({
                 node: prop,
                 messageId: 'fixedLayout',
@@ -244,4 +240,3 @@ module.exports = {
     };
   },
 };
-

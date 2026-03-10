@@ -160,7 +160,6 @@ const messages = {
   // -----------------------------------------------------------------------
 
   jsxA11y: {
-
     // --- alt-text ---
     // "img elements must have an alt prop..."
     // "Input elements must have alt prop..."
@@ -526,4 +525,3 @@ const messages = {
 };
 
 module.exports = messages;
-

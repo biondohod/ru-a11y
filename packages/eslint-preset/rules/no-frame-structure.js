@@ -72,8 +72,7 @@ module.exports = {
 
     return {
       JSXOpeningElement(node) {
-        const tagName =
-          node.name && node.name.type === 'JSXIdentifier' ? node.name.name : null;
+        const tagName = node.name && node.name.type === 'JSXIdentifier' ? node.name.name : null;
 
         if (!tagName) return;
 
@@ -107,8 +106,7 @@ module.exports = {
 
           // Ищем атрибут title
           const titleAttr = node.attributes.find(
-            (attr) =>
-              attr.type === 'JSXAttribute' && attr.name && attr.name.name === 'title',
+            (attr) => attr.type === 'JSXAttribute' && attr.name && attr.name.name === 'title',
           );
 
           if (!titleAttr) {
@@ -136,4 +134,3 @@ module.exports = {
     };
   },
 };
-

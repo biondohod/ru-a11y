@@ -99,9 +99,7 @@ module.exports = {
       JSXElement(node) {
         const openingEl = node.openingElement;
         const tagName =
-          openingEl.name && openingEl.name.type === 'JSXIdentifier'
-            ? openingEl.name.name
-            : null;
+          openingEl.name && openingEl.name.type === 'JSXIdentifier' ? openingEl.name.name : null;
 
         if (!tagName) return;
 
@@ -137,9 +135,7 @@ module.exports = {
         const textContent = getJSXTextContent(node).trim();
         if (textContent.length === 0) {
           // Проверяем вложенные нетекстовые элементы (иконки, изображения)
-          const hasNonTextChildren = node.children.some(
-            (child) => child.type === 'JSXElement',
-          );
+          const hasNonTextChildren = node.children.some((child) => child.type === 'JSXElement');
           if (!hasNonTextChildren) {
             context.report({
               node,
@@ -168,4 +164,3 @@ module.exports = {
     };
   },
 };
-

@@ -142,9 +142,7 @@ module.exports = {
       JSXElement(node) {
         const openingEl = node.openingElement;
         const tagName =
-          openingEl.name && openingEl.name.type === 'JSXIdentifier'
-            ? openingEl.name.name
-            : null;
+          openingEl.name && openingEl.name.type === 'JSXIdentifier' ? openingEl.name.name : null;
 
         // Проверяем только элементы <table>
         if (tagName !== 'table') return;
@@ -206,4 +204,3 @@ module.exports = {
     };
   },
 };
-

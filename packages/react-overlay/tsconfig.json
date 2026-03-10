@@ -20,5 +20,3 @@
   "include": ["src", "src/scss.d.ts", "tests"],
   "exclude": ["node_modules", "dist"]
 }
-
-

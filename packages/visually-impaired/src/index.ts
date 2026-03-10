@@ -13,4 +13,3 @@
  */
 export { useVisuallyImpaired } from './useVisuallyImpaired';
 export type { UseVisuallyImpairedReturn } from './useVisuallyImpaired';
-

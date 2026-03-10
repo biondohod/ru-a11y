@@ -14,7 +14,13 @@
 const messages = require('../messages');
 
 /** Допустимые значения href для ссылки пропуска */
-const VALID_SKIP_HREFS = new Set(['#main', '#content', '#maincontent', '#main-content', '#основной-контент']);
+const VALID_SKIP_HREFS = new Set([
+  '#main',
+  '#content',
+  '#maincontent',
+  '#main-content',
+  '#основной-контент',
+]);
 
 /**
  * Проверяет, является ли узел ссылкой пропуска навигации
@@ -33,7 +39,8 @@ function isSkipLink(node) {
   const hrefValue =
     hrefAttr.value.type === 'Literal'
       ? hrefAttr.value.value
-      : hrefAttr.value.type === 'JSXExpressionContainer' && hrefAttr.value.expression.type === 'Literal'
+      : hrefAttr.value.type === 'JSXExpressionContainer' &&
+          hrefAttr.value.expression.type === 'Literal'
         ? hrefAttr.value.expression.value
         : null;
 
@@ -155,4 +162,3 @@ module.exports = {
     };
   },
 };
-

@@ -50,10 +50,7 @@ const rules = {
   ],
 
   // Требуем <caption> для таблиц данных (ГОСТ Р 52872-2019 §5.1.5)
-  '@ru-a11y/gost-a11y/table-requires-th': [
-    'error',
-    { requireCaption: true, requireScope: true },
-  ],
+  '@ru-a11y/gost-a11y/table-requires-th': ['error', { requireCaption: true, requireScope: true }],
 
   // -----------------------------------------------------------------------
   // Правила jsx-a11y с русскими сообщениями (WCAG 2.1, уровень AA)
@@ -135,4 +132,3 @@ const legacyConfig = {
 
 module.exports = legacyConfig;
 module.exports.rules = rules;
-

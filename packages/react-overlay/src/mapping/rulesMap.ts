@@ -150,7 +150,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
       '4.5:1 для обычного текста (до 18px или до 14px жирного) и 3:1 для крупного текста (18px+ или 14px+ жирный). ' +
       'Это затрудняет чтение для пользователей с нарушениями зрения. ' +
       'Фактическое соотношение контраста отображается рядом с заголовком нарушения.',
-    fix: 'Измените цвет текста или фона, чтобы соотношение контраста было не ниже 4.5:1 для обычного текста. ' +
+    fix:
+      'Измените цвет текста или фона, чтобы соотношение контраста было не ниже 4.5:1 для обычного текста. ' +
       'Используйте инструменты: contrast-ratio.com, WebAIM Contrast Checker или встроенные DevTools браузера.',
     post102: 'Постановление №102, п. в)',
     wcag: 'WCAG 2.1, 1.4.3 Contrast (Minimum)',
@@ -169,7 +170,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
       '7:1 для обычного текста (до 18px или до 14px жирного) и 4.5:1 для крупного текста (18px+ или 14px+ жирный). ' +
       'Фактическое соотношение контраста отображается рядом с заголовком нарушения. ' +
       'Требование применяется для пресета strict.',
-    fix: 'Увеличьте контраст до 7:1 для обычного текста и до 4.5:1 для крупного. ' +
+    fix:
+      'Увеличьте контраст до 7:1 для обычного текста и до 4.5:1 для крупного. ' +
       'Используйте инструменты: contrast-ratio.com, WebAIM Contrast Checker или встроенные DevTools браузера.',
     wcag: 'WCAG 2.1, 1.4.6 Contrast (Enhanced)',
     principle: 'perceivable',
@@ -186,7 +188,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     description:
       'Мета-тег viewport содержит user-scalable=no или maximum-scale<2, что запрещает ' +
       'пользователям увеличивать текст до 200%. Это критично для людей со слабым зрением.',
-    fix: 'Удалите user-scalable=no и установите maximum-scale=5.0 или не указывайте его: ' +
+    fix:
+      'Удалите user-scalable=no и установите maximum-scale=5.0 или не указывайте его: ' +
       '<meta name="viewport" content="width=device-width, initial-scale=1.0" />',
     post102: 'Постановление №102, п. б)',
     wcag: 'WCAG 2.1, 1.4.4 Resize text',
@@ -220,7 +223,7 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
    * ГОСТ Р 52872-2019 §5.2.3.1 — Ссылка пропуска навигации
    * Постановление №102 п. а)
    */
-  'bypass': {
+  bypass: {
     id: 'bypass',
     title: 'Отсутствует ссылка пропуска навигации',
     description:
@@ -277,13 +280,14 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
    * WCAG 2.4.3 Последовательность фокуса
    * Постановление №102 п. а)
    */
-  'tabindex': {
+  tabindex: {
     id: 'tabindex',
     title: 'Некорректное значение tabIndex',
     description:
       'Элемент имеет положительное значение tabIndex (>0). Это нарушает ' +
       'естественный порядок фокуса и создаёт непредсказуемую навигацию с клавиатуры.',
-    fix: 'Используйте tabIndex={0} для включения в порядок фокуса или tabIndex={-1} ' +
+    fix:
+      'Используйте tabIndex={0} для включения в порядок фокуса или tabIndex={-1} ' +
       'для программного управления. Избегайте положительных значений.',
     post102: 'Постановление №102, п. а)',
     wcag: 'WCAG 2.1, 2.4.3 Focus Order',
@@ -353,13 +357,14 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
    * ГОСТ Р 52872-2019 §5.1.3
    * Постановление №102 п. м)
    */
-  'label': {
+  label: {
     id: 'label',
     title: 'Поле формы без метки',
     description:
       'Элемент формы (<input>, <select>, <textarea>) не имеет связанной метки <label>. ' +
       'Пользователи скринридеров не поймут, что нужно ввести в это поле.',
-    fix: 'Используйте <label htmlFor="fieldId">Описание</label> или aria-label="Описание" ' +
+    fix:
+      'Используйте <label htmlFor="fieldId">Описание</label> или aria-label="Описание" ' +
       'на самом поле ввода.',
     gost: 'ГОСТ Р 52872-2019, §5.1.3',
     post102: 'Постановление №102, п. м)',
@@ -383,7 +388,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     description:
       'Элемент <button> не имеет текстового содержимого или aria-label. ' +
       'Скринридер объявит кнопку без названия, и пользователь не поймёт её назначение.',
-    fix: 'Добавьте текст внутрь кнопки: <button>Отправить</button> ' +
+    fix:
+      'Добавьте текст внутрь кнопки: <button>Отправить</button> ' +
       'или aria-label="Отправить форму" для кнопок с иконками.',
     gost: 'ГОСТ Р 52872-2019, §5.1.1',
     post102: 'Постановление №102, п. а)',
@@ -504,7 +510,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
       'На элементе заданы межстрочный интервал (line-height), межбуквенный интервал (letter-spacing), ' +
       'интервал между словами (word-spacing) или отступ после абзаца (margin-bottom после p) через атрибут style. ' +
       'Это блокирует пользовательские стили специальных возможностей, позволяющие увеличивать интервалы для удобочитаемости.',
-    fix: 'Перенесите стили межинтервала в CSS-класс вместо атрибута style. ' +
+    fix:
+      'Перенесите стили межинтервала в CSS-класс вместо атрибута style. ' +
       'Не используйте !important для этих свойств в CSS.',
     wcag: 'WCAG 2.1, 1.4.12 Text Spacing',
     principle: 'perceivable',
@@ -521,7 +528,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
       'Ссылка внутри текстового блока визуально выделяется только цветом — без подчёркивания, ' +
       'рамки или другого невизуального признака. Пользователи с нарушениями цветовосприятия ' +
       'не смогут отличить ссылку от обычного текста.',
-    fix: 'Добавьте подчёркивание или другой нецветовой визуальный индикатор для ссылок: ' +
+    fix:
+      'Добавьте подчёркивание или другой нецветовой визуальный индикатор для ссылок: ' +
       'text-decoration: underline; или outline/border при :focus.',
     wcag: 'WCAG 2.1, 1.4.1 Use of Color',
     principle: 'perceivable',
@@ -538,7 +546,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
       'CSS media-запросы блокируют отображение контента в одной из ориентаций (портретной или альбомной). ' +
       'Пользователи с ограниченной подвижностью, которые фиксируют устройство в одном положении, ' +
       'не смогут получить доступ к содержимому.',
-    fix: 'Удалите CSS-правила, ограничивающие ориентацию экрана. ' +
+    fix:
+      'Удалите CSS-правила, ограничивающие ориентацию экрана. ' +
       'Используйте orientation media-query только для стилизации, но не для скрытия контента.',
     wcag: 'WCAG 2.1, 1.3.4 Orientation',
     principle: 'perceivable',
@@ -554,7 +563,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     description:
       'Атрибут autocomplete на поле формы содержит недопустимое значение или применён к неподходящему типу поля. ' +
       'Правильный autocomplete позволяет менеджерам паролей и вспомогательным технологиям автоматически заполнять поля.',
-    fix: 'Используйте стандартные значения autocomplete согласно спецификации: ' +
+    fix:
+      'Используйте стандартные значения autocomplete согласно спецификации: ' +
       '"name", "email", "tel", "street-address", "current-password" и др. ' +
       'Полный список: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#autofill',
     wcag: 'WCAG 2.1, 1.3.5 Identify Input Purpose',
@@ -565,14 +575,15 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
   /**
    * WCAG 2.2.2 — мигающий элемент <blink>
    */
-  'blink': {
+  blink: {
     id: 'blink',
     title: 'Используется устаревший элемент <blink>',
     description:
       'Элемент <blink> заставляет текст мигать без возможности остановить анимацию. ' +
       'Мигание может вызвать эпилептический приступ у чувствительных пользователей. ' +
       'Элемент является устаревшим (deprecated).',
-    fix: 'Удалите <blink>. Если нужно привлечь внимание, используйте CSS-анимацию ' +
+    fix:
+      'Удалите <blink>. Если нужно привлечь внимание, используйте CSS-анимацию ' +
       'с опцией prefers-reduced-motion и возможностью её отключить.',
     wcag: 'WCAG 2.1, 2.2.2 Pause, Stop, Hide',
     principle: 'operable',
@@ -582,14 +593,15 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
   /**
    * WCAG 2.2.2 — мигающий элемент <marquee>
    */
-  'marquee': {
+  marquee: {
     id: 'marquee',
     title: 'Используется устаревший элемент <marquee>',
     description:
       'Элемент <marquee> создаёт автоматически прокручивающийся текст без возможности остановить его. ' +
       'Это нарушает управляемость и может дезориентировать пользователей с когнитивными нарушениями. ' +
       'Элемент является устаревшим (deprecated).',
-    fix: 'Удалите <marquee>. Если нужна прокрутка, реализуйте её на CSS/JS с кнопкой паузы и ' +
+    fix:
+      'Удалите <marquee>. Если нужна прокрутка, реализуйте её на CSS/JS с кнопкой паузы и ' +
       'поддержкой prefers-reduced-motion.',
     wcag: 'WCAG 2.1, 2.2.2 Pause, Stop, Hide',
     principle: 'operable',
@@ -605,7 +617,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     description:
       'Тег <meta http-equiv="refresh"> выполняет автоматическое обновление или перенаправление страницы ' +
       'без ведома пользователя. Пользователи скринридеров могут потерять фокус и текущую позицию чтения.',
-    fix: 'Удалите meta refresh. Для перенаправления используйте серверный HTTP 301/302. ' +
+    fix:
+      'Удалите meta refresh. Для перенаправления используйте серверный HTTP 301/302. ' +
       'Если нужно предупредить об обновлении — используйте уведомление с кнопкой подтверждения.',
     wcag: 'WCAG 2.1, 2.2.1 Timing Adjustable',
     principle: 'operable',
@@ -638,7 +651,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
       'Элемент <video> или <audio> воспроизводит звук автоматически более 3 секунд ' +
       'без возможности остановить или заглушить его. Это мешает пользователям скринридеров, ' +
       'у которых звук страницы накладывается на их вспомогательные технологии.',
-    fix: 'Добавьте атрибут muted или controls, уберите autoplay. ' +
+    fix:
+      'Добавьте атрибут muted или controls, уберите autoplay. ' +
       'Если автовоспроизведение необходимо — предоставьте заметную кнопку паузы.',
     wcag: 'WCAG 2.1, 1.4.2 Audio Control',
     principle: 'perceivable',
@@ -684,7 +698,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     description:
       'Два или более <iframe>/<frame> имеют одинаковое значение атрибута title. ' +
       'Скринридеры не смогут различить эти фреймы между собой.',
-    fix: 'Сделайте title каждого фрейма уникальным и описательным: ' +
+    fix:
+      'Сделайте title каждого фрейма уникальным и описательным: ' +
       '<iframe title="Карта" />, <iframe title="Форма обратной связи" />.',
     wcag: 'WCAG 2.1, 4.1.2 Name, Role, Value',
     principle: 'robust',
@@ -701,7 +716,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
       'Элемент включён в порядок клавиатурного фокуса (tabindex ≥ 0), ' +
       'но не имеет интерактивной семантической роли (button, link, input и т.д.). ' +
       'Это создаёт непредсказуемый опыт для пользователей скринридеров.',
-    fix: 'Используйте семантически подходящий элемент (<button>, <a>) или ' +
+    fix:
+      'Используйте семантически подходящий элемент (<button>, <a>) или ' +
       'добавьте подходящую ARIA-роль: role="button" с обработчиком клавиатуры.',
     wcag: 'WCAG 2.1, 2.4.3 Focus Order',
     principle: 'operable',
@@ -717,7 +733,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     description:
       'На странице есть несколько ссылок с одинаковым доступным именем, но разными URL. ' +
       'Пользователи скринридеров, просматривающие список ссылок, не смогут различить их назначение.',
-    fix: 'Сделайте текст каждой ссылки уникальным или добавьте aria-label с дополнительным контекстом: ' +
+    fix:
+      'Сделайте текст каждой ссылки уникальным или добавьте aria-label с дополнительным контекстом: ' +
       '<a href="/cat" aria-label="Читать статью о кошках">Читать далее</a>.',
     wcag: 'WCAG 2.1, 2.4.9 Link Purpose (Link Only)',
     principle: 'operable',
@@ -748,7 +765,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     description:
       'На странице есть ссылка пропуска навигации (skip-link), но элемент, на который она ссылается ' +
       '(href="#..."), не существует или не является фокусируемым. Ссылка пропуска не работает.',
-    fix: 'Убедитесь, что целевой элемент (например, <main id="main">) существует и ' +
+    fix:
+      'Убедитесь, что целевой элемент (например, <main id="main">) существует и ' +
       'является фокусируемым (добавьте tabindex="-1" если нужно).',
     gost: 'ГОСТ Р 52872-2019, §5.2.3.1',
     wcag: 'WCAG 2.1, 2.4.1 Bypass Blocks',
@@ -759,13 +777,14 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
   /**
    * WCAG 1.3.1 — структура списка нарушена
    */
-  'list': {
+  list: {
     id: 'list',
     title: 'Неправильная структура списка',
     description:
       'Элементы <ul> или <ol> содержат дочерние узлы, которые не являются <li>, <script> или <template>. ' +
       'Некорректная структура нарушает семантику и работу скринридеров.',
-    fix: 'Убедитесь, что прямыми потомками <ul>/<ol> являются только <li>. ' +
+    fix:
+      'Убедитесь, что прямыми потомками <ul>/<ol> являются только <li>. ' +
       'Не вкладывайте <div> или другие элементы напрямую внутрь списка.',
     wcag: 'WCAG 2.1, 1.3.1 Info and Relationships',
     principle: 'perceivable',
@@ -775,7 +794,7 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
   /**
    * WCAG 1.3.1 — элемент <li> вне списка
    */
-  'listitem': {
+  listitem: {
     id: 'listitem',
     title: 'Элемент <li> не является потомком списка',
     description:
@@ -796,7 +815,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     description:
       'Элемент <dl> содержит дочерние узлы, отличные от <dt>, <dd>, <div>, <script> или <template>. ' +
       'Нарушение структуры затрудняет чтение списка определений скринридерами.',
-    fix: 'Используйте правильную структуру: <dl><dt>Термин</dt><dd>Определение</dd></dl>. ' +
+    fix:
+      'Используйте правильную структуру: <dl><dt>Термин</dt><dd>Определение</dd></dl>. ' +
       'Допускается группировка <dt>/<dd> внутри <div>.',
     wcag: 'WCAG 2.1, 1.3.1 Info and Relationships',
     principle: 'perceivable',
@@ -806,7 +826,7 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
   /**
    * WCAG 1.3.1 — элементы <dt>/<dd> вне <dl>
    */
-  'dlitem': {
+  dlitem: {
     id: 'dlitem',
     title: 'Элемент <dt> или <dd> не является потомком <dl>',
     description:
@@ -828,7 +848,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
       'Несколько элементов на странице имеют одинаковое значение id, которое используется ' +
       'в ARIA-атрибутах (aria-labelledby, aria-describedby) или в атрибуте for тега <label>. ' +
       'Скринридер может связать метку/описание с неправильным элементом.',
-    fix: 'Сделайте значение id уникальным на всей странице. ' +
+    fix:
+      'Сделайте значение id уникальным на всей странице. ' +
       'Используйте генераторы уникальных id или добавляйте суффикс к id.',
     wcag: 'WCAG 2.1, 4.1.2 Name, Role, Value',
     principle: 'robust',
@@ -875,7 +896,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     description:
       'Элемент заголовка (<h1>–<h6>) не содержит текста или доступного имени. ' +
       'Скринридеры объявят пустой заголовок, что дезориентирует пользователей.',
-    fix: 'Добавьте текстовое содержимое в заголовок или удалите пустой элемент. ' +
+    fix:
+      'Добавьте текстовое содержимое в заголовок или удалите пустой элемент. ' +
       'Если заголовок не нужен визуально, используйте visually-hidden класс.',
     principle: 'operable',
     severity: 'warning',
@@ -890,7 +912,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     description:
       'Ячейка заголовка таблицы <th> не содержит текста. ' +
       'Скринридеры не смогут объявить заголовок столбца/строки.',
-    fix: 'Добавьте текст в <th> или замените его на <td> если это не заголовочная ячейка. ' +
+    fix:
+      'Добавьте текст в <th> или замените его на <td> если это не заголовочная ячейка. ' +
       'Для угловой ячейки можно использовать aria-label="".',
     principle: 'perceivable',
     severity: 'warning',
@@ -906,7 +929,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
       'К одному полю формы привязано более одного элемента <label>. ' +
       'Скринридеры обрабатывают это по-разному: некоторые читают только первую метку, ' +
       'другие — все, что создаёт путаницу.',
-    fix: 'Оставьте только одну метку <label> для каждого поля. ' +
+    fix:
+      'Оставьте только одну метку <label> для каждого поля. ' +
       'Дополнительную информацию разместите в aria-describedby.',
     wcag: 'WCAG 2.1, 3.3.2 Labels or Instructions',
     principle: 'understandable',
@@ -922,7 +946,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     description:
       'Атрибут lang на элементе содержит значение, не являющееся допустимым кодом языка BCP-47. ' +
       'Скринридер не сможет переключить языковой профиль для правильного произношения.',
-    fix: 'Используйте стандартные коды языков: lang="ru", lang="en", lang="de". ' +
+    fix:
+      'Используйте стандартные коды языков: lang="ru", lang="en", lang="de". ' +
       'Полный список: https://www.iana.org/assignments/language-subtag-registry/',
     wcag: 'WCAG 2.1, 3.1.2 Language of Parts',
     principle: 'understandable',
@@ -953,7 +978,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     description:
       'Элемент <input type="button">, <input type="submit"> или <input type="reset"> ' +
       'не имеет атрибута value или aria-label. Скринридер объявит кнопку без названия.',
-    fix: 'Добавьте атрибут value: <input type="submit" value="Отправить форму" /> ' +
+    fix:
+      'Добавьте атрибут value: <input type="submit" value="Отправить форму" /> ' +
       'или aria-label="Отправить форму".',
     wcag: 'WCAG 2.1, 4.1.2 Name, Role, Value',
     principle: 'robust',
@@ -985,7 +1011,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
       'Элемент имеет видимый текстовый контент, но его ARIA-имя (aria-label или aria-labelledby) ' +
       'не содержит этот текст. Пользователи голосового управления, произносящие видимый текст, ' +
       'не смогут активировать элемент.',
-    fix: 'Включите видимый текст в aria-label: если кнопка содержит "Войти", ' +
+    fix:
+      'Включите видимый текст в aria-label: если кнопка содержит "Войти", ' +
       'то aria-label должен начинаться с "Войти" или включать это слово.',
     wcag: 'WCAG 2.1, 2.5.3 Label in Name',
     principle: 'operable',
@@ -1016,7 +1043,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     description:
       'Элемент <select> не имеет связанного <label>, aria-label или aria-labelledby. ' +
       'Пользователи скринридеров не поймут назначение выпадающего списка.',
-    fix: 'Добавьте метку: <label htmlFor="countrySelect">Страна</label><select id="countrySelect"> ' +
+    fix:
+      'Добавьте метку: <label htmlFor="countrySelect">Страна</label><select id="countrySelect"> ' +
       'или aria-label="Страна" на сам select.',
     wcag: 'WCAG 2.1, 4.1.2 Name, Role, Value',
     principle: 'robust',
@@ -1047,7 +1075,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     description:
       'Элемент <object> (встроенный контент: Flash, PDF, SVG и др.) не предоставляет ' +
       'текстовую альтернативу. Пользователи скринридеров не получат информацию о содержимом.',
-    fix: 'Добавьте текст внутрь <object>: <object data="file.pdf">Скачать PDF-документ</object> ' +
+    fix:
+      'Добавьте текст внутрь <object>: <object data="file.pdf">Скачать PDF-документ</object> ' +
       'или атрибут aria-label.',
     wcag: 'WCAG 2.1, 1.1.1 Non-text Content',
     principle: 'perceivable',
@@ -1063,7 +1092,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     description:
       'Элемент <audio> не содержит субтитров. Пользователи с нарушениями слуха ' +
       'не получат доступ к аудиосодержанию.',
-    fix: 'Добавьте <track kind="captions" src="captions.vtt" srclang="ru" label="Русский" /> ' +
+    fix:
+      'Добавьте <track kind="captions" src="captions.vtt" srclang="ru" label="Русский" /> ' +
       'или разместите транскрипцию рядом с аудиоплеером.',
     wcag: 'WCAG 2.1, 1.2.1 Audio-only and Video-only (Prerecorded)',
     principle: 'perceivable',
@@ -1079,7 +1109,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     description:
       'Элемент <svg> с ролью img, graphics-document или graphics-symbol не имеет ' +
       'доступного текстового описания. Пользователи скринридеров не поймут содержимое изображения.',
-    fix: 'Добавьте <title>Описание изображения</title> внутрь <svg> ' +
+    fix:
+      'Добавьте <title>Описание изображения</title> внутрь <svg> ' +
       'или атрибут aria-label="Описание" на сам элемент <svg>.',
     wcag: 'WCAG 2.1, 1.1.1 Non-text Content',
     principle: 'perceivable',
@@ -1127,7 +1158,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     description:
       'Интерактивный элемент (кнопка, ссылка, input) вложен внутрь другого интерактивного элемента. ' +
       'Скринридеры могут не объявить внутренний элемент, а навигация с клавиатуры станет непредсказуемой.',
-    fix: 'Разнесите интерактивные элементы на один уровень. ' +
+    fix:
+      'Разнесите интерактивные элементы на один уровень. ' +
       'Не вкладывайте <button> в <a> и <a> в <button>.',
     wcag: 'WCAG 2.1, 4.1.2 Name, Role, Value',
     principle: 'robust',
@@ -1137,14 +1169,15 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
   /**
    * best-practice — ориентиры (landmarks) должны охватывать весь контент
    */
-  'region': {
+  region: {
     id: 'region',
     title: 'Контент страницы не обёрнут в landmark-регион',
     description:
       'Часть контента страницы находится вне семантических landmark-регионов ' +
       '(<header>, <main>, <nav>, <footer>, <aside> или аналогов с role=). ' +
       'Пользователи скринридеров не смогут быстро перейти к этому контенту.',
-    fix: 'Обверните весь контент страницы в семантические ориентиры: ' +
+    fix:
+      'Обверните весь контент страницы в семантические ориентиры: ' +
       '<header>, <nav>, <main>, <aside>, <footer>.',
     principle: 'operable',
     severity: 'warning',
@@ -1215,7 +1248,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     description:
       'На странице обнаружено более одного элемента с ролью banner (<header> на верхнем уровне). ' +
       'Пользователи скринридеров ожидают ровно один глобальный заголовок страницы.',
-    fix: 'Оставьте только один верхнеуровневый <header>. ' +
+    fix:
+      'Оставьте только один верхнеуровневый <header>. ' +
       'Заголовки секций используйте с <header> внутри <section> или <article>.',
     principle: 'operable',
     severity: 'warning',
@@ -1230,7 +1264,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     description:
       'На странице обнаружено более одного верхнеуровневого <footer> (role="contentinfo"). ' +
       'Пользователи скринридеров ожидают ровно один глобальный подвал страницы.',
-    fix: 'Оставьте только один верхнеуровневый <footer>. ' +
+    fix:
+      'Оставьте только один верхнеуровневый <footer>. ' +
       'Подвалы секций используйте с <footer> внутри <section> или <article>.',
     principle: 'operable',
     severity: 'warning',
@@ -1274,7 +1309,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
       'На странице несколько landmark-регионов с одинаковой ролью (например, два <nav>) ' +
       'без уникального доступного имени (aria-label или aria-labelledby). ' +
       'Пользователи не смогут отличить их при навигации.',
-    fix: 'Добавьте уникальный aria-label каждому одноимённому ориентиру: ' +
+    fix:
+      'Добавьте уникальный aria-label каждому одноимённому ориентиру: ' +
       '<nav aria-label="Главная навигация">, <nav aria-label="Навигация по статье">.',
     principle: 'operable',
     severity: 'warning',
@@ -1290,7 +1326,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
       'Атрибут scope на элементе <th> или <td> содержит недопустимое значение ' +
       'или применён к неподходящему элементу. ' +
       'Скринридеры могут неправильно связать заголовки с ячейками данных.',
-    fix: 'Используйте scope="col" для заголовков столбцов и scope="row" для заголовков строк: ' +
+    fix:
+      'Используйте scope="col" для заголовков столбцов и scope="row" для заголовков строк: ' +
       '<th scope="col">Название</th>.',
     wcag: 'WCAG 2.1, 1.3.1 Info and Relationships',
     principle: 'perceivable',
@@ -1307,7 +1344,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
       'В таблице размером более 3×3 ячеек есть непустые ячейки <td>, ' +
       'не связанные ни с одним заголовком <th>. ' +
       'Скринридер не сможет объявить контекст ячейки.',
-    fix: 'Добавьте <th> заголовки к столбцам/строкам или используйте атрибут headers ' +
+    fix:
+      'Добавьте <th> заголовки к столбцам/строкам или используйте атрибут headers ' +
       'для явной связи: <td headers="th-id">Значение</td>.',
     gost: 'ГОСТ Р 52872-2019, §5.1.5',
     wcag: 'WCAG 2.1, 1.3.1 Info and Relationships',
@@ -1324,7 +1362,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     description:
       'Атрибут summary таблицы содержит тот же текст, что и элемент <caption>. ' +
       'Скринридеры зачитают одинаковую информацию дважды.',
-    fix: 'Используйте <caption> для краткого описания таблицы, ' +
+    fix:
+      'Используйте <caption> для краткого описания таблицы, ' +
       'а summary (или aria-describedby) — для более подробного объяснения её структуры.',
     principle: 'perceivable',
     severity: 'warning',
@@ -1356,7 +1395,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
       'Интерактивный элемент (кнопка, ссылка) имеет размер касания менее 24×24 CSS-пикселей ' +
       'и не имеет достаточного свободного пространства вокруг. ' +
       'Пользователям с нарушениями моторики сложно точно нажать на маленькие цели.',
-    fix: 'Установите минимальный размер касания 24×24px через padding или min-width/min-height. ' +
+    fix:
+      'Установите минимальный размер касания 24×24px через padding или min-width/min-height. ' +
       'Оптимальный размер — 44×44px (рекомендация Apple/Google).',
     wcag: 'WCAG 2.2, 2.5.8 Target Size (Minimum)',
     principle: 'operable',
@@ -1372,7 +1412,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     description:
       'Мета-тег viewport ограничивает масштабирование значением менее 5.0 (500%). ' +
       'Некоторые пользователи с нарушениями зрения нуждаются в масштабировании более 200%.',
-    fix: 'Установите maximum-scale=5.0 или не ограничивайте его: ' +
+    fix:
+      'Установите maximum-scale=5.0 или не ограничивайте его: ' +
       '<meta name="viewport" content="width=device-width, initial-scale=1.0" />.',
     principle: 'perceivable',
     severity: 'warning',
@@ -1388,7 +1429,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
       'Атрибут aria-roledescription используется на элементе, не имеющем явной или неявной ' +
       'семантической роли. aria-roledescription переопределяет описание роли для скринридеров, ' +
       'но без базовой роли его поведение непредсказуемо.',
-    fix: 'Добавьте явную роль элементу: role="button" или используйте семантический HTML-элемент, ' +
+    fix:
+      'Добавьте явную роль элементу: role="button" или используйте семантический HTML-элемент, ' +
       'прежде чем добавлять aria-roledescription.',
     wcag: 'WCAG 2.1, 4.1.2 Name, Role, Value',
     principle: 'robust',
@@ -1405,7 +1447,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
       'Элемент с role="text" имеет фокусируемых потомков (ссылки, кнопки и т.д.). ' +
       'Роль text объединяет дочерние элементы в единую строку для скринридера, ' +
       'но фокусируемые потомки могут стать недоступными.',
-    fix: 'Не используйте role="text" если внутри есть интерактивные элементы. ' +
+    fix:
+      'Не используйте role="text" если внутри есть интерактивные элементы. ' +
       'Перейдите к обычной семантике HTML.',
     principle: 'robust',
     severity: 'warning',
@@ -1465,7 +1508,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
       'Обнаружены элементы с visibility:hidden, display:none или aria-hidden="true". ' +
       'Это информационное предупреждение — скрытый контент может содержать важную информацию ' +
       'или нарушения доступности, которые не проверяются в скрытом состоянии.',
-    fix: 'Проверьте, что скрытый контент не содержит нарушений доступности. ' +
+    fix:
+      'Проверьте, что скрытый контент не содержит нарушений доступности. ' +
       'При необходимости проверьте его в видимом состоянии.',
     principle: 'perceivable',
     severity: 'warning',
@@ -1488,14 +1532,15 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
   /**
    * best-practice — уникальность accesskey
    */
-  'accesskeys': {
+  accesskeys: {
     id: 'accesskeys',
     title: 'Дублирующееся значение атрибута accesskey',
     description:
       'Несколько элементов на странице имеют одинаковое значение атрибута accesskey. ' +
       'Это делает быструю клавишу непредсказуемой: браузер активирует один из элементов ' +
       'произвольно, лишая пользователя надёжного способа перейти к нужному элементу.',
-    fix: 'Убедитесь, что каждое значение accesskey уникально на странице, ' +
+    fix:
+      'Убедитесь, что каждое значение accesskey уникально на странице, ' +
       'или рассмотрите отказ от accesskey в пользу явных ссылок для пропуска навигации.',
     principle: 'operable',
     severity: 'warning',
@@ -1510,7 +1555,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     description:
       'Элемент <area> в клиентской карте изображений не имеет атрибута alt. ' +
       'Пользователи скринридеров не поймут, куда ведёт эта область карты.',
-    fix: 'Добавьте атрибут alt с описанием ссылки: <area alt="Перейти на страницу контактов" href="/contacts" />. ' +
+    fix:
+      'Добавьте атрибут alt с описанием ссылки: <area alt="Перейти на страницу контактов" href="/contacts" />. ' +
       'Для неактивных областей используйте alt="".',
     wcag: 'WCAG 2.1, 2.4.4 Link Purpose / 4.1.2 Name, Role, Value',
     principle: 'perceivable',
@@ -1526,7 +1572,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     description:
       'На элементе используется ARIA-атрибут, который не разрешён для его текущей роли. ' +
       'Вспомогательные технологии проигнорируют такой атрибут или обработают его некорректно.',
-    fix: 'Проверьте спецификацию WAI-ARIA и убедитесь, что используемые атрибуты aria-* ' +
+    fix:
+      'Проверьте спецификацию WAI-ARIA и убедитесь, что используемые атрибуты aria-* ' +
       'допустимы для роли данного элемента. Например, aria-checked допустим только для checkbox, radio, switch.',
     wcag: 'WCAG 2.1, 4.1.2 Name, Role, Value',
     principle: 'robust',
@@ -1543,7 +1590,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
       'Атрибут role содержит значение, которое не является семантически уместным ' +
       'для данного HTML-элемента. Например, role="heading" на элементе <button>. ' +
       'Это вызывает конфликт нативной и ARIA-семантики.',
-    fix: 'Используйте подходящий по семантике HTML-элемент или выберите роль, ' +
+    fix:
+      'Используйте подходящий по семантике HTML-элемент или выберите роль, ' +
       'совместимую с базовым элементом. Полный список допустимых ролей: ' +
       'https://www.w3.org/TR/html-aria/',
     principle: 'robust',
@@ -1560,7 +1608,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
       'Атрибут aria-braillelabel или aria-brailleroledescription используется без ' +
       'соответствующего текстового атрибута (aria-label или aria-roledescription). ' +
       'Пользователи без брайлевских дисплеев не получат доступную альтернативу.',
-    fix: 'Всегда сопровождайте aria-braillelabel атрибутом aria-label, ' +
+    fix:
+      'Всегда сопровождайте aria-braillelabel атрибутом aria-label, ' +
       'а aria-brailleroledescription — атрибутом aria-roledescription.',
     wcag: 'WCAG 2.1, 4.1.2 Name, Role, Value',
     principle: 'robust',
@@ -1592,7 +1641,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
       'ARIA-атрибут используется на элементе, но не соответствует условиям применения, ' +
       'описанным в спецификации для роли этого элемента. ' +
       'Например, aria-checked на элементе без роли checkbox/radio/switch.',
-    fix: 'Проверьте документацию WAI-ARIA: каждый aria-* атрибут имеет условия применения. ' +
+    fix:
+      'Проверьте документацию WAI-ARIA: каждый aria-* атрибут имеет условия применения. ' +
       'Используйте атрибут только если элемент соответствует этим условиям.',
     wcag: 'WCAG 2.1, 4.1.2 Name, Role, Value',
     principle: 'robust',
@@ -1608,7 +1658,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     description:
       'Элемент использует ARIA-роль, помеченную как устаревшая (deprecated) в спецификации WAI-ARIA. ' +
       'Поддержка устаревших ролей во вспомогательных технологиях может прекратиться.',
-    fix: 'Замените устаревшую роль на актуальный эквивалент. ' +
+    fix:
+      'Замените устаревшую роль на актуальный эквивалент. ' +
       'Проверьте список устаревших ролей в спецификации WAI-ARIA 1.2.',
     wcag: 'WCAG 2.1, 4.1.2 Name, Role, Value',
     principle: 'robust',
@@ -1624,7 +1675,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     description:
       'Элемент с ролью dialog или alertdialog не имеет доступного имени (aria-label или aria-labelledby). ' +
       'Скринридер откроет диалог без объявления его темы/назначения, что дезориентирует пользователя.',
-    fix: 'Добавьте aria-labelledby="id-заголовка-диалога" или aria-label="Название диалога" ' +
+    fix:
+      'Добавьте aria-labelledby="id-заголовка-диалога" или aria-label="Название диалога" ' +
       'на элемент с role="dialog".',
     principle: 'robust',
     severity: 'warning',
@@ -1639,7 +1691,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     description:
       'Атрибут aria-hidden="true" применён к элементу <body>, что скрывает всю страницу ' +
       'от вспомогательных технологий. Скринридеры не смогут прочитать ни один элемент страницы.',
-    fix: 'Удалите aria-hidden="true" с элемента <body>. ' +
+    fix:
+      'Удалите aria-hidden="true" с элемента <body>. ' +
       'Используйте aria-hidden только на конкретных декоративных или скрытых элементах.',
     wcag: 'WCAG 2.1, 1.3.1 Info and Relationships / 4.1.2 Name, Role, Value',
     principle: 'robust',
@@ -1656,7 +1709,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
       'Элемент с aria-hidden="true" сам является фокусируемым или содержит фокусируемые элементы ' +
       '(кнопки, ссылки, поля ввода). При клавиатурной навигации фокус попадает на элемент, ' +
       'который скринридер не видит — пользователь теряется.',
-    fix: 'Никогда не применяйте aria-hidden="true" к элементам, получающим фокус. ' +
+    fix:
+      'Никогда не применяйте aria-hidden="true" к элементам, получающим фокус. ' +
       'Если элемент должен быть скрыт — используйте display:none или visibility:hidden ' +
       '(они также убирают из порядка фокуса).',
     wcag: 'WCAG 2.1, 4.1.2 Name, Role, Value',
@@ -1673,7 +1727,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     description:
       'Элемент с ролью поля ввода (combobox, listbox, searchbox, spinbutton, textbox) ' +
       'не имеет доступного имени. Скринридер не сможет объяснить пользователю назначение поля.',
-    fix: 'Добавьте aria-label="Описание поля" или aria-labelledby="id-метки" ' +
+    fix:
+      'Добавьте aria-label="Описание поля" или aria-labelledby="id-метки" ' +
       'либо явный элемент <label>.',
     wcag: 'WCAG 2.1, 4.1.2 Name, Role, Value',
     principle: 'robust',
@@ -1689,7 +1744,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     description:
       'Элемент с role="meter" не имеет доступного имени. ' +
       'Скринридер объявит числовое значение без контекста того, что оно измеряет.',
-    fix: 'Добавьте aria-label="Уровень заряда батареи" или aria-labelledby ' +
+    fix:
+      'Добавьте aria-label="Уровень заряда батареи" или aria-labelledby ' +
       'на элемент с role="meter". Также укажите aria-valuenow, aria-valuemin, aria-valuemax.',
     wcag: 'WCAG 2.1, 1.1.1 Non-text Content',
     principle: 'perceivable',
@@ -1705,7 +1761,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     description:
       'Элемент с role="progressbar" не имеет доступного имени. ' +
       'Скринридер объявит прогресс-бар без указания, что именно загружается или выполняется.',
-    fix: 'Добавьте aria-label="Загрузка файла" или aria-labelledby на элемент с role="progressbar". ' +
+    fix:
+      'Добавьте aria-label="Загрузка файла" или aria-labelledby на элемент с role="progressbar". ' +
       'Также укажите aria-valuenow и aria-valuemax для отображения прогресса.',
     wcag: 'WCAG 2.1, 1.1.1 Non-text Content',
     principle: 'perceivable',
@@ -1722,7 +1779,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
       'На элементе используется ARIA-атрибут, явно запрещённый спецификацией для его роли. ' +
       'Например, aria-label на элементе с role="presentation" или role="none" ' +
       'нейтрализует скрытие элемента от скринридеров.',
-    fix: 'Удалите запрещённый ARIA-атрибут. Проверьте раздел "Prohibited States and Properties" ' +
+    fix:
+      'Удалите запрещённый ARIA-атрибут. Проверьте раздел "Prohibited States and Properties" ' +
       'в спецификации WAI-ARIA для данной роли.',
     wcag: 'WCAG 2.1, 4.1.2 Name, Role, Value',
     principle: 'robust',
@@ -1739,7 +1797,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
       'Элемент с данной ARIA-ролью должен содержать дочерние элементы с определёнными ролями, ' +
       'но они отсутствуют. Например, role="list" требует наличия потомков с role="listitem", ' +
       'role="menu" — потомков с role="menuitem".',
-    fix: 'Добавьте дочерние элементы с требуемыми ролями согласно спецификации WAI-ARIA. ' +
+    fix:
+      'Добавьте дочерние элементы с требуемыми ролями согласно спецификации WAI-ARIA. ' +
       'Пример: <ul role="list"><li role="listitem">Пункт</li></ul>.',
     wcag: 'WCAG 2.1, 1.3.1 Info and Relationships',
     principle: 'perceivable',
@@ -1756,7 +1815,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
       'Элемент использует ARIA-роль, которая должна быть вложена в родительский элемент с определённой ролью, ' +
       'но такой родитель отсутствует. Например, role="listitem" должен быть внутри role="list", ' +
       'role="option" — внутри role="listbox".',
-    fix: 'Оберните элемент в контейнер с требуемой родительской ролью. ' +
+    fix:
+      'Оберните элемент в контейнер с требуемой родительской ролью. ' +
       'Пример: <div role="listbox"><div role="option">Вариант</div></div>.',
     wcag: 'WCAG 2.1, 1.3.1 Info and Relationships',
     principle: 'perceivable',
@@ -1772,7 +1832,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     description:
       'Элемент с role="presentation" или role="none" имеет глобальные ARIA-атрибуты ' +
       'или tabindex, из-за чего скринридеры не смогут его корректно проигнорировать.',
-    fix: 'Удалите ARIA-атрибуты и tabindex с элемента, если его нужно скрыть от вспомогательных технологий. ' +
+    fix:
+      'Удалите ARIA-атрибуты и tabindex с элемента, если его нужно скрыть от вспомогательных технологий. ' +
       'Либо уберите role="presentation" и сохраните семантику.',
     principle: 'robust',
     severity: 'warning',
@@ -1810,4 +1871,3 @@ export function getRuleMeta(ruleId: string): RuA11yRuleMeta {
     severity: 'warning',
   };
 }
-

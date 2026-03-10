@@ -1,6 +1,6 @@
 {
   "name": "ru-a11y-toolkit-visually-impaired",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Модуль повышенной читабельности для пользователей с нарушениями зрения — часть ru-a11y-toolkit",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -92,5 +92,3 @@
     }
   }
 }
-
-

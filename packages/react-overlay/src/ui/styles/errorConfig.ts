@@ -226,4 +226,3 @@ export const expandButtonConfig: CSSProperties = {
   textAlign: 'left',
   fontFamily: FONTS.base,
 };
-

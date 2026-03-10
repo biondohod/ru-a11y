@@ -24,4 +24,3 @@ export {
 // Типы axe-runner (для расширенного использования)
 export type { A11yViolationNode, ScanResult, AxeRunnerConfig, AxePreset } from './axeRunner';
 export { PRESET_TAGS } from './axeRunner';
-

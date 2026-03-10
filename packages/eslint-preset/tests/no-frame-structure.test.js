@@ -118,4 +118,3 @@ ruleTester.run('no-frame-structure', rule, {
 });
 
 console.log('✅ Тесты no-frame-structure прошли успешно');
-

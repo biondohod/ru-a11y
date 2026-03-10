@@ -100,4 +100,3 @@ describe('WCAG_PRINCIPLES', () => {
     expect(WCAG_PRINCIPLES.robust).toBe('Надёжность');
   });
 });
-

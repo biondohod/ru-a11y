@@ -135,4 +135,3 @@ ruleTester.run('zoom-200-warning', rule, {
 });
 
 console.log('✅ Тесты zoom-200-warning прошли успешно');
-

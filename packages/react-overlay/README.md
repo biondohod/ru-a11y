@@ -6,6 +6,7 @@
 **Runtime-визуализатор нарушений доступности для React-приложений**
 
 Часть экосистемы [ru-a11y-toolkit](https://github.com/biondohod/ru-a11y) — набора инструментов для проверки веб-доступности по российским нормативам:
+
 - **ГОСТ Р 52872-2019** «Интернет-ресурсы и другая информация, представленная в электронно-цифровой форме»
 - **Постановление Правительства РФ №102** от 07.02.2026
 - **WCAG 2.1/2.2** (Web Content Accessibility Guidelines)
@@ -47,6 +48,7 @@ yarn add -D ru-a11y-toolkit-overlay
 ```
 
 **Peer dependencies** (должны быть установлены в вашем проекте):
+
 ```bash
 npm install react react-dom
 ```
@@ -59,42 +61,42 @@ npm install react react-dom
 
 ```tsx
 // src/main.tsx или src/index.tsx
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
 
 // Ленивый импорт, чтобы не попасть в production-бандл
 const RuA11yOverlay = import.meta.env.DEV
   ? (await import('ru-a11y-toolkit-overlay')).RuA11yOverlay
-  : null
+  : null;
 
-const root = ReactDOM.createRoot(document.getElementById('root')!)
+const root = ReactDOM.createRoot(document.getElementById('root')!);
 
 root.render(
   <React.StrictMode>
     <App />
     {import.meta.env.DEV && RuA11yOverlay && <RuA11yOverlay />}
-  </React.StrictMode>
-)
+  </React.StrictMode>,
+);
 ```
 
 ### Простой способ (через process.env)
 
 ```tsx
 // src/main.tsx
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App'
-import { RuA11yOverlay } from 'ru-a11y-toolkit-overlay'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+import { RuA11yOverlay } from 'ru-a11y-toolkit-overlay';
 
-const root = ReactDOM.createRoot(document.getElementById('root')!)
+const root = ReactDOM.createRoot(document.getElementById('root')!);
 
 root.render(
   <React.StrictMode>
     <App />
     {process.env.NODE_ENV === 'development' && <RuA11yOverlay />}
-  </React.StrictMode>
-)
+  </React.StrictMode>,
+);
 ```
 
 > **Примечание:** При использовании Vite tree-shaking автоматически уберёт overlay из production-сборки, если вы используете `import.meta.env.DEV`. При использовании `process.env.NODE_ENV` убедитесь, что ваш бандлер правильно заменяет это значение.
@@ -105,29 +107,25 @@ root.render(
 
 ### `<RuA11yOverlay />` — пропсы
 
-| Prop | Тип | По умолчанию | Описание |
-|------|-----|--------------|----------|
-| `preset` | `'recommended' \| 'gost-aa' \| 'strict'` | `'recommended'` | Набор правил проверки (см. ниже) |
-| `excludeSelector` | `string` | — | CSS-селектор элементов, исключаемых из сканирования (оверлей исключается автоматически) |
-| `debounceMs` | `number` | `1000` | Задержка ресканирования при изменениях DOM (мс) |
-| `autoScan` | `boolean` | `true` | Автоматически пересканировать при изменениях DOM |
+| Prop              | Тип                                      | По умолчанию    | Описание                                                                                |
+| ----------------- | ---------------------------------------- | --------------- | --------------------------------------------------------------------------------------- |
+| `preset`          | `'recommended' \| 'gost-aa' \| 'strict'` | `'recommended'` | Набор правил проверки (см. ниже)                                                        |
+| `excludeSelector` | `string`                                 | —               | CSS-селектор элементов, исключаемых из сканирования (оверлей исключается автоматически) |
+| `debounceMs`      | `number`                                 | `1000`          | Задержка ресканирования при изменениях DOM (мс)                                         |
+| `autoScan`        | `boolean`                                | `true`          | Автоматически пересканировать при изменениях DOM                                        |
 
 #### Пресеты (`preset`)
 
-| Пресет | Уровень | Для кого |
-|--------|---------|----------|
-| `recommended` | WCAG 2.1 AA | Все проекты — базовые критические проверки |
-| `gost-aa` | WCAG 2.1 AA + best-practice | Гос. органы, порталы под Постановление №102 |
-| `strict` | WCAG 2.1 AAA | Максимальная строгость, включая экспериментальные правила |
+| Пресет        | Уровень                     | Для кого                                                  |
+| ------------- | --------------------------- | --------------------------------------------------------- |
+| `recommended` | WCAG 2.1 AA                 | Все проекты — базовые критические проверки                |
+| `gost-aa`     | WCAG 2.1 AA + best-practice | Гос. органы, порталы под Постановление №102               |
+| `strict`      | WCAG 2.1 AAA                | Максимальная строгость, включая экспериментальные правила |
 
 ### Пример с настройками
 
 ```tsx
-<RuA11yOverlay
-  preset="gost-aa"
-  debounceMs={2000}
-  autoScan={false}
-/>
+<RuA11yOverlay preset="gost-aa" debounceMs={2000} autoScan={false} />
 ```
 
 ---
@@ -137,21 +135,21 @@ root.render(
 ### Доступ к маппингу правил
 
 ```ts
-import { getRuleMeta, RU_A11Y_RULES, WCAG_PRINCIPLES } from 'ru-a11y-toolkit-overlay'
+import { getRuleMeta, RU_A11Y_RULES, WCAG_PRINCIPLES } from 'ru-a11y-toolkit-overlay';
 
 // Получить метаданные правила по ID axe-core
-const meta = getRuleMeta('image-alt')
-console.log(meta.title)       // 'Изображение без альтернативного текста'
-console.log(meta.gost)        // 'ГОСТ Р 52872-2019, §5.1.1'
-console.log(meta.post102)     // 'Постановление №102, п. г)'
-console.log(meta.wcag)        // 'WCAG 2.1, 1.1.1 Non-text Content'
-console.log(meta.severity)    // 'error'
+const meta = getRuleMeta('image-alt');
+console.log(meta.title); // 'Изображение без альтернативного текста'
+console.log(meta.gost); // 'ГОСТ Р 52872-2019, §5.1.1'
+console.log(meta.post102); // 'Постановление №102, п. г)'
+console.log(meta.wcag); // 'WCAG 2.1, 1.1.1 Non-text Content'
+console.log(meta.severity); // 'error'
 
 // Получить все правила
-console.log(Object.keys(RU_A11Y_RULES)) // ['image-alt', 'color-contrast', ...]
+console.log(Object.keys(RU_A11Y_RULES)); // ['image-alt', 'color-contrast', ...]
 
 // Принципы WCAG на русском
-console.log(WCAG_PRINCIPLES)
+console.log(WCAG_PRINCIPLES);
 // { perceivable: 'Воспринимаемость', operable: 'Управляемость', ... }
 ```
 
@@ -161,11 +159,11 @@ console.log(WCAG_PRINCIPLES)
 
 Overlay использует **единый маппинг правил** с ESLint-пакетом. Идентификаторы нарушений согласованы:
 
-| Инструмент | Когда работает | Что проверяет |
-|-----------|----------------|---------------|
-| `ru-a11y-toolkit-eslint` | В IDE / CI во время написания кода | JSX-атрибуты, семантика компонентов |
-| `ru-a11y-toolkit-overlay` | В браузере во время разработки | Реальный DOM, динамический контент, цвета |
-| `ru-a11y-toolkit-cli` | В CI/CD на готовой странице | Полная страница, включая SEO и структуру |
+| Инструмент                | Когда работает                     | Что проверяет                             |
+| ------------------------- | ---------------------------------- | ----------------------------------------- |
+| `ru-a11y-toolkit-eslint`  | В IDE / CI во время написания кода | JSX-атрибуты, семантика компонентов       |
+| `ru-a11y-toolkit-overlay` | В браузере во время разработки     | Реальный DOM, динамический контент, цвета |
+| `ru-a11y-toolkit-cli`     | В CI/CD на готовой странице        | Полная страница, включая SEO и структуру  |
 
 **Рекомендуемый подход** — использовать все три инструмента вместе для максимального покрытия.
 

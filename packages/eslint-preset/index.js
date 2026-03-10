@@ -77,7 +77,7 @@ const plugin = {
     // Обёрнутые правила jsx-a11y с русскими сообщениями
     // Доступны как @ru-a11y/gost-a11y/jsx-a11y/alt-text и т.д.
     ...Object.fromEntries(
-      Object.entries(jsxA11yRu).map(([name, rule]) => [`jsx-a11y/${name}`, rule])
+      Object.entries(jsxA11yRu).map(([name, rule]) => [`jsx-a11y/${name}`, rule]),
     ),
   },
 };
@@ -127,4 +127,3 @@ plugin.configs = {
 };
 
 module.exports = plugin;
-

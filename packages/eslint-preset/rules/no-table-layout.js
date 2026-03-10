@@ -38,10 +38,7 @@ function findAttribute(attributes, name) {
 function getAttributeValue(attr) {
   if (!attr || !attr.value) return null;
   if (attr.value.type === 'Literal') return String(attr.value.value);
-  if (
-    attr.value.type === 'JSXExpressionContainer' &&
-    attr.value.expression.type === 'Literal'
-  ) {
+  if (attr.value.type === 'JSXExpressionContainer' && attr.value.expression.type === 'Literal') {
     return String(attr.value.expression.value);
   }
   return null;
@@ -124,8 +121,7 @@ module.exports = {
 
     return {
       JSXOpeningElement(node) {
-        const tagName =
-          node.name && node.name.type === 'JSXIdentifier' ? node.name.name : null;
+        const tagName = node.name && node.name.type === 'JSXIdentifier' ? node.name.name : null;
 
         if (tagName !== 'table') return;
 
@@ -172,4 +168,3 @@ module.exports = {
     };
   },
 };
-

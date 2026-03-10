@@ -142,4 +142,3 @@ ruleTester.run('no-table-layout', rule, {
 });
 
 console.log('✅ Тесты no-table-layout прошли успешно');
-

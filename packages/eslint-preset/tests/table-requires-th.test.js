@@ -162,10 +162,7 @@ ruleTester.run('table-requires-th', rule, {
           );
         }
       `,
-      errors: [
-        { messageId: 'missingScope' },
-        { messageId: 'missingScope' },
-      ],
+      errors: [{ messageId: 'missingScope' }, { messageId: 'missingScope' }],
     },
     {
       name: 'таблица с <th> и невалидным scope',
@@ -206,4 +203,3 @@ ruleTester.run('table-requires-th', rule, {
 });
 
 console.log('✅ Тесты table-requires-th прошли успешно');
-

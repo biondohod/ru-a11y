@@ -163,5 +163,3 @@ export const loadingStateConfig: CSSProperties = {
   color: COLORS.mutedText,
   fontSize: FONTS.sizeSm,
 };
-
-

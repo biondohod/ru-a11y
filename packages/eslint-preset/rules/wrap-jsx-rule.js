@@ -53,7 +53,10 @@ function wrapJsxRule(originalRule, ruMessages) {
           if (descriptor && typeof descriptor.message === 'string') {
             const translated = translateMessage(descriptor.message);
             if (translated !== descriptor.message) {
-              return context.report.call(context, Object.assign({}, descriptor, { message: translated }));
+              return context.report.call(
+                context,
+                Object.assign({}, descriptor, { message: translated }),
+              );
             }
           }
           return context.report.call(context, descriptor);
@@ -77,4 +80,3 @@ function wrapJsxRule(originalRule, ruMessages) {
 }
 
 module.exports = wrapJsxRule;
-

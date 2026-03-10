@@ -36,8 +36,14 @@ function wrap(ruleName, ruMappings) {
   const original = jsxRules[ruleName];
   if (!original) {
     return {
-      meta: { type: 'suggestion', docs: { description: `jsx-a11y/${ruleName} (eslint-plugin-jsx-a11y не установлен)` }, schema: [] },
-      create() { return {}; },
+      meta: {
+        type: 'suggestion',
+        docs: { description: `jsx-a11y/${ruleName} (eslint-plugin-jsx-a11y не установлен)` },
+        schema: [],
+      },
+      create() {
+        return {};
+      },
     };
   }
   return wrapJsxRule(original, ruMappings);
@@ -46,33 +52,45 @@ function wrap(ruleName, ruMappings) {
 const m = messages.jsxA11y;
 
 const rules = {
-  'alt-text':                                    wrap('alt-text',                                    m.altText),
-  'anchor-has-content':                          wrap('anchor-has-content',                          m.anchorHasContent),
-  'anchor-is-valid':                             wrap('anchor-is-valid',                             m.anchorIsValid),
-  'aria-props':                                  wrap('aria-props',                                  m.ariaProps),
-  'aria-proptypes':                              wrap('aria-proptypes',                              m.ariaProptypes),
-  'aria-role':                                   wrap('aria-role',                                   m.ariaRole),
-  'aria-unsupported-elements':                   wrap('aria-unsupported-elements',                   m.ariaUnsupportedElements),
-  'click-events-have-key-events':                wrap('click-events-have-key-events',                m.clickEventsHaveKeyEvents),
-  'heading-has-content':                         wrap('heading-has-content',                         m.headingHasContent),
-  'html-has-lang':                               wrap('html-has-lang',                               m.htmlHasLang),
-  'iframe-has-title':                            wrap('iframe-has-title',                            m.iframeHasTitle),
-  'img-redundant-alt':                           wrap('img-redundant-alt',                           m.imgRedundantAlt),
-  'interactive-supports-focus':                  wrap('interactive-supports-focus',                  m.interactiveSupportsFocus),
-  'label-has-associated-control':                wrap('label-has-associated-control',                m.labelHasAssociatedControl),
-  'media-has-caption':                           wrap('media-has-caption',                           m.mediaHasCaption),
-  'mouse-events-have-key-events':                wrap('mouse-events-have-key-events',                m.mouseEventsHaveKeyEvents),
+  'alt-text': wrap('alt-text', m.altText),
+  'anchor-has-content': wrap('anchor-has-content', m.anchorHasContent),
+  'anchor-is-valid': wrap('anchor-is-valid', m.anchorIsValid),
+  'aria-props': wrap('aria-props', m.ariaProps),
+  'aria-proptypes': wrap('aria-proptypes', m.ariaProptypes),
+  'aria-role': wrap('aria-role', m.ariaRole),
+  'aria-unsupported-elements': wrap('aria-unsupported-elements', m.ariaUnsupportedElements),
+  'click-events-have-key-events': wrap('click-events-have-key-events', m.clickEventsHaveKeyEvents),
+  'heading-has-content': wrap('heading-has-content', m.headingHasContent),
+  'html-has-lang': wrap('html-has-lang', m.htmlHasLang),
+  'iframe-has-title': wrap('iframe-has-title', m.iframeHasTitle),
+  'img-redundant-alt': wrap('img-redundant-alt', m.imgRedundantAlt),
+  'interactive-supports-focus': wrap('interactive-supports-focus', m.interactiveSupportsFocus),
+  'label-has-associated-control': wrap('label-has-associated-control', m.labelHasAssociatedControl),
+  'media-has-caption': wrap('media-has-caption', m.mediaHasCaption),
+  'mouse-events-have-key-events': wrap('mouse-events-have-key-events', m.mouseEventsHaveKeyEvents),
   // Правило в jsx-a11y называется tabindex-no-positive (не no-positive-tabindex)
-  'tabindex-no-positive':                        wrap('tabindex-no-positive',                        m.tabindexNoPositive),
-  'no-noninteractive-element-interactions':      wrap('no-noninteractive-element-interactions',      m.noNoninteractiveElementInteractions),
-  'no-noninteractive-tabindex':                  wrap('no-noninteractive-tabindex',                  m.noNoninteractiveTabindex),
-  'no-redundant-roles':                          wrap('no-redundant-roles',                          m.noRedundantRoles),
-  'scope':                                       wrap('scope',                                       m.scope),
-  'autocomplete-valid':                          wrap('autocomplete-valid',                          m.autocompleteValid),
-  'no-access-key':                               wrap('no-access-key',                               m.noAccessKey),
-  'no-static-element-interactions':              wrap('no-static-element-interactions',              m.noStaticElementInteractions),
-  'no-interactive-element-to-noninteractive-role': wrap('no-interactive-element-to-noninteractive-role', m.noInteractiveElementToNoninteractiveRole),
-  'aria-activedescendant-has-tabindex':          wrap('aria-activedescendant-has-tabindex',          m.ariaActivedescendantHasTabindex),
+  'tabindex-no-positive': wrap('tabindex-no-positive', m.tabindexNoPositive),
+  'no-noninteractive-element-interactions': wrap(
+    'no-noninteractive-element-interactions',
+    m.noNoninteractiveElementInteractions,
+  ),
+  'no-noninteractive-tabindex': wrap('no-noninteractive-tabindex', m.noNoninteractiveTabindex),
+  'no-redundant-roles': wrap('no-redundant-roles', m.noRedundantRoles),
+  scope: wrap('scope', m.scope),
+  'autocomplete-valid': wrap('autocomplete-valid', m.autocompleteValid),
+  'no-access-key': wrap('no-access-key', m.noAccessKey),
+  'no-static-element-interactions': wrap(
+    'no-static-element-interactions',
+    m.noStaticElementInteractions,
+  ),
+  'no-interactive-element-to-noninteractive-role': wrap(
+    'no-interactive-element-to-noninteractive-role',
+    m.noInteractiveElementToNoninteractiveRole,
+  ),
+  'aria-activedescendant-has-tabindex': wrap(
+    'aria-activedescendant-has-tabindex',
+    m.ariaActivedescendantHasTabindex,
+  ),
 };
 
 module.exports = rules;

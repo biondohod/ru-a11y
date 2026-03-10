@@ -9,6 +9,5 @@ module.exports = new Proxy(
     get(_, className) {
       return typeof className === 'string' ? className : '';
     },
-  }
+  },
 );
-

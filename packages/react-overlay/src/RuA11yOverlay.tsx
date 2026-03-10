@@ -17,12 +17,18 @@
  * гарантирует это при бандлинге (tree-shaking).
  */
 
-import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {createPortal} from 'react-dom';
-import {type A11yViolationNode, type AxePreset, createDomObserver, runAxeScan, type ScanResult} from './axeRunner';
-import {Panel} from './ui/Panel';
-import {HighlightLayer} from './ui/HighlightLayer';
-import {COLORS, panelStyles} from './ui/styles';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import {
+  type A11yViolationNode,
+  type AxePreset,
+  createDomObserver,
+  runAxeScan,
+  type ScanResult,
+} from './axeRunner';
+import { Panel } from './ui/Panel';
+import { HighlightLayer } from './ui/HighlightLayer';
+import { COLORS, panelStyles } from './ui/styles';
 
 export interface RuA11yOverlayProps {
   /**
@@ -112,15 +118,14 @@ export function RuA11yOverlay({
       clearTimeout(timer);
       isMountedRef.current = false;
     };
-  }, []);  // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Подключение MutationObserver для автоматического ресканирования
   useEffect(() => {
     if (!autoScan) return;
 
     return createDomObserver(handleScanResult, axeConfig);
-  }, [autoScan]);  // eslint-disable-line react-hooks/exhaustive-deps
-
+  }, [autoScan]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const totalIssues = (result?.counts.error ?? 0) + (result?.counts.warning ?? 0);
   const errorCount = result?.counts.error ?? 0;
@@ -128,19 +133,12 @@ export function RuA11yOverlay({
 
   // Определяем цвет кнопки-переключателя на основе наличия ошибок
   const toggleColor =
-    errorCount > 0
-      ? COLORS.badgeError
-      : warningCount > 0
-        ? COLORS.badgeWarning
-        : COLORS.btnPrimary;
+    errorCount > 0 ? COLORS.badgeError : warningCount > 0 ? COLORS.badgeWarning : COLORS.btnPrimary;
 
   return createPortal(
     <>
       {/* Слой подсветки */}
-      <HighlightLayer
-        activeViolation={activeViolation}
-        allViolations={result?.violations ?? []}
-      />
+      <HighlightLayer activeViolation={activeViolation} allViolations={result?.violations ?? []} />
 
       {/* Панель с нарушениями */}
       {isOpen && (
@@ -172,10 +170,7 @@ export function RuA11yOverlay({
         <span aria-hidden="true">♿</span>
         <span>Доступность</span>
         {isScanning ? (
-          <span
-            aria-hidden="true"
-            style={{ fontSize: '11px', opacity: 0.7 }}
-          >
+          <span aria-hidden="true" style={{ fontSize: '11px', opacity: 0.7 }}>
             ⟳
           </span>
         ) : totalIssues > 0 ? (
@@ -197,4 +192,3 @@ export function RuA11yOverlay({
 }
 
 export default RuA11yOverlay;
-

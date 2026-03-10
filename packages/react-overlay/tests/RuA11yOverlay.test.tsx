@@ -86,7 +86,13 @@ describe('RuA11yOverlay', () => {
     // Задерживаем ответ axe
     const mockedRun = axe.run as jest.MockedFunction<typeof axe.run>;
     mockedRun.mockImplementation(
-      () => new Promise((resolve) => setTimeout(() => resolve({ violations: [], passes: [], incomplete: [], inapplicable: [] } as any), 2000)),
+      () =>
+        new Promise((resolve) =>
+          setTimeout(
+            () => resolve({ violations: [], passes: [], incomplete: [], inapplicable: [] } as any),
+            2000,
+          ),
+        ),
     );
 
     await act(async () => {
@@ -136,6 +142,3 @@ describe('RuA11yOverlay', () => {
     expect(toggleBtn).toHaveAttribute('aria-expanded', 'true');
   });
 });
-
-
-

@@ -60,4 +60,3 @@ export function useVisuallyImpaired(): UseVisuallyImpairedReturn {
 
   return { toggle, isEnabled };
 }
-

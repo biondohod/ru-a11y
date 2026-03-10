@@ -135,4 +135,3 @@ ruleTester.run('require-title-semantic', rule, {
 });
 
 console.log('✅ Тесты require-title-semantic прошли успешно');
-

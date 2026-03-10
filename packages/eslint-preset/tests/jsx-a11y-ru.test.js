@@ -59,12 +59,14 @@ function lint(ruleName, code) {
   const linter = new Linter({ configType: 'flat' });
   // Регистрируем плагин под коротким именем чтобы обойти ESLint 9
   // парсинг @scope/pkg/rulename как pluginName=@scope/pkg, rule=rulename
-  const config = [{
-    files: ['**/*.jsx', '**/*.js'],
-    plugins: { 'a11y': plugin },
-    rules: { [`a11y/jsx-a11y/${ruleName}`]: 'error' },
-    languageOptions: LANG_OPTS,
-  }];
+  const config = [
+    {
+      files: ['**/*.jsx', '**/*.js'],
+      plugins: { a11y: plugin },
+      rules: { [`a11y/jsx-a11y/${ruleName}`]: 'error' },
+      languageOptions: LANG_OPTS,
+    },
+  ];
   const msgs = linter.verify(code, config, { filename: 'test.jsx' });
   return msgs[0] || null;
 }
@@ -138,7 +140,10 @@ describe('jsx-a11y-ru: русские сообщения при нарушени
   });
 
   test('click-events-have-key-events: onClick без клавиатуры — русское сообщение', () => {
-    const msg = lint('click-events-have-key-events', `function C(){return <div onClick={()=>{}}>x</div>;}`);
+    const msg = lint(
+      'click-events-have-key-events',
+      `function C(){return <div onClick={()=>{}}>x</div>;}`,
+    );
     expect(msg).not.toBeNull();
     expect(msg.message).toMatch(/клавиатур/);
     expect(msg.message).toMatch(/Постановление №102/);
@@ -162,11 +167,11 @@ describe('jsx-a11y-ru: русские сообщения при нарушени
     const cyrillicRe = /[а-яёА-ЯЁ]/;
     const testCases = {
       'anchor-has-content': `function C(){return <a href="/p"></a>;}`,
-      'html-has-lang':      `function C(){return <html><body/></html>;}`,
-      'iframe-has-title':   `function C(){return <iframe src="x.html"/>;}`,
+      'html-has-lang': `function C(){return <html><body/></html>;}`,
+      'iframe-has-title': `function C(){return <iframe src="x.html"/>;}`,
       'tabindex-no-positive': `function C(){return <div tabIndex={2}>x</div>;}`,
-      'aria-role':          `function C(){return <div role="superman">x</div>;}`,
-      'scope':              `function C(){return <td scope="col">x</td>;}`,
+      'aria-role': `function C(){return <div role="superman">x</div>;}`,
+      scope: `function C(){return <td scope="col">x</td>;}`,
     };
     for (const [ruleName, code] of Object.entries(testCases)) {
       const msg = lint(ruleName, code);
@@ -189,7 +194,9 @@ describe('wrap-jsx-rule: утилита подмены сообщений', () =
     let reported = null;
     // Простой объект — report можно переопределить через Object.create
     const fakeContext = Object.create({
-      report(descriptor) { reported = descriptor; },
+      report(descriptor) {
+        reported = descriptor;
+      },
     });
     const wrapped = wrapJsxRule(rule, mappings);
     const listeners = wrapped.create(fakeContext);
@@ -266,9 +273,7 @@ ruleTester.run(
       { code: `function C(){return <a href="/page">Перейти</a>;}` },
       { code: `function C(){return <a href="/page" aria-label="Главная страница"/>;}` },
     ],
-    invalid: [
-      { code: `function C(){return <a href="/page"></a>;}`, errors: 1 },
-    ],
+    invalid: [{ code: `function C(){return <a href="/page"></a>;}`, errors: 1 }],
   },
 );
 
@@ -276,12 +281,8 @@ ruleTester.run(
   '@ru-a11y/gost-a11y/jsx-a11y/html-has-lang',
   plugin.rules['jsx-a11y/html-has-lang'],
   {
-    valid: [
-      { code: `function App(){return <html lang="ru"><body/></html>;}` },
-    ],
-    invalid: [
-      { code: `function App(){return <html><body/></html>;}`, errors: 1 },
-    ],
+    valid: [{ code: `function App(){return <html lang="ru"><body/></html>;}` }],
+    invalid: [{ code: `function App(){return <html><body/></html>;}`, errors: 1 }],
   },
 );
 
@@ -289,12 +290,8 @@ ruleTester.run(
   '@ru-a11y/gost-a11y/jsx-a11y/iframe-has-title',
   plugin.rules['jsx-a11y/iframe-has-title'],
   {
-    valid: [
-      { code: `function C(){return <iframe title="Карта" src="map.html"/>;}` },
-    ],
-    invalid: [
-      { code: `function C(){return <iframe src="map.html"/>;}`, errors: 1 },
-    ],
+    valid: [{ code: `function C(){return <iframe title="Карта" src="map.html"/>;}` }],
+    invalid: [{ code: `function C(){return <iframe src="map.html"/>;}`, errors: 1 }],
   },
 );
 
@@ -306,24 +303,13 @@ ruleTester.run(
       { code: `function C(){return <div tabIndex={0}>OK</div>;}` },
       { code: `function C(){return <div tabIndex={-1}>OK</div>;}` },
     ],
-    invalid: [
-      { code: `function C(){return <div tabIndex={1}>Bad</div>;}`, errors: 1 },
-    ],
+    invalid: [{ code: `function C(){return <div tabIndex={1}>Bad</div>;}`, errors: 1 }],
   },
 );
 
-ruleTester.run(
-  '@ru-a11y/gost-a11y/jsx-a11y/aria-role',
-  plugin.rules['jsx-a11y/aria-role'],
-  {
-    valid: [
-      { code: `function C(){return <div role="button">OK</div>;}` },
-    ],
-    invalid: [
-      { code: `function C(){return <div role="superman">Bad</div>;}`, errors: 1 },
-    ],
-  },
-);
+ruleTester.run('@ru-a11y/gost-a11y/jsx-a11y/aria-role', plugin.rules['jsx-a11y/aria-role'], {
+  valid: [{ code: `function C(){return <div role="button">OK</div>;}` }],
+  invalid: [{ code: `function C(){return <div role="superman">Bad</div>;}`, errors: 1 }],
+});
 
 console.log('✅ Тесты jsx-a11y-ru прошли успешно');
-

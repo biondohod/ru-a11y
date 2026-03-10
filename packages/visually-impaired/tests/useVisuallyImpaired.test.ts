@@ -47,4 +47,3 @@ describe('useVisuallyImpaired', () => {
     expect(result.current.toggle).toBe(toggleBefore);
   });
 });
-

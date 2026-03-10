@@ -57,9 +57,9 @@ export type AxePreset = 'recommended' | 'gost-aa' | 'strict';
 
 /** Маппинг пресетов на теги axe-core */
 export const PRESET_TAGS: Record<AxePreset, string[]> = {
-  'recommended': ['wcag2a', 'wcag21a', 'wcag2aa', 'wcag21aa'],
-  'gost-aa':     ['wcag2a', 'wcag21a', 'wcag2aa', 'wcag21aa', 'best-practice'],
-  'strict':      ['wcag2a', 'wcag21a', 'wcag2aa', 'wcag21aa', 'wcag2aaa', 'wcag21aaa', 'best-practice'],
+  recommended: ['wcag2a', 'wcag21a', 'wcag2aa', 'wcag21aa'],
+  'gost-aa': ['wcag2a', 'wcag21a', 'wcag2aa', 'wcag21aa', 'best-practice'],
+  strict: ['wcag2a', 'wcag21a', 'wcag2aa', 'wcag21aa', 'wcag2aaa', 'wcag21aaa', 'best-practice'],
 };
 
 /** Конфигурация axe-runner */
@@ -173,12 +173,14 @@ export async function runAxeScan(config: AxeRunnerConfig = {}): Promise<ScanResu
     const results = await axe.run(context, runOptions);
 
     if (results.violations.length > 0) {
-      console.table(results.violations.map(v => ({
-        id: v.id,
-        impact: v.impact,
-        description: v.description,
-        nodes: v.nodes.length,
-      })));
+      console.table(
+        results.violations.map((v) => ({
+          id: v.id,
+          impact: v.impact,
+          description: v.description,
+          nodes: v.nodes.length,
+        })),
+      );
     } else {
       console.warn('⚠️ violations пустой! Проверь теги и контекст выше.');
     }
@@ -186,8 +188,10 @@ export async function runAxeScan(config: AxeRunnerConfig = {}): Promise<ScanResu
 
     const violations = mapAxeViolations(results.violations);
 
-    violations.forEach(v => {
-      console.log(`  → [${v.meta.severity}] ${v.ruleId}: ${v.meta.title} | selector: ${v.selector}`);
+    violations.forEach((v) => {
+      console.log(
+        `  → [${v.meta.severity}] ${v.ruleId}: ${v.meta.title} | selector: ${v.selector}`,
+      );
     });
 
     return {
@@ -254,13 +258,25 @@ export function createDomObserver(
   });
 
   observer.observe(document.body, {
-    childList: true,   // отслеживаем добавление/удаление элементов
-    subtree: true,     // включая вложенные элементы
-    attributes: true,  // отслеживаем изменение атрибутов (alt, aria-*, role и т.д.)
-    attributeFilter: [ // только значимые для доступности атрибуты
-      'alt', 'aria-label', 'aria-labelledby', 'aria-describedby',
-      'aria-hidden', 'role', 'tabindex', 'href', 'lang', 'title',
-      'for', 'id', 'type', 'disabled',
+    childList: true, // отслеживаем добавление/удаление элементов
+    subtree: true, // включая вложенные элементы
+    attributes: true, // отслеживаем изменение атрибутов (alt, aria-*, role и т.д.)
+    attributeFilter: [
+      // только значимые для доступности атрибуты
+      'alt',
+      'aria-label',
+      'aria-labelledby',
+      'aria-describedby',
+      'aria-hidden',
+      'role',
+      'tabindex',
+      'href',
+      'lang',
+      'title',
+      'for',
+      'id',
+      'type',
+      'disabled',
     ],
   });
 
@@ -269,6 +285,3 @@ export function createDomObserver(
     if (debounceTimer) clearTimeout(debounceTimer);
   };
 }
-
-
-

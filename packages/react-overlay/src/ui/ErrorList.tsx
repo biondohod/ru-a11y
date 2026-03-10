@@ -46,20 +46,24 @@ export function ErrorList({ violations, activeViolation, onSelect }: ErrorListPr
       map.get(key)!.push(v);
     }
 
-    return GROUP_ORDER
-      .filter((g) => (map.get(g)?.length ?? 0) > 0)
-      .map((g) => ({ key: g, label: GROUP_LABELS[g], items: map.get(g)! }));
+    return GROUP_ORDER.filter((g) => (map.get(g)?.length ?? 0) > 0).map((g) => ({
+      key: g,
+      label: GROUP_LABELS[g],
+      items: map.get(g)!,
+    }));
   }, [violations]);
 
   if (violations.length === 0) {
     return (
       <div style={emptyStateConfig} role="status">
-        <div style={emptyIconConfig} aria-hidden="true">✅</div>
+        <div style={emptyIconConfig} aria-hidden="true">
+          ✅
+        </div>
         <p style={emptyTitleConfig}>Нарушений не обнаружено</p>
         <p style={emptySubtextConfig}>
-          Это не означает полного отсутствия проблем — axe-core находит ~57% нарушений.
-          Используйте ручное тестирование и{' '}
-          <span style={{ color: COLORS.link }}>ru-a11y-toolkit-eslint</span> для полного покрытия.
+          Это не означает полного отсутствия проблем — axe-core находит ~57% нарушений. Используйте
+          ручное тестирование и <span style={{ color: COLORS.link }}>ru-a11y-toolkit-eslint</span>{' '}
+          для полного покрытия.
         </p>
       </div>
     );
@@ -79,7 +83,7 @@ export function ErrorList({ violations, activeViolation, onSelect }: ErrorListPr
       {groups.map(({ key, label, items }) => {
         const isCollapsed = collapsedGroups.has(key);
         const errorCount = items.filter((v) => v.meta.severity === 'error').length;
-        const warnCount  = items.filter((v) => v.meta.severity === 'warning').length;
+        const warnCount = items.filter((v) => v.meta.severity === 'warning').length;
 
         return (
           <div key={key} role="listitem">

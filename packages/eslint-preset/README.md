@@ -42,18 +42,21 @@ yarn add -D ru-a11y-toolkit-eslint eslint
 ### Настройка `eslint.config.js` (ESLint 9 Flat Config)
 
 **Базовый уровень** (ГОСТ Р 52872-2019, уровень A — критические ошибки):
+
 ```js
 const ruA11y = require('ru-a11y-toolkit-eslint');
 module.exports = [ruA11y.configs.recommended];
 ```
 
 **Стандартный уровень** (ГОСТ AA + Постановление №102 — для гос. сайтов):
+
 ```js
 const ruA11y = require('ru-a11y-toolkit-eslint');
 module.exports = [ruA11y.configs['gost-aa']];
 ```
 
 **Строгий уровень** (ГОСТ AAA — максимальная строгость):
+
 ```js
 const ruA11y = require('ru-a11y-toolkit-eslint');
 module.exports = [ruA11y.configs.strict];
@@ -71,11 +74,11 @@ module.exports = {
 
 ## Уровни конфигурации
 
-| Конфиг | Уровень | Для кого |
-|--------|---------|----------|
-| `recommended` | ГОСТ A | Все проекты — базовая доступность |
-| `gost-aa` | ГОСТ AA + №102 | Гос. органы, порталы, обязанные соответствовать Постановлению №102 |
-| `strict` | ГОСТ AAA | Критически важные сервисы (Госуслуги и аналоги) |
+| Конфиг        | Уровень        | Для кого                                                           |
+| ------------- | -------------- | ------------------------------------------------------------------ |
+| `recommended` | ГОСТ A         | Все проекты — базовая доступность                                  |
+| `gost-aa`     | ГОСТ AA + №102 | Гос. органы, порталы, обязанные соответствовать Постановлению №102 |
+| `strict`      | ГОСТ AAA       | Критически важные сервисы (Госуслуги и аналоги)                    |
 
 ---
 
@@ -104,48 +107,48 @@ module.exports = {
 
 ### Кастомные правила `@ru-a11y/gost-a11y/`
 
-| Правило | Уровень | ГОСТ Р 52872-2019 | Постановление №102 | Описание |
-|---------|---------|-------------------|--------------------|----------|
-| `require-skip-link` | A | §5.2.3.1 | п. а) | Обязательная ссылка «Перейти к содержанию» в начале `<body>` |
-| `require-lang-attr` | A | §5.2.4 | п. а), п. д) | Обязательный `lang` на `<html>`, рекомендуется `lang="ru"` |
-| `require-title-semantic` | A | §5.2.3 | п. е) | Информативный `<title>`, формат «Орган — Услуга» |
-| `no-frame-structure` | A | §5.1.1 | п. а) | Запрет `<frame>`/`<frameset>`, `<iframe>` требует `title` |
-| `table-requires-th` | A | §5.1.5 | п. а) | Таблицы данных должны иметь `<th scope="...">` |
-| `no-table-layout` | A | §5.1.5 | п. а) | Запрет таблиц для вёрстки, только для табличных данных |
-| `zoom-200-warning` | AA | — | п. б) | Запрет блокировки масштабирования, `maximum-scale` ≥ 2 |
+| Правило                  | Уровень | ГОСТ Р 52872-2019 | Постановление №102 | Описание                                                     |
+| ------------------------ | ------- | ----------------- | ------------------ | ------------------------------------------------------------ |
+| `require-skip-link`      | A       | §5.2.3.1          | п. а)              | Обязательная ссылка «Перейти к содержанию» в начале `<body>` |
+| `require-lang-attr`      | A       | §5.2.4            | п. а), п. д)       | Обязательный `lang` на `<html>`, рекомендуется `lang="ru"`   |
+| `require-title-semantic` | A       | §5.2.3            | п. е)              | Информативный `<title>`, формат «Орган — Услуга»             |
+| `no-frame-structure`     | A       | §5.1.1            | п. а)              | Запрет `<frame>`/`<frameset>`, `<iframe>` требует `title`    |
+| `table-requires-th`      | A       | §5.1.5            | п. а)              | Таблицы данных должны иметь `<th scope="...">`               |
+| `no-table-layout`        | A       | §5.1.5            | п. а)              | Запрет таблиц для вёрстки, только для табличных данных       |
+| `zoom-200-warning`       | AA      | —                 | п. б)              | Запрет блокировки масштабирования, `maximum-scale` ≥ 2       |
 
 ### Правила из `eslint-plugin-jsx-a11y` (подключаются в `gost-aa` и `strict`)
 
 Все 26 правил переведены на русский язык и содержат ссылки на нормативные документы. Перевод реализован через перехват `context.report()` в runtime — оригинальная логика проверки не изменяется.
 
-| Правило | ГОСТ / №102 / WCAG | Описание |
-|---------|--------------------|----------|
-| `jsx-a11y/alt-text` | §5.1.1; №102 п. г) | `alt` для `<img>`, `<area>`, `<input type="image">` |
-| `jsx-a11y/anchor-has-content` | §5.2.4; №102 п. ж) | Ссылки должны содержать текст |
-| `jsx-a11y/anchor-is-valid` | №102 п. ж) | Корректный `href`, не использовать `<a>` как кнопку |
-| `jsx-a11y/aria-activedescendant-has-tabindex` | WCAG 4.1.2; №102 п. а) | `tabIndex` для элементов с `aria-activedescendant` |
-| `jsx-a11y/aria-props` | WCAG 4.1.2 | Допустимые ARIA-атрибуты |
-| `jsx-a11y/aria-proptypes` | WCAG 4.1.2 | Корректные значения ARIA-атрибутов |
-| `jsx-a11y/aria-role` | WCAG 4.1.2 | Допустимые значения `role` |
-| `jsx-a11y/aria-unsupported-elements` | WCAG 4.1.2 | Запрет ARIA на неподдерживающих элементах |
-| `jsx-a11y/autocomplete-valid` | WCAG 1.3.5 | Корректные значения `autoComplete` |
-| `jsx-a11y/click-events-have-key-events` | №102 п. а); WCAG 2.1.1 | `onClick` → аналоги клавиатуры |
-| `jsx-a11y/heading-has-content` | §5.2.3; №102 п. е) | Заголовки не должны быть пустыми |
-| `jsx-a11y/html-has-lang` | §5.2.4; №102 п. а) | `lang` на `<html>` |
-| `jsx-a11y/iframe-has-title` | §5.1.1; №102 п. а) | `title` для `<iframe>` |
-| `jsx-a11y/img-redundant-alt` | §5.1.1; №102 п. г) | Запрет слов «фото», «картинка» в `alt` |
-| `jsx-a11y/interactive-supports-focus` | №102 п. а); WCAG 2.1.1 | Интерактивные элементы должны принимать фокус |
-| `jsx-a11y/label-has-associated-control` | §5.1.3; №102 п. м) | `<label>` связан с полем ввода |
-| `jsx-a11y/media-has-caption` | №102 п. г); WCAG 1.2.2 | Субтитры для `<video>`/`<audio>` |
-| `jsx-a11y/mouse-events-have-key-events` | №102 п. а); WCAG 2.1.1 | `onMouseOver`/`onMouseOut` → `onFocus`/`onBlur` |
-| `jsx-a11y/no-access-key` | WCAG 2.1.4 | Запрет `accessKey` |
-| `jsx-a11y/no-interactive-element-to-noninteractive-role` | WCAG 4.1.2 | Запрет неинтерактивной роли на интерактивном элементе |
-| `jsx-a11y/no-noninteractive-element-interactions` | WCAG 4.1.2 | Обработчики событий только на интерактивных элементах |
-| `jsx-a11y/no-noninteractive-tabindex` | WCAG 2.4.3; №102 п. а) | `tabIndex` только на интерактивных элементах |
-| `jsx-a11y/no-redundant-roles` | WCAG 4.1.2 | Запрет явного дублирования неявной роли |
-| `jsx-a11y/no-static-element-interactions` | WCAG 4.1.2 | Запрет обработчиков на статичных элементах |
-| `jsx-a11y/scope` | §5.1.5 | `scope` только на `<th>` |
-| `jsx-a11y/tabindex-no-positive` | №102 п. а); WCAG 2.4.3 | Запрет `tabIndex > 0` |
+| Правило                                                  | ГОСТ / №102 / WCAG     | Описание                                              |
+| -------------------------------------------------------- | ---------------------- | ----------------------------------------------------- |
+| `jsx-a11y/alt-text`                                      | §5.1.1; №102 п. г)     | `alt` для `<img>`, `<area>`, `<input type="image">`   |
+| `jsx-a11y/anchor-has-content`                            | §5.2.4; №102 п. ж)     | Ссылки должны содержать текст                         |
+| `jsx-a11y/anchor-is-valid`                               | №102 п. ж)             | Корректный `href`, не использовать `<a>` как кнопку   |
+| `jsx-a11y/aria-activedescendant-has-tabindex`            | WCAG 4.1.2; №102 п. а) | `tabIndex` для элементов с `aria-activedescendant`    |
+| `jsx-a11y/aria-props`                                    | WCAG 4.1.2             | Допустимые ARIA-атрибуты                              |
+| `jsx-a11y/aria-proptypes`                                | WCAG 4.1.2             | Корректные значения ARIA-атрибутов                    |
+| `jsx-a11y/aria-role`                                     | WCAG 4.1.2             | Допустимые значения `role`                            |
+| `jsx-a11y/aria-unsupported-elements`                     | WCAG 4.1.2             | Запрет ARIA на неподдерживающих элементах             |
+| `jsx-a11y/autocomplete-valid`                            | WCAG 1.3.5             | Корректные значения `autoComplete`                    |
+| `jsx-a11y/click-events-have-key-events`                  | №102 п. а); WCAG 2.1.1 | `onClick` → аналоги клавиатуры                        |
+| `jsx-a11y/heading-has-content`                           | §5.2.3; №102 п. е)     | Заголовки не должны быть пустыми                      |
+| `jsx-a11y/html-has-lang`                                 | §5.2.4; №102 п. а)     | `lang` на `<html>`                                    |
+| `jsx-a11y/iframe-has-title`                              | §5.1.1; №102 п. а)     | `title` для `<iframe>`                                |
+| `jsx-a11y/img-redundant-alt`                             | §5.1.1; №102 п. г)     | Запрет слов «фото», «картинка» в `alt`                |
+| `jsx-a11y/interactive-supports-focus`                    | №102 п. а); WCAG 2.1.1 | Интерактивные элементы должны принимать фокус         |
+| `jsx-a11y/label-has-associated-control`                  | §5.1.3; №102 п. м)     | `<label>` связан с полем ввода                        |
+| `jsx-a11y/media-has-caption`                             | №102 п. г); WCAG 1.2.2 | Субтитры для `<video>`/`<audio>`                      |
+| `jsx-a11y/mouse-events-have-key-events`                  | №102 п. а); WCAG 2.1.1 | `onMouseOver`/`onMouseOut` → `onFocus`/`onBlur`       |
+| `jsx-a11y/no-access-key`                                 | WCAG 2.1.4             | Запрет `accessKey`                                    |
+| `jsx-a11y/no-interactive-element-to-noninteractive-role` | WCAG 4.1.2             | Запрет неинтерактивной роли на интерактивном элементе |
+| `jsx-a11y/no-noninteractive-element-interactions`        | WCAG 4.1.2             | Обработчики событий только на интерактивных элементах |
+| `jsx-a11y/no-noninteractive-tabindex`                    | WCAG 2.4.3; №102 п. а) | `tabIndex` только на интерактивных элементах          |
+| `jsx-a11y/no-redundant-roles`                            | WCAG 4.1.2             | Запрет явного дублирования неявной роли               |
+| `jsx-a11y/no-static-element-interactions`                | WCAG 4.1.2             | Запрет обработчиков на статичных элементах            |
+| `jsx-a11y/scope`                                         | §5.1.5                 | `scope` только на `<th>`                              |
+| `jsx-a11y/tabindex-no-positive`                          | №102 п. а); WCAG 2.4.3 | Запрет `tabIndex > 0`                                 |
 
 ---
 
@@ -172,7 +175,9 @@ function App() {
 function App() {
   return (
     <body>
-      <a href="#main" className="skip-link">Перейти к содержанию</a>
+      <a href="#main" className="skip-link">
+        Перейти к содержанию
+      </a>
       <nav>Длинное меню...</nav>
       <main id="main">Контент</main>
     </body>
@@ -197,6 +202,7 @@ function App() {
   top: 0;
 }
 ```
+
 </details>
 
 ---
@@ -222,6 +228,7 @@ function App() {
 ```
 
 **Опция `enforceRussian`** (для гос. сайтов, в пресете `strict`):
+
 ```js
     '@ru-a11y/gost-a11y/require-lang-attr': ['error', {enforceRussian: true}]
 ```
@@ -398,17 +405,17 @@ anchorHasContent: [
 
 ## Сравнение с `eslint-plugin-jsx-a11y`
 
-| Возможность | `eslint-plugin-jsx-a11y` | `ru-a11y-toolkit-eslint` |
-|-------------|--------------------------|--------------------------|
-| Язык сообщений | Английский | **Русский** |
-| Стандарт | WCAG 2.1 | **ГОСТ Р 52872-2019 + №102** |
-| Масштабирование 200% | ❌ | ✅ `zoom-200-warning` |
-| Ссылка пропуска навигации | Частично | ✅ `require-skip-link` |
-| Требование lang="ru" | ❌ | ✅ `require-lang-attr` |
-| Запрет вёрстки таблицами | ❌ | ✅ `no-table-layout` |
-| Информативный `<title>` | ❌ | ✅ `require-title-semantic` |
-| Готовые пресеты для РФ | ❌ | ✅ `recommended`, `gost-aa`, `strict` |
-| Ссылки на российские НПА | ❌ | ✅ В каждом сообщении |
+| Возможность               | `eslint-plugin-jsx-a11y` | `ru-a11y-toolkit-eslint`              |
+| ------------------------- | ------------------------ | ------------------------------------- |
+| Язык сообщений            | Английский               | **Русский**                           |
+| Стандарт                  | WCAG 2.1                 | **ГОСТ Р 52872-2019 + №102**          |
+| Масштабирование 200%      | ❌                       | ✅ `zoom-200-warning`                 |
+| Ссылка пропуска навигации | Частично                 | ✅ `require-skip-link`                |
+| Требование lang="ru"      | ❌                       | ✅ `require-lang-attr`                |
+| Запрет вёрстки таблицами  | ❌                       | ✅ `no-table-layout`                  |
+| Информативный `<title>`   | ❌                       | ✅ `require-title-semantic`           |
+| Готовые пресеты для РФ    | ❌                       | ✅ `recommended`, `gost-aa`, `strict` |
+| Ссылки на российские НПА  | ❌                       | ✅ В каждом сообщении                 |
 
 `ru-a11y-toolkit-eslint` **расширяет** `eslint-plugin-jsx-a11y`, а не заменяет его.
 
@@ -430,13 +437,22 @@ module.exports = [
       // Требовать lang="ru" для гос. сайта
       '@ru-a11y/gost-a11y/require-lang-attr': ['error', { enforceRussian: true }],
       // Дополнительные допустимые href для skip-link
-      '@ru-a11y/gost-a11y/require-skip-link': ['error', {
-        allowedHrefs: ['#main', '#content', '#основной-контент'],
-      }],
+      '@ru-a11y/gost-a11y/require-skip-link': [
+        'error',
+        {
+          allowedHrefs: ['#main', '#content', '#основной-контент'],
+        },
+      ],
       // Строгая проверка масштабирования
-      '@ru-a11y/gost-a11y/zoom-200-warning': ['error', { minFontSizePx: 16, checkInlineStyles: true }],
+      '@ru-a11y/gost-a11y/zoom-200-warning': [
+        'error',
+        { minFontSizePx: 16, checkInlineStyles: true },
+      ],
       // Требовать <caption> для всех таблиц
-      '@ru-a11y/gost-a11y/table-requires-th': ['error', { requireCaption: true, requireScope: true }],
+      '@ru-a11y/gost-a11y/table-requires-th': [
+        'error',
+        { requireCaption: true, requireScope: true },
+      ],
     },
   },
 ];
@@ -447,14 +463,16 @@ module.exports = [
 ```js
 const ruA11y = require('ru-a11y-toolkit-eslint');
 
-module.exports = [{
-  plugins: { '@ru-a11y/gost-a11y': ruA11y },
-  rules: {
-    '@ru-a11y/gost-a11y/require-lang-attr': 'error',
-    '@ru-a11y/gost-a11y/zoom-200-warning': 'error',
-    '@ru-a11y/gost-a11y/require-skip-link': 'warn',
+module.exports = [
+  {
+    plugins: { '@ru-a11y/gost-a11y': ruA11y },
+    rules: {
+      '@ru-a11y/gost-a11y/require-lang-attr': 'error',
+      '@ru-a11y/gost-a11y/zoom-200-warning': 'error',
+      '@ru-a11y/gost-a11y/require-skip-link': 'warn',
+    },
   },
-}];
+];
 ```
 
 ### Игнорирование отдельных мест
@@ -499,7 +517,6 @@ MIT © [biondohod](https://github.com/biondohod)
 - **[`ru-a11y-toolkit-cli`](../cli/README.md)** — CLI-сканер для проверки готовых страниц (Puppeteer + axe-core)
 - **[`ru-a11y-toolkit`](../../README.md)** — umbrella-пакет, включающий все три модуля
 
-
 «Интернет-ресурсы и другая информация, представленная в электронно-цифровой форме. Приложения для стационарных и мобильных устройств, иные пользовательские интерфейсы. Требования доступности для людей с инвалидностью и других лиц с ограничениями жизнедеятельности»
 
 - Введён в действие с 1 апреля 2020 года
@@ -512,15 +529,15 @@ MIT © [biondohod](https://github.com/biondohod)
 
 Ключевые требования, которые проверяет этот пресет:
 
-| Пункт | Требование | Правило |
-|-------|-----------|---------|
-| п. а) | Беспрепятственный доступ с клавиатуры, корректное считывание скринридерами | `require-skip-link`, `require-lang-attr`, `no-frame-structure`, `table-requires-th`, `no-table-layout` |
-| п. б) | Масштабирование текста не менее 200% без потери функциональности и горизонтального скролла | `zoom-200-warning` |
-| п. д) | CAPTCHA на государственном языке РФ | `require-lang-attr` (enforceRussian) |
-| п. е) | Заголовки страниц описывают их тему или цель | `require-title-semantic` |
-| п. г) | Нетекстовый контент имеет текстовую альтернативу | `jsx-a11y/alt-text` |
-| п. ж) | Цель каждой ссылки определяется из её текста | `jsx-a11y/anchor-has-content` |
-| п. м) | Формы имеют текстовые описания полей, ошибки доступны скринридерам | `jsx-a11y/label-has-associated-control` |
+| Пункт | Требование                                                                                 | Правило                                                                                                |
+| ----- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| п. а) | Беспрепятственный доступ с клавиатуры, корректное считывание скринридерами                 | `require-skip-link`, `require-lang-attr`, `no-frame-structure`, `table-requires-th`, `no-table-layout` |
+| п. б) | Масштабирование текста не менее 200% без потери функциональности и горизонтального скролла | `zoom-200-warning`                                                                                     |
+| п. д) | CAPTCHA на государственном языке РФ                                                        | `require-lang-attr` (enforceRussian)                                                                   |
+| п. е) | Заголовки страниц описывают их тему или цель                                               | `require-title-semantic`                                                                               |
+| п. г) | Нетекстовый контент имеет текстовую альтернативу                                           | `jsx-a11y/alt-text`                                                                                    |
+| п. ж) | Цель каждой ссылки определяется из её текста                                               | `jsx-a11y/anchor-has-content`                                                                          |
+| п. м) | Формы имеют текстовые описания полей, ошибки доступны скринридерам                         | `jsx-a11y/label-has-associated-control`                                                                |
 
 - Вступает в силу с **1 марта 2026 года**
 - Ссылка: [pravo.gov.ru](http://publication.pravo.gov.ru/document/0001202602100010?index=1)
@@ -586,4 +603,3 @@ MIT © biondohod
 
 - **`@ru-a11y/react-overlay`** — Runtime-визуализатор ошибок доступности в браузере
 - **`@ru-a11y/cli`** — CLI-сканер для проверки готовых страниц (Puppeteer + axe-core)
-

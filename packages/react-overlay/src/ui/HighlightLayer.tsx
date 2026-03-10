@@ -7,14 +7,14 @@ import { COLORS } from './styles/tokens';
 import type { A11yViolationNode } from '../axeRunner';
 
 const STYLE_ID = 'ru-a11y-highlight-styles';
-const HIGHLIGHT_CLASS_ERROR   = 'ru-a11y-highlight-error';
+const HIGHLIGHT_CLASS_ERROR = 'ru-a11y-highlight-error';
 const HIGHLIGHT_CLASS_WARNING = 'ru-a11y-highlight-warning';
-const HIGHLIGHT_DURATION_MS   = 2000;
+const HIGHLIGHT_DURATION_MS = 2000;
 
 function buildHighlightCss(): string {
-  const e  = COLORS.errorBorder;
+  const e = COLORS.errorBorder;
   const eBg = COLORS.errorBg;
-  const w  = COLORS.warningBorder;
+  const w = COLORS.warningBorder;
   const wBg = COLORS.warningBg;
 
   return `
@@ -48,10 +48,7 @@ function injectStyles() {
 }
 
 function findElement(violation: A11yViolationNode): Element | null {
-  const selectors = [
-    violation.targets[0]?.[0],
-    violation.selector,
-  ].filter(Boolean) as string[];
+  const selectors = [violation.targets[0]?.[0], violation.selector].filter(Boolean) as string[];
 
   for (const sel of selectors) {
     try {
@@ -72,16 +69,19 @@ export function scrollAndHighlight(violation: A11yViolationNode | null) {
   const el = findElement(violation);
   if (!el) return;
 
-  document.querySelectorAll(`.${HIGHLIGHT_CLASS_ERROR}, .${HIGHLIGHT_CLASS_WARNING}`)
-    .forEach(e => e.classList.remove(HIGHLIGHT_CLASS_ERROR, HIGHLIGHT_CLASS_WARNING));
+  document
+    .querySelectorAll(`.${HIGHLIGHT_CLASS_ERROR}, .${HIGHLIGHT_CLASS_WARNING}`)
+    .forEach((e) => e.classList.remove(HIGHLIGHT_CLASS_ERROR, HIGHLIGHT_CLASS_WARNING));
 
   el.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
   setTimeout(() => {
-    document.querySelectorAll(`.${HIGHLIGHT_CLASS_ERROR}, .${HIGHLIGHT_CLASS_WARNING}`)
-      .forEach(e => e.classList.remove(HIGHLIGHT_CLASS_ERROR, HIGHLIGHT_CLASS_WARNING));
+    document
+      .querySelectorAll(`.${HIGHLIGHT_CLASS_ERROR}, .${HIGHLIGHT_CLASS_WARNING}`)
+      .forEach((e) => e.classList.remove(HIGHLIGHT_CLASS_ERROR, HIGHLIGHT_CLASS_WARNING));
 
-    const cls = violation.meta.severity === 'error' ? HIGHLIGHT_CLASS_ERROR : HIGHLIGHT_CLASS_WARNING;
+    const cls =
+      violation.meta.severity === 'error' ? HIGHLIGHT_CLASS_ERROR : HIGHLIGHT_CLASS_WARNING;
     el.classList.add(cls);
 
     setTimeout(() => {
@@ -107,8 +107,9 @@ export function HighlightLayer({ activeViolation }: HighlightLayerProps) {
 
   useEffect(() => {
     return () => {
-      document.querySelectorAll(`.${HIGHLIGHT_CLASS_ERROR}, .${HIGHLIGHT_CLASS_WARNING}`)
-        .forEach(e => e.classList.remove(HIGHLIGHT_CLASS_ERROR, HIGHLIGHT_CLASS_WARNING));
+      document
+        .querySelectorAll(`.${HIGHLIGHT_CLASS_ERROR}, .${HIGHLIGHT_CLASS_WARNING}`)
+        .forEach((e) => e.classList.remove(HIGHLIGHT_CLASS_ERROR, HIGHLIGHT_CLASS_WARNING));
     };
   }, []);
 

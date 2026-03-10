@@ -50,16 +50,10 @@ const rules = {
   // -----------------------------------------------------------------------
 
   // Требуем lang="ru" для всех русскоязычных страниц (Постановление №102 п. д))
-  '@ru-a11y/gost-a11y/require-lang-attr': [
-    'error',
-    { enforceRussian: true },
-  ],
+  '@ru-a11y/gost-a11y/require-lang-attr': ['error', { enforceRussian: true }],
 
   // Требуем <caption> и scope для всех таблиц (ГОСТ Р 52872-2019 §5.1.5)
-  '@ru-a11y/gost-a11y/table-requires-th': [
-    'error',
-    { requireCaption: true, requireScope: true },
-  ],
+  '@ru-a11y/gost-a11y/table-requires-th': ['error', { requireCaption: true, requireScope: true }],
 
   // Допустимые href для skip-link расширены
   '@ru-a11y/gost-a11y/require-skip-link': [

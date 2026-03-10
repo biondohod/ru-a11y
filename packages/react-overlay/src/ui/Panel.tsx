@@ -37,12 +37,15 @@ function useDraggable(initialOffset = { x: 0, y: 0 }) {
   const [offset, setOffset] = useState(initialOffset);
   const dragStart = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
 
-  const onMouseDown = useCallback((e: React.MouseEvent) => {
-    // Не начинаем drag при клике на кнопки внутри шапки
-    if ((e.target as HTMLElement).tagName === 'BUTTON') return;
-    e.preventDefault();
-    dragStart.current = { x: e.clientX, y: e.clientY, ox: offset.x, oy: offset.y };
-  }, [offset]);
+  const onMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      // Не начинаем drag при клике на кнопки внутри шапки
+      if ((e.target as HTMLElement).tagName === 'BUTTON') return;
+      e.preventDefault();
+      dragStart.current = { x: e.clientX, y: e.clientY, ox: offset.x, oy: offset.y };
+    },
+    [offset],
+  );
 
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
@@ -76,8 +79,8 @@ export function Panel({
   onRescan,
 }: PanelProps) {
   const { offset, onMouseDown } = useDraggable();
-  const totalErrors   = result?.counts.error   ?? 0;
-  const totalWarnings = result?.counts.warning  ?? 0;
+  const totalErrors = result?.counts.error ?? 0;
+  const totalWarnings = result?.counts.warning ?? 0;
 
   return (
     <div

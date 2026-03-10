@@ -79,8 +79,7 @@ module.exports = {
 
     return {
       JSXOpeningElement(node) {
-        const tagName =
-          node.name && node.name.type === 'JSXIdentifier' ? node.name.name : null;
+        const tagName = node.name && node.name.type === 'JSXIdentifier' ? node.name.name : null;
 
         // Проверяем только элемент <html>
         if (tagName !== 'html') return;
@@ -128,4 +127,3 @@ module.exports = {
     };
   },
 };
-
