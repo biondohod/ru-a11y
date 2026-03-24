@@ -1,6 +1,6 @@
 {
   "name": "ru-a11y-toolkit-eslint",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "ESLint-плагин для проверки веб-доступности согласно ГОСТ Р 52872-2019 и Постановлению Правительства РФ №102. Часть ru-a11y-toolkit.",
   "main": "index.js",
   "exports": {

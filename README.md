@@ -16,10 +16,10 @@
 
 | Пакет | Кратко |
 | --- | --- |
-| [`ru-a11y-toolkit-eslint`](./packages/eslint-preset/README.md) | Статический lint-доступности с русскими сообщениями и пресетами ГОСТ/№102. |
-| [`ru-a11y-toolkit-overlay`](./packages/react-overlay/README.md) | Runtime-панель в браузере для визуализации нарушений в dev-режиме. |
-| [`ru-a11y-toolkit-cli`](./packages/cli/README.md) | CLI-аудит готовых URL (Puppeteer + axe-core) с отчетами `console/json/html`. |
-| [`ru-a11y-toolkit-visually-impaired`](./packages/visually-impaired/README.md) | Режим повышенной читабельности для конечных пользователей сайта. |
+| [`ru-a11y-toolkit-eslint`](https://www.npmjs.com/package/ru-a11y-toolkit-eslint) | Статический lint-доступности с русскими сообщениями и пресетами ГОСТ/№102. |
+| [`ru-a11y-toolkit-overlay`](https://www.npmjs.com/package/ru-a11y-toolkit-overlay) | Runtime-панель в браузере для визуализации нарушений в dev-режиме. |
+| [`ru-a11y-toolkit-cli`](https://www.npmjs.com/package/ru-a11y-toolkit-cli) | CLI-аудит готовых URL (Puppeteer + axe-core) с отчетами `console/json/html`. |
+| [`ru-a11y-toolkit-visually-impaired`](https://www.npmjs.com/package/ru-a11y-toolkit-visually-impaired) | Режим повышенной читабельности для конечных пользователей сайта. |
 
 ---
 
@@ -62,7 +62,7 @@ module.exports = [ruA11y.configs['gost-aa']];
   src/App.jsx:3:5  @ru-a11y/gost-a11y/require-skip-link
 ```
 
-Подробнее: [`packages/eslint-preset/README.md`](./packages/eslint-preset/README.md)
+Подробнее: [`packages/eslint-preset/README.md`](https://www.npmjs.com/package/ru-a11y-toolkit-eslint)
 
 ---
 
@@ -85,7 +85,7 @@ import { RuA11yOverlay } from 'ru-a11y-toolkit-overlay';
 группировкой по принципам и подсветкой проблемных элементов на странице.
 ```
 
-Подробнее: [`packages/react-overlay/README.md`](./packages/react-overlay/README.md)
+Подробнее: [`packages/react-overlay/README.md`](https://www.npmjs.com/package/ru-a11y-toolkit-overlay)
 
 ---
 
@@ -106,7 +106,7 @@ ru-a11y-cli https://example.com --format html --output ./reports
 Выявлено нарушений: 3
 ```
 
-Подробнее: [`packages/cli/README.md`](./packages/cli/README.md)
+Подробнее: [`packages/cli/README.md`](https://www.npmjs.com/package/ru-a11y-toolkit-cli)
 
 ---
 
@@ -128,11 +128,11 @@ import 'ru-a11y-toolkit-visually-impaired/styles/visually-impaired.css';
 а интерфейс переключается в высококонтрастный режим с крупным шрифтом.
 ```
 
-Подробнее: [`packages/visually-impaired/README.md`](./packages/visually-impaired/README.md)
+Подробнее: [`packages/visually-impaired/README.md`](https://www.npmjs.com/package/ru-a11y-toolkit-visually-impaired)
 
 ---
 
-## Документация пакетов
+## Документация пакетов в github
 
 - [`packages/eslint-preset/README.md`](./packages/eslint-preset/README.md)
 - [`packages/cli/README.md`](./packages/cli/README.md)

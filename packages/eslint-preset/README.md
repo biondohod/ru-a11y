@@ -3,7 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/ru-a11y-toolkit-eslint)](https://www.npmjs.com/package/ru-a11y-toolkit-eslint)
 [![license](https://img.shields.io/npm/l/ru-a11y-toolkit-eslint)](../../LICENSE)
 
-> Часть [ru-a11y-toolkit](../../README.md) — можно установить отдельно или в составе всего toolkit.
+> Часть [ru-a11y-toolkit](https://www.npmjs.com/package/ru-a11y-toolkit) — можно установить отдельно или в составе всего toolkit.
 
 ESLint-пресет для автоматической проверки веб-доступности React/JSX-приложений согласно **российским нормативам**:
 
@@ -507,10 +507,10 @@ npm test -- --watch
 
 ## Связанные пакеты
 
-- **[`ru-a11y-toolkit-overlay`](../react-overlay/README.md)** — Runtime-визуализатор ошибок доступности в браузере
-- **[`ru-a11y-toolkit-cli`](../cli/README.md)** — CLI-сканер для проверки готовых страниц (Puppeteer + axe-core)
-- **[`ru-a11y-toolkit-visually-impaired`](../visually-impaired/README.md)** — Плагин для внедрения в интерфейс режимов для слабовидящих (увеличение, контраст, монохром и т.д.)
-- **[`ru-a11y-toolkit`](../../README.md)** — umbrella-пакет, включающий все три модуля
+- **[`ru-a11y-toolkit-overlay`](https://www.npmjs.com/package/ru-a11y-toolkit-overlay)** — Runtime-визуализатор ошибок доступности в браузере
+- **[`ru-a11y-toolkit-cli`](https://www.npmjs.com/package/ru-a11y-toolkit-cli)** — CLI-сканер для проверки готовых страниц (Puppeteer + axe-core)
+- **[`ru-a11y-toolkit-visually-impaired`](https://www.npmjs.com/package/ru-a11y-toolkit-visually-impaired)** — Плагин для внедрения в интерфейс режимов для слабовидящих (увеличение, контраст, монохром и т.д.)
+- **[`ru-a11y-toolkit`](https://www.npmjs.com/package/ru-a11y-toolkit)** — umbrella-пакет, включающий все три модуля
 
 ---
 

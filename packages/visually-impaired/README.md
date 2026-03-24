@@ -3,9 +3,9 @@
 [![npm version](https://badge.fury.io/js/ru-a11y-toolkit-visually-impaired.svg)](https://www.npmjs.com/package/ru-a11y-toolkit-visually-impaired)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Модуль повышенной читабельности для пользователей с нарушениями зрения. Часть [ru-a11y-toolkit](https://github.com/biondohod/ru-a11y).
+Модуль повышенной читабельности для пользователей с нарушениями зрения. Часть [ru-a11y-toolkit](https://www.npmjs.com/package/ru-a11y-toolkit).
 
-> **⚠️ Важно:** этот модуль **не является** заменой соответствию ГОСТ Р 52872-2019 / WCAG на уровне верстки. Он — дополнение к [`ru-a11y-toolkit-eslint`](../eslint-preset) и [`ru-a11y-toolkit-overlay`](../react-overlay), которое даёт конечному **пользователю сайта** возможность переключиться в режим повышенной читабельности.
+> **⚠️ Важно:** этот модуль **не является** заменой соответствию ГОСТ Р 52872-2019 / WCAG на уровне верстки. Он — дополнение к [`ru-a11y-toolkit-eslint`](https://www.npmjs.com/package/ru-a11y-toolkit-eslint) и [`ru-a11y-toolkit-overlay`](https://www.npmjs.com/package/ru-a11y-toolkit-overlay), которое даёт конечному **пользователю сайта** возможность переключиться в режим повышенной читабельности.
 >
 > Для полноценного соответствия ГОСТ Р 52872-2019 используйте `ru-a11y-toolkit-eslint` (статический анализ) и `ru-a11y-toolkit-overlay` (runtime-проверка). Лучший результат достигается при вёрстке сайта с относительными единицами (`rem`/`em`).
 
@@ -113,8 +113,8 @@ ru-a11y-toolkit-eslint   ru-a11y-toolkit-overlay   ru-a11y-toolkit-visually-impa
 
 | Модуль                                        | Для кого                    | Когда работает                        |
 | --------------------------------------------- | --------------------------- | ------------------------------------- |
-| [`ru-a11y-toolkit-eslint`](../eslint-preset)  | Разработчик                 | Во время написания кода (lint)        |
-| [`ru-a11y-toolkit-overlay`](../react-overlay) | Разработчик                 | В dev-режиме в браузере               |
+| [`ru-a11y-toolkit-eslint`](https://www.npmjs.com/package/ru-a11y-toolkit-eslint)  | Разработчик                 | Во время написания кода (lint)        |
+| [`ru-a11y-toolkit-overlay`](https://www.npmjs.com/package/ru-a11y-toolkit-overlay) | Разработчик                 | В dev-режиме в браузере               |
 | `ru-a11y-toolkit-visually-impaired`           | Конечный пользователь сайта | В production, по запросу пользователя |
 
 ---

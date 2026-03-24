@@ -5,7 +5,7 @@
 
 CLI-сканер для автоматизированной проверки доступности веб-страниц по российским требованиям.
 
-Пакет входит в экосистему [ru-a11y-toolkit](../../README.md) и помогает проверять уже работающие страницы (локальные стенды, test/prod окружения, собранные SPA/SSR приложения) в headless-браузере.
+Пакет входит в экосистему [ru-a11y-toolkit](https://www.npmjs.com/package/ru-a11y-toolkit) и помогает проверять уже работающие страницы (локальные стенды, test/prod окружения, собранные SPA/SSR приложения) в headless-браузере.
 
 Поддерживаемые ориентиры в текущей версии:
 
@@ -281,8 +281,8 @@ ru-a11y-cli --urls-file ./urls.txt --format json --output ./artifacts/a11y --max
 
 | Инструмент | Когда работает | Что покрывает |
 | --- | --- | --- |
-| [`ru-a11y-toolkit-eslint`](../eslint-preset/README.md) | во время разработки | проблемы в JSX/TSX и статике кода |
-| [`ru-a11y-toolkit-overlay`](../react-overlay/README.md) | dev-режим в браузере | проблемы реального DOM и визуальные подсказки |
+| [`ru-a11y-toolkit-eslint`](https://www.npmjs.com/package/ru-a11y-toolkit-eslint) | во время разработки | проблемы в JSX/TSX и статике кода |
+| [`ru-a11y-toolkit-overlay`](https://www.npmjs.com/package/ru-a11y-toolkit-overlay) | dev-режим в браузере | проблемы реального DOM и визуальные подсказки |
 | `ru-a11y-toolkit-cli` | CI/CD и регресс-аудит | готовые страницы и централизованный отчет |
 
 ---
