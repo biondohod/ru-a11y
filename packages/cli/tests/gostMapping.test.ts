@@ -13,6 +13,9 @@ describe('mapAxeResultToGost', () => {
     expect(issue.ruRuleCode).toBe('RU_GOST_NAV_SKIP_LINK');
     expect(issue.severity).toBe('критичное');
     expect(issue.selector).toBe('a.skip-link');
+    expect(issue.origin).toBe('runtime-axe');
+    expect(issue.ruleSource).toBeDefined();
+    expect(issue.source?.selector).toBe('a.skip-link');
     expect(issue.post102Refs[0]).toContain('№102');
   });
 
@@ -27,6 +30,7 @@ describe('mapAxeResultToGost', () => {
     expect(issue.ruRuleCode).toBe('RU_GOST_GENERIC');
     expect(issue.severity).toBe('незначительное');
     expect(issue.selector).toBe('document');
+    expect(issue.ruleSource).toBe('fallback');
   });
 });
 

@@ -6,9 +6,16 @@ import type { AuditRunResult, CliOptions, GostIssue, PageAuditResult } from '../
 interface AxeNodeResult {
   target: string[];
   failureSummary?: string;
+  html?: string;
 }
 
 interface AxeRunResponse {
+  incomplete: Array<{
+    id: string;
+    impact?: string | null;
+    help: string;
+    nodes: AxeNodeResult[];
+  }>;
   violations: Array<{
     id: string;
     impact?: string | null;
@@ -55,31 +62,39 @@ async function runSingleUrl(browser: Browser, url: string, options: CliOptions):
       return axeApi.run(document, config);
     }, axeConfig);
 
-    const issues: GostIssue[] = result.violations.flatMap((violation: AxeRunResponse['violations'][number]) => {
-      if (!violation.nodes.length) {
-        return [
+    const groups: Array<{ items: AxeRunResponse['violations']; type: 'violation' | 'incomplete' }> = [
+      { items: result.violations, type: 'violation' },
+      { items: result.incomplete, type: 'incomplete' },
+    ];
+
+    const issues: GostIssue[] = groups.flatMap(({ items, type }) =>
+      items.flatMap((violation: AxeRunResponse['violations'][number]) => {
+        if (!violation.nodes.length) {
+          return [
+            mapAxeResultToGost({
+              url,
+              id: violation.id,
+              impact: violation.impact,
+              message: violation.help,
+              target: ['document'],
+              type,
+            }),
+          ];
+        }
+
+        return violation.nodes.map((node: AxeNodeResult) =>
           mapAxeResultToGost({
             url,
             id: violation.id,
             impact: violation.impact,
-            message: violation.help,
-            target: ['document'],
-            type: 'violation',
+            message: node.failureSummary ?? violation.help,
+            target: node.target,
+            type,
+            html: node.html,
           }),
-        ];
-      }
-
-      return violation.nodes.map((node: AxeNodeResult) =>
-        mapAxeResultToGost({
-          url,
-          id: violation.id,
-          impact: violation.impact,
-          message: node.failureSummary ?? violation.help,
-          target: node.target,
-          type: 'violation',
-        }),
-      );
-    });
+        );
+      }),
+    );
 
     return {
       url,

@@ -1,6 +1,6 @@
 {
   "name": "ru-a11y-toolkit-cli",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "CLI-аудит веб-доступности по ГОСТ и Постановлению №102 на базе Puppeteer + axe-core.",
   "main": "dist/cli.js",
   "types": "dist/index.d.ts",
@@ -45,7 +45,9 @@
   },
   "dependencies": {
     "axe-core": "^4.10.0",
-    "puppeteer": "^24.2.1"
+    "eslint": "^9.39.1",
+    "puppeteer": "^24.2.1",
+    "ru-a11y-toolkit-overlay": "^1.2.1"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",

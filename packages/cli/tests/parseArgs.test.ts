@@ -30,5 +30,24 @@ describe('parseCliArgs', () => {
   it('должен выбрасывать ошибку при некорректном URL', async () => {
     await expect(parseCliArgs(['not-a-url'])).rejects.toThrow('Некорректный URL');
   });
+
+  it('должен разрешать запуск без URL при включенном --with-eslint', async () => {
+    const options = await parseCliArgs(['--with-eslint', '--project-root', '.']);
+
+    expect(options.withEslint).toBe(true);
+    expect(options.urls).toEqual([]);
+    expect(options.projectRoot).toBe('.');
+  });
+
+  it('должен корректно парсить eslint-targets с brace glob', async () => {
+    const options = await parseCliArgs([
+      'https://example.com',
+      '--with-eslint',
+      '--eslint-targets',
+      'src/**/*.{js,jsx},tests/**/*.js',
+    ]);
+
+    expect(options.eslintTargets).toEqual(['src/**/*.{js,jsx}', 'tests/**/*.js']);
+  });
 });
 

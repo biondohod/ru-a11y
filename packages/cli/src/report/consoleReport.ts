@@ -62,6 +62,14 @@ export function buildConsoleReport(result: AuditRunResult): string {
         lines.push(`    - [${issue.severity}] ${issue.title}`);
         lines.push(`      Селектор: ${issue.selector}`);
         lines.push(`      Правило: ${issue.ruRuleCode} / axe: ${issue.axeRuleId}`);
+        lines.push(`      Источник правила: ${issue.ruleSource}; тип: ${issue.origin}`);
+        if (issue.source?.filePath) {
+          lines.push(
+            `      Source: ${issue.source.filePath}:${issue.source.line ?? '?'}:${issue.source.column ?? '?'}`,
+          );
+        } else if (issue.source?.selector) {
+          lines.push(`      Source selector: ${issue.source.selector}`);
+        }
         lines.push(`      ГОСТ: ${issue.gostRefs.join('; ')}`);
         lines.push(`      Постановление №102: ${issue.post102Refs.join('; ')}`);
         lines.push(`      Рекомендация: ${issue.recommendation}`);

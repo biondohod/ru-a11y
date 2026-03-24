@@ -1,5 +1,29 @@
 import type { AxeIssueType, GostIssue, GostPrinciple, GostSeverity } from '../types';
 
+interface OverlayRuleMeta {
+  id: string;
+  title: string;
+  description: string;
+  fix: string;
+  gost?: string;
+  post102?: string;
+  wcag?: string;
+  principle?: 'perceivable' | 'operable' | 'understandable' | 'robust';
+  severity: 'error' | 'warning';
+}
+
+function loadOverlayRules(): Record<string, OverlayRuleMeta> {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
+    const overlayPackage = require('ru-a11y-toolkit-overlay') as { RU_A11Y_RULES?: Record<string, OverlayRuleMeta> };
+    return overlayPackage.RU_A11Y_RULES ?? {};
+  } catch {
+    return {};
+  }
+}
+
+const OVERLAY_RULES = loadOverlayRules();
+
 /**
  * Метаданные внутреннего правила ru-a11y и его связь с axe-core.
  */
@@ -61,6 +85,13 @@ export const GOST_RULES: GostRuleDefinition[] = [
   },
 ];
 
+const LEGACY_CODE_BY_AXE_ID: Record<string, string> = {
+  bypass: 'RU_GOST_NAV_SKIP_LINK',
+  'color-contrast': 'RU_GOST_TEXT_CONTRAST',
+  'color-contrast-enhanced': 'RU_GOST_TEXT_CONTRAST',
+  'document-title': 'RU_GOST_PAGE_TITLE',
+};
+
 const FALLBACK_RULE: GostRuleDefinition = {
   code: 'RU_GOST_GENERIC',
   axeRuleIds: [],
@@ -81,12 +112,64 @@ export interface AxeResultItem {
   message: string;
   target?: string[];
   type?: AxeIssueType;
+  html?: string;
+}
+
+function toGostPrinciple(principle?: OverlayRuleMeta['principle']): GostPrinciple {
+  if (principle === 'perceivable') {
+    return 'воспринимаемость';
+  }
+
+  if (principle === 'operable') {
+    return 'управляемость';
+  }
+
+  if (principle === 'understandable') {
+    return 'понятность';
+  }
+
+  return 'надежность';
+}
+
+function toDefaultSeverity(level?: OverlayRuleMeta['severity']): GostSeverity {
+  return level === 'error' ? 'существенное' : 'незначительное';
+}
+
+function normalizeRuleCode(axeRuleId: string): string {
+  const legacyCode = LEGACY_CODE_BY_AXE_ID[axeRuleId];
+  if (legacyCode) {
+    return legacyCode;
+  }
+
+  return `RU_AXE_${axeRuleId.toUpperCase().replace(/[^A-Z0-9]+/g, '_')}`;
+}
+
+function mapOverlayRuleToGostRule(meta: OverlayRuleMeta): GostRuleDefinition {
+  return {
+    code: normalizeRuleCode(meta.id),
+    axeRuleIds: [meta.id],
+    title: meta.title,
+    description: meta.description,
+    recommendation: meta.fix,
+    principle: toGostPrinciple(meta.principle),
+    defaultSeverity: toDefaultSeverity(meta.severity),
+    gostRefs: meta.gost ? [meta.gost] : ['ГОСТ Р 52872-2012 (требуется уточнение в маппинге)'],
+    post102Refs: meta.post102
+      ? [meta.post102]
+      : ['Постановление Правительства РФ №102 от 07.02.2026 (требуется уточнение в маппинге)'],
+    wcagRefs: meta.wcag ? [meta.wcag] : [],
+  };
 }
 
 /**
  * Ищет мета-описание правила по id из axe-core.
  */
 export function findGostRuleByAxeId(axeRuleId: string): GostRuleDefinition {
+  const overlayRule = OVERLAY_RULES[axeRuleId];
+  if (overlayRule) {
+    return mapOverlayRuleToGostRule(overlayRule);
+  }
+
   return GOST_RULES.find((rule) => rule.axeRuleIds.includes(axeRuleId)) ?? FALLBACK_RULE;
 }
 
@@ -111,6 +194,7 @@ function mapImpactToSeverity(impact?: string | null, fallback: GostSeverity = '�
  */
 export function mapAxeResultToGost(axeResultItem: AxeResultItem): GostIssue {
   const rule = findGostRuleByAxeId(axeResultItem.id);
+  const overlayRuleMatched = Boolean(OVERLAY_RULES[axeResultItem.id]);
 
   return {
     url: axeResultItem.url,
@@ -127,6 +211,17 @@ export function mapAxeResultToGost(axeResultItem: AxeResultItem): GostIssue {
     wcagRefs: rule.wcagRefs,
     sourceMessage: axeResultItem.message,
     issueType: axeResultItem.type ?? 'violation',
+    origin: 'runtime-axe',
+    ruleSource: overlayRuleMatched
+      ? 'overlay-rules-map'
+      : rule === FALLBACK_RULE
+        ? 'fallback'
+        : 'cli-gost-map',
+    source: {
+      selector: axeResultItem.target?.[0] ?? 'document',
+      snippet: axeResultItem.html,
+      note: 'Для runtime-аудита точный файл и строка обычно недоступны без отдельной интеграции source maps.',
+    },
   };
 }
 

@@ -26,6 +26,11 @@ describe('buildJsonReport', () => {
               wcagRefs: ['WCAG 2.1'],
               sourceMessage: 'source',
               issueType: 'violation',
+              origin: 'runtime-axe',
+              ruleSource: 'cli-gost-map',
+              source: {
+                selector: '#main',
+              },
             },
           ],
         },

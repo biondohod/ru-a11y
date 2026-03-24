@@ -22,10 +22,17 @@ export function buildHtmlReport(result: AuditRunResult): string {
         (issue) => `
         <tr>
           <td>${escapeHtml(page.url)}</td>
+          <td>${escapeHtml(issue.origin)}</td>
           <td>${escapeHtml(issue.severity)}</td>
           <td>${escapeHtml(issue.principle)}</td>
           <td>${escapeHtml(issue.title)}</td>
           <td><code>${escapeHtml(issue.selector)}</code></td>
+          <td>${escapeHtml(
+            issue.source?.filePath
+              ? `${issue.source.filePath}:${issue.source.line ?? '?'}:${issue.source.column ?? '?'}`
+              : issue.source?.selector ?? '-',
+          )}</td>
+          <td>${escapeHtml(issue.sourceMessage)}</td>
           <td>${escapeHtml(issue.gostRefs.join('; '))}</td>
           <td>${escapeHtml(issue.post102Refs.join('; '))}</td>
           <td>${escapeHtml(issue.recommendation)}</td>
@@ -63,17 +70,20 @@ export function buildHtmlReport(result: AuditRunResult): string {
       <thead>
         <tr>
           <th>URL</th>
+          <th>Origin</th>
           <th>Серьезность</th>
           <th>Принцип</th>
           <th>Нарушение</th>
           <th>Селектор</th>
+          <th>Source</th>
+          <th>Сообщение</th>
           <th>ГОСТ</th>
           <th>Постановление №102</th>
           <th>Рекомендация</th>
         </tr>
       </thead>
       <tbody>
-        ${rows || '<tr><td colspan="8">Нарушения не обнаружены.</td></tr>'}
+        ${rows || '<tr><td colspan="11">Нарушения не обнаружены.</td></tr>'}
       </tbody>
     </table>
   </body>

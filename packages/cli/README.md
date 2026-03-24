@@ -42,6 +42,12 @@ node packages/cli/dist/cli.js https://example.com https://example.com/catalog --
 node packages/cli/dist/cli.js --urls-file ./urls.txt --standard gost-aa --concurrency 3
 ```
 
+Объединенный аудит (runtime + ESLint) в одном HTML-отчете:
+
+```bash
+node packages/cli/dist/cli.js https://example.com --with-eslint --project-root ../ru-a11y-playground --eslint-targets "src/**/*.{js,jsx,ts,tsx}" --format html --output ./reports
+```
+
 ## Справка CLI
 
 ```bash
@@ -58,6 +64,10 @@ ru-a11y-cli --help
 - `--timeout`: таймаут проверки одной страницы в миллисекундах
 - `--concurrency`: число одновременных проверок
 - `--include` / `--exclude`: фильтрация нарушений (по внутреннему коду, id правила axe, принципу, серьезности)
+- `--with-eslint`: добавить к runtime-аудиту статический аудит ESLint
+- `--eslint-targets`: паттерны файлов для ESLint (через запятую)
+- `--eslint-config`: путь к конфигу ESLint
+- `--project-root`: корень проекта для ESLint
 
 ## Форматы отчетов
 
@@ -72,7 +82,10 @@ ru-a11y-cli --help
 Файл `ru-a11y-report.json` содержит:
 
 - массив страниц;
-- нормализованные нарушения (`ruRuleCode`, `axeRuleId`, `gostRefs`, `post102Refs`, `selector`, `description`, `recommendation`).
+- нормализованные нарушения (`ruRuleCode`, `axeRuleId`, `origin`, `ruleSource`, `source`, `gostRefs`, `post102Refs`, `selector`, `description`, `recommendation`).
+
+`origin` показывает источник нарушения (`runtime-axe` или `static-eslint`).
+`source` для `static-eslint` включает `filePath`, `line`, `column`; для `runtime-axe` обычно содержит `selector` и html-сниппет узла.
 
 Этот формат подходит для последующей интеграции с overlay и другими инструментами в рамках `ru-a11y-toolkit`.
 

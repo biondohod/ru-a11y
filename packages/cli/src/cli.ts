@@ -5,6 +5,7 @@ import { DEFAULT_CONFIG, STANDARD_TO_WCAG_TAGS } from './config/defaultConfig';
 import { buildConsoleReport } from './report/consoleReport';
 import { writeHtmlReport } from './report/htmlReport';
 import { buildJsonReport, writeJsonReport } from './report/jsonReport';
+import { runEslintAudit } from './runner/eslintRunner';
 import { runPuppeteerAudit } from './runner/puppeteerRunner';
 import type { AuditRunResult, CliOptions, GostIssue, OutputFormat, StandardLevel } from './types';
 
@@ -27,6 +28,10 @@ const HELP_TEXT = `ru-a11y-cli - проверка доступности сай�
   --include <фильтр>      Включить только указанные группы (через запятую)
   --exclude <фильтр>      Исключить указанные группы (через запятую)
   --disable-rules <ids>   Отключить отдельные правила axe (через запятую)
+  --with-eslint           Дополнительно запустить статический аудит ESLint
+  --eslint-targets <glob> Файлы/паттерны для ESLint (через запятую)
+  --eslint-config <путь>  Явный путь до eslint.config.js/.eslintrc
+  --project-root <путь>   Корень проекта для ESLint (по умолчанию: текущая директория)
   --help                  Показать эту справку
   --version               Показать версию CLI
 
@@ -41,10 +46,41 @@ function splitList(value: string | undefined): string[] {
     return [];
   }
 
-  return value
-    .split(',')
-    .map((item) => item.trim())
-    .filter(Boolean);
+  const chunks: string[] = [];
+  let current = '';
+  let braceDepth = 0;
+
+  for (const char of value) {
+    if (char === '{') {
+      braceDepth += 1;
+      current += char;
+      continue;
+    }
+
+    if (char === '}') {
+      braceDepth = Math.max(0, braceDepth - 1);
+      current += char;
+      continue;
+    }
+
+    if (char === ',' && braceDepth === 0) {
+      const normalized = current.trim();
+      if (normalized) {
+        chunks.push(normalized);
+      }
+      current = '';
+      continue;
+    }
+
+    current += char;
+  }
+
+  const tail = current.trim();
+  if (tail) {
+    chunks.push(tail);
+  }
+
+  return chunks;
 }
 
 function parseInteger(value: string, flagName: string): number {
@@ -89,6 +125,9 @@ export async function parseCliArgs(argv: string[]): Promise<CliOptions> {
     include: [],
     exclude: [],
     disabledRules: [],
+    withEslint: false,
+    eslintTargets: [],
+    projectRoot: process.cwd(),
     help: false,
     version: false,
   };
@@ -187,6 +226,30 @@ export async function parseCliArgs(argv: string[]): Promise<CliOptions> {
         options.disabledRules = splitList(value);
         i += 1;
         break;
+      case '--with-eslint':
+        options.withEslint = true;
+        break;
+      case '--eslint-targets':
+        if (!value) {
+          throw new Error('Для флага --eslint-targets нужно указать хотя бы один паттерн.');
+        }
+        options.eslintTargets = splitList(value);
+        i += 1;
+        break;
+      case '--eslint-config':
+        if (!value) {
+          throw new Error('Для флага --eslint-config нужно указать путь к конфигурации.');
+        }
+        options.eslintConfigFile = value;
+        i += 1;
+        break;
+      case '--project-root':
+        if (!value) {
+          throw new Error('Для флага --project-root нужно указать путь к корню проекта.');
+        }
+        options.projectRoot = value;
+        i += 1;
+        break;
       default:
         throw new Error(`Неизвестный флаг: ${token}`);
     }
@@ -199,13 +262,15 @@ export async function parseCliArgs(argv: string[]): Promise<CliOptions> {
 
   options.urls = Array.from(new Set(options.urls));
 
-  if (!options.help && !options.version && options.urls.length === 0) {
+  if (!options.help && !options.version && options.urls.length === 0 && !options.withEslint) {
     throw new Error('Не указан ни один URL. Передайте URL аргументами или используйте --urls-file.');
   }
 
-  const invalid = options.urls.find((url) => !isHttpUrl(url));
-  if (invalid) {
-    throw new Error(`Некорректный URL: ${invalid}. Допустимы только адреса с http/https.`);
+  if (options.urls.length > 0) {
+    const invalid = options.urls.find((url) => !isHttpUrl(url));
+    if (invalid) {
+      throw new Error(`Некорректный URL: ${invalid}. Допустимы только адреса с http/https.`);
+    }
   }
 
   if (options.wcagTags.length === 0) {
@@ -285,8 +350,25 @@ export async function runCli(argv: string[]): Promise<number> {
     return 0;
   }
 
-  const audit = await runPuppeteerAudit(options);
-  const filtered = applyIssueFilters(audit, options.include, options.exclude);
+  const runtimeAudit = options.urls.length > 0
+    ? await runPuppeteerAudit(options)
+    : {
+        startedAt: new Date().toISOString(),
+        finishedAt: new Date().toISOString(),
+        scannedPages: 0,
+        pages: [],
+      };
+
+  const eslintPages = await runEslintAudit(options);
+
+  const mergedAudit: AuditRunResult = {
+    startedAt: runtimeAudit.startedAt,
+    finishedAt: new Date().toISOString(),
+    scannedPages: runtimeAudit.scannedPages + eslintPages.length,
+    pages: [...runtimeAudit.pages, ...eslintPages],
+  };
+
+  const filtered = applyIssueFilters(mergedAudit, options.include, options.exclude);
   printReport(filtered, options.format);
 
   if (options.format === 'json') {

@@ -12,6 +12,21 @@ export type GostPrinciple =
 
 export type AxeIssueType = 'violation' | 'incomplete' | 'inapplicable' | 'pass';
 
+export type AuditIssueType = AxeIssueType | 'lint';
+
+export type IssueOrigin = 'runtime-axe' | 'static-eslint';
+
+export type RuleSource = 'cli-gost-map' | 'overlay-rules-map' | 'eslint-rules' | 'fallback';
+
+export interface IssueSourceLocation {
+  filePath?: string;
+  line?: number;
+  column?: number;
+  selector?: string;
+  snippet?: string;
+  note?: string;
+}
+
 export interface GostIssue {
   url: string;
   selector: string;
@@ -26,7 +41,10 @@ export interface GostIssue {
   post102Refs: string[];
   wcagRefs: string[];
   sourceMessage: string;
-  issueType: AxeIssueType;
+  issueType: AuditIssueType;
+  origin: IssueOrigin;
+  ruleSource: RuleSource;
+  source?: IssueSourceLocation;
 }
 
 export interface PageAuditResult {
@@ -55,6 +73,10 @@ export interface CliOptions {
   include: string[];
   exclude: string[];
   disabledRules: string[];
+  withEslint: boolean;
+  eslintTargets: string[];
+  eslintConfigFile?: string;
+  projectRoot: string;
   help: boolean;
   version: boolean;
   urlsFile?: string;
