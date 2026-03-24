@@ -505,17 +505,16 @@ npm test -- --watch
 
 ---
 
-## Лицензия
-
-MIT © [biondohod](https://github.com/biondohod)
-
----
-
-## Связанные пакеты (в разработке)
+## Связанные пакеты
 
 - **[`ru-a11y-toolkit-overlay`](../react-overlay/README.md)** — Runtime-визуализатор ошибок доступности в браузере
 - **[`ru-a11y-toolkit-cli`](../cli/README.md)** — CLI-сканер для проверки готовых страниц (Puppeteer + axe-core)
+- **[`ru-a11y-toolkit-visually-impaired`](../visually-impaired/README.md)** — Плагин для внедрения в интерфейс режимов для слабовидящих (увеличение, контраст, монохром и т.д.)
 - **[`ru-a11y-toolkit`](../../README.md)** — umbrella-пакет, включающий все три модуля
+
+---
+
+## Нормативная база
 
 «Интернет-ресурсы и другая информация, представленная в электронно-цифровой форме. Приложения для стационарных и мобильных устройств, иные пользовательские интерфейсы. Требования доступности для людей с инвалидностью и других лиц с ограничениями жизнедеятельности»
 
@@ -539,7 +538,7 @@ MIT © [biondohod](https://github.com/biondohod)
 | п. ж) | Цель каждой ссылки определяется из её текста                                               | `jsx-a11y/anchor-has-content`                                                                          |
 | п. м) | Формы имеют текстовые описания полей, ошибки доступны скринридерам                         | `jsx-a11y/label-has-associated-control`                                                                |
 
-- Вступает в силу с **1 марта 2026 года**
+- Вступило в силу с **1 марта 2026 года**
 - Ссылка: [pravo.gov.ru](http://publication.pravo.gov.ru/document/0001202602100010?index=1)
 
 ---
@@ -577,29 +576,6 @@ MIT © [biondohod](https://github.com/biondohod)
 
 ---
 
-## Разработка
-
-```bash
-# Клонировать репозиторий
-git clone https://github.com/ru-a11y/ru-a11y.git
-cd ru-a11y/packages/eslint-preset
-
-# Запустить тесты
-npm test
-
-# Запустить тесты с watch-режимом
-npm test -- --watch
-```
-
----
-
 ## Лицензия
 
-MIT © biondohod
-
----
-
-## Связанные пакеты (в разработке)
-
-- **`@ru-a11y/react-overlay`** — Runtime-визуализатор ошибок доступности в браузере
-- **`@ru-a11y/cli`** — CLI-сканер для проверки готовых страниц (Puppeteer + axe-core)
+MIT © [biondohod](https://github.com/biondohod)

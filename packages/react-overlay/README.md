@@ -234,3 +234,4 @@ MIT © [biondohod](https://github.com/biondohod)
 - [ГОСТ Р 52872-2019](https://protect.gost.ru/) — стандарт доступности
 - [axe-core](https://github.com/dequelabs/axe-core) — движок проверки доступности
 - [WCAG 2.1](https://www.w3.org/TR/WCAG21/) — руководство по доступности веб-контента
+
