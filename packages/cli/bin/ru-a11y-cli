@@ -2,5 +2,14 @@
 
 'use strict';
 
-require('../dist/cli.js');
+ const { runCli } = require('../dist/cli.js');
 
+runCli(process.argv.slice(2))
+  .then((code) => {
+    process.exit(code);
+  })
+  .catch((error) => {
+    const message = error instanceof Error ? error.message : 'Внутренняя ошибка CLI.';
+    process.stderr.write(`Ошибка: ${message}\n`);
+    process.exit(2);
+  });
