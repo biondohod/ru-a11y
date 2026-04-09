@@ -12,6 +12,19 @@ const IMAGE_ALT_CAPTION_ATTRIBUTE = 'data-ru-a11y-image-alt-caption';
 let imageAltObserver: MutationObserver | null = null;
 let isSyncingImageAltCaptions = false;
 
+function observeImageAltChanges(): void {
+  if (typeof document === 'undefined' || !document.body || !imageAltObserver) {
+    return;
+  }
+
+  imageAltObserver.observe(document.body, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+    attributeFilter: ['alt'],
+  });
+}
+
 function syncImageAltCaptions(): void {
   if (typeof document === 'undefined' || isSyncingImageAltCaptions) {
     return;
@@ -20,6 +33,8 @@ function syncImageAltCaptions(): void {
   isSyncingImageAltCaptions = true;
 
   try {
+    imageAltObserver?.disconnect();
+
     const images = Array.from(document.querySelectorAll<HTMLImageElement>('img[alt]'));
     const activeImages = new Set(images);
 
@@ -60,6 +75,7 @@ function syncImageAltCaptions(): void {
     });
   } finally {
     isSyncingImageAltCaptions = false;
+    observeImageAltChanges();
   }
 }
 
@@ -72,12 +88,7 @@ function startImageAltObserver(): void {
     syncImageAltCaptions();
   });
 
-  imageAltObserver.observe(document.body, {
-    childList: true,
-    subtree: true,
-    attributes: true,
-    attributeFilter: ['alt'],
-  });
+  observeImageAltChanges();
 }
 
 function stopImageAltObserver(): void {
