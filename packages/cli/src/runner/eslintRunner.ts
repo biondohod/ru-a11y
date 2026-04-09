@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { mapEslintResultToGost } from '../mapping/eslintMapping';
 import type { CliOptions, PageAuditResult } from '../types';
@@ -13,6 +14,15 @@ interface EslintMessage {
 interface EslintFileResult {
   filePath: string;
   messages: EslintMessage[];
+}
+
+async function readSourceLines(filePath: string): Promise<string[]> {
+  try {
+    const content = await readFile(filePath, 'utf-8');
+    return content.split(/\r?\n/);
+  } catch {
+    return [];
+  }
 }
 
 async function loadEslintConstructor(): Promise<new (options?: Record<string, unknown>) => {
@@ -46,7 +56,8 @@ export async function runEslintAudit(options: CliOptions): Promise<PageAuditResu
 
   const lintResults = await eslint.lintFiles(patterns);
 
-  return lintResults.map((fileResult) => {
+  return Promise.all(lintResults.map(async (fileResult) => {
+    const sourceLines = await readSourceLines(fileResult.filePath);
     const issues = fileResult.messages
       .filter((message) => message.ruleId && message.severity > 0)
       .map((message) =>
@@ -57,6 +68,7 @@ export async function runEslintAudit(options: CliOptions): Promise<PageAuditResu
           ruleId: message.ruleId as string,
           message: message.message,
           severity: message.severity === 2 ? 2 : 1,
+          snippet: sourceLines[message.line - 1],
         }),
       );
 
@@ -65,6 +77,5 @@ export async function runEslintAudit(options: CliOptions): Promise<PageAuditResu
       issues,
       durationMs: 0,
     };
-  });
+  }));
 }
-

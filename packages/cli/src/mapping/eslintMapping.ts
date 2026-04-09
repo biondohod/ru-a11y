@@ -60,6 +60,7 @@ export interface EslintIssueInput {
   ruleId: string;
   message: string;
   severity: 1 | 2;
+  snippet?: string;
 }
 
 function severityFromEslint(level: 1 | 2): GostSeverity {
@@ -114,6 +115,7 @@ export function mapEslintResultToGost(input: EslintIssueInput): GostIssue {
       filePath: input.filePath,
       line: input.line,
       column: input.column,
+      snippet: input.snippet,
       note: 'Источник получен из ESLint (статический анализ исходного кода).',
     },
   };
