@@ -47,11 +47,11 @@ describe('buildConsoleReport', () => {
     expect(report).toContain('ru-a11y CLI report');
     expect(report).toContain('Текст ошибки');
     expect(report).toContain('Нормативные требования');
-    expect(report).toContain('Постановление №102');
-    expect(report).toContain('WCAG');
     expect(report).toContain('Рекомендация по исправлению');
     expect(report).toContain('Фрагмент кода');
     expect(report).toContain('<img src="/hero.png" />');
+    expect(report).toContain('Постановление Правительства РФ №102');
+    expect(report).toContain('WCAG 1.1.1');
   });
 
   it('должен показывать успешный результат без нарушений', () => {

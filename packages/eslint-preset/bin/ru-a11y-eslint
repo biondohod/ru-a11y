@@ -1,0 +1,49 @@
+#!/usr/bin/env node
+'use strict';
+
+const { spawn } = require('node:child_process');
+const { createRequire } = require('node:module');
+
+function hasExplicitFormatter(args) {
+  return args.includes('-f') || args.includes('--format');
+}
+
+function resolveEslintBin() {
+  const localRequire = createRequire(`${process.cwd()}/package.json`);
+  return localRequire.resolve('eslint/bin/eslint.js');
+}
+
+function main() {
+  const args = process.argv.slice(2);
+  const formatterArgs = hasExplicitFormatter(args)
+    ? args
+    : ['-f', 'ru-a11y-toolkit-eslint/formatter', ...args];
+
+  let eslintBin;
+
+  try {
+    eslintBin = resolveEslintBin();
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Не удалось найти eslint.';
+    process.stderr.write(`Ошибка: ${message}\n`);
+    process.stderr.write('Убедитесь, что `eslint` установлен в проекте как dependency или devDependency.\n');
+    process.exit(2);
+    return;
+  }
+
+  const child = spawn(process.execPath, [eslintBin, ...formatterArgs], {
+    stdio: 'inherit',
+    env: process.env,
+  });
+
+  child.on('exit', (code, signal) => {
+    if (signal) {
+      process.kill(process.pid, signal);
+      return;
+    }
+
+    process.exit(code ?? 1);
+  });
+}
+
+main();

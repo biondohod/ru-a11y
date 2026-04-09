@@ -115,6 +115,10 @@ function formatReferenceSection(label: string, refs: string[]): string[] {
   ];
 }
 
+function collectNormativeReferences(issue: GostIssue): string[] {
+  return [...issue.gostRefs, ...issue.post102Refs, ...issue.wcagRefs];
+}
+
 function formatSourceSnippet(issue: GostIssue): string[] {
   const snippet = issue.source?.snippet?.trimEnd();
   const line = issue.source?.line;
@@ -164,9 +168,7 @@ function formatIssue(issue: GostIssue, index: number): string[] {
   lines.push(`      ${formatLabel('Текст ошибки')}:`);
   lines.push(...indentBlock(formatInlineCode(issue.sourceMessage), '        '));
   lines.push(...formatSourceSnippet(issue));
-  lines.push(...formatReferenceSection('Нормативные требования', issue.gostRefs));
-  lines.push(...formatReferenceSection('Постановление №102', issue.post102Refs));
-  lines.push(...formatReferenceSection('WCAG', issue.wcagRefs));
+  lines.push(...formatReferenceSection('Нормативные требования', collectNormativeReferences(issue)));
   lines.push(`      ${formatLabel('Рекомендация по исправлению')}:`);
   lines.push(...indentBlock(formatInlineCode(issue.recommendation), '        '));
 

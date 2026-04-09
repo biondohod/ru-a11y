@@ -109,6 +109,14 @@ module.exports = {
 npx eslint "src/**/*.{js,jsx,ts,tsx}" -f ru-a11y-toolkit-eslint/formatter
 ```
 
+Если хотите запускать lint сразу с этим оформлением без запоминания `-f`, используйте обёртку:
+
+```bash
+npx ru-a11y-eslint "src/**/*.{js,jsx,ts,tsx}"
+```
+
+Команда запускает локальный `eslint` и автоматически подставляет `ru-a11y-toolkit-eslint/formatter`, если вы не передали свой `-f` или `--format`.
+
 Formatter показывает:
 
 - текст ошибки;
