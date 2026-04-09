@@ -2,10 +2,31 @@ import type { GostIssue, GostPrinciple, GostSeverity } from '../types';
 import { findGostRuleByAxeId } from './gostMapping';
 
 const ESLINT_RULE_TO_AXE_ID: Record<string, string> = {
+  'no-table-layout': 'no-table-layout',
+  'table-requires-th': 'table-requires-th',
+  'click-events-have-key-events': 'click-events-have-key-events',
+  'heading-has-content': 'heading-has-content',
+  'aria-activedescendant-has-tabindex': 'aria-activedescendant-has-tabindex',
+  'no-noninteractive-element-interactions': 'no-noninteractive-element-interactions',
+  'no-noninteractive-tabindex': 'no-noninteractive-tabindex',
+  'no-redundant-roles': 'no-redundant-roles',
+  'no-static-element-interactions': 'no-static-element-interactions',
+  'no-interactive-element-to-noninteractive-role': 'no-interactive-element-to-noninteractive-role',
+  'jsx-a11y/anchor-has-content': 'link-name',
+  'jsx-a11y/iframe-has-title': 'frame-title',
+  'jsx-a11y/img-redundant-alt': 'image-redundant-alt',
+  accesskeys: 'accesskeys',
+  tabindex: 'tabindex',
+  'meta-viewport': 'meta-viewport',
+  'video-caption': 'video-caption',
+  'autocomplete-valid': 'autocomplete-valid',
+  'aria-roles': 'aria-roles',
   '@ru-a11y/gost-a11y/require-skip-link': 'bypass',
   '@ru-a11y/gost-a11y/require-lang-attr': 'html-has-lang',
   '@ru-a11y/gost-a11y/require-title-semantic': 'document-title',
   '@ru-a11y/gost-a11y/no-frame-structure': 'frame-title',
+  '@ru-a11y/gost-a11y/no-table-layout': 'no-table-layout',
+  '@ru-a11y/gost-a11y/table-requires-th': 'table-requires-th',
   '@ru-a11y/gost-a11y/zoom-200-warning': 'meta-viewport',
   '@ru-a11y/gost-a11y/jsx-a11y/alt-text': 'image-alt',
   '@ru-a11y/gost-a11y/jsx-a11y/anchor-has-content': 'link-name',
@@ -20,6 +41,14 @@ const ESLINT_RULE_TO_AXE_ID: Record<string, string> = {
   '@ru-a11y/gost-a11y/jsx-a11y/label-has-associated-control': 'label',
   '@ru-a11y/gost-a11y/jsx-a11y/media-has-caption': 'video-caption',
   '@ru-a11y/gost-a11y/jsx-a11y/tabindex-no-positive': 'tabindex',
+  '@ru-a11y/gost-a11y/jsx-a11y/heading-has-content': 'heading-has-content',
+  '@ru-a11y/gost-a11y/jsx-a11y/no-noninteractive-element-interactions': 'no-noninteractive-element-interactions',
+  '@ru-a11y/gost-a11y/jsx-a11y/no-noninteractive-tabindex': 'no-noninteractive-tabindex',
+  '@ru-a11y/gost-a11y/jsx-a11y/no-redundant-roles': 'no-redundant-roles',
+  '@ru-a11y/gost-a11y/jsx-a11y/no-static-element-interactions': 'no-static-element-interactions',
+  '@ru-a11y/gost-a11y/jsx-a11y/no-interactive-element-to-noninteractive-role':
+    'no-interactive-element-to-noninteractive-role',
+  '@ru-a11y/gost-a11y/jsx-a11y/aria-activedescendant-has-tabindex': 'aria-activedescendant-has-tabindex',
   '@ru-a11y/gost-a11y/jsx-a11y/no-access-key': 'accesskeys',
   '@ru-a11y/gost-a11y/jsx-a11y/autocomplete-valid': 'autocomplete-valid',
 };
@@ -89,4 +118,3 @@ export function mapEslintResultToGost(input: EslintIssueInput): GostIssue {
     },
   };
 }
-

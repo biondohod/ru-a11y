@@ -6,6 +6,94 @@ import { useState, useCallback } from 'react';
  * переключения в режим для слабовидящих.
  */
 const VISUALLY_IMPAIRED_CLASS = 'ru-a11y-visually-impaired';
+const IMAGE_ALT_CAPTION_CLASS = 'ru-a11y-visually-impaired-image-alt';
+const IMAGE_ALT_CAPTION_ATTRIBUTE = 'data-ru-a11y-image-alt-caption';
+
+let imageAltObserver: MutationObserver | null = null;
+let isSyncingImageAltCaptions = false;
+
+function syncImageAltCaptions(): void {
+  if (typeof document === 'undefined' || isSyncingImageAltCaptions) {
+    return;
+  }
+
+  isSyncingImageAltCaptions = true;
+
+  try {
+    const images = Array.from(document.querySelectorAll<HTMLImageElement>('img[alt]'));
+    const activeImages = new Set(images);
+
+    images.forEach((image) => {
+      const altText = image.getAttribute('alt')?.trim();
+      const nextSibling = image.nextElementSibling;
+      const existingCaption =
+        nextSibling instanceof HTMLElement &&
+        nextSibling.classList.contains(IMAGE_ALT_CAPTION_CLASS)
+          ? nextSibling
+          : null;
+
+      if (!altText) {
+        existingCaption?.remove();
+        return;
+      }
+
+      const caption = existingCaption ?? document.createElement('span');
+      caption.className = IMAGE_ALT_CAPTION_CLASS;
+      caption.setAttribute(IMAGE_ALT_CAPTION_ATTRIBUTE, 'true');
+      caption.textContent = altText;
+
+      if (!existingCaption) {
+        image.insertAdjacentElement('afterend', caption);
+      }
+    });
+
+    const captions = Array.from(
+      document.querySelectorAll<HTMLElement>(`.${IMAGE_ALT_CAPTION_CLASS}`)
+    );
+
+    captions.forEach((caption) => {
+      const previousSibling = caption.previousElementSibling;
+
+      if (!(previousSibling instanceof HTMLImageElement) || !activeImages.has(previousSibling)) {
+        caption.remove();
+      }
+    });
+  } finally {
+    isSyncingImageAltCaptions = false;
+  }
+}
+
+function startImageAltObserver(): void {
+  if (typeof document === 'undefined' || imageAltObserver) {
+    return;
+  }
+
+  imageAltObserver = new MutationObserver(() => {
+    syncImageAltCaptions();
+  });
+
+  imageAltObserver.observe(document.body, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+    attributeFilter: ['alt'],
+  });
+}
+
+function stopImageAltObserver(): void {
+  imageAltObserver?.disconnect();
+  imageAltObserver = null;
+}
+
+function removeImageAltCaptions(): void {
+  if (typeof document === 'undefined') {
+    return;
+  }
+
+  document.querySelectorAll(`.${IMAGE_ALT_CAPTION_CLASS}`).forEach((caption) => {
+    caption.remove();
+  });
+}
 
 /**
  * Возвращаемый тип хука useVisuallyImpaired
@@ -54,6 +142,15 @@ export function useVisuallyImpaired(): UseVisuallyImpairedReturn {
       // Переключаем CSS-класс на корневом элементе документа.
       // Это позволяет CSS-файлу применять стили глобально через каскад.
       document.documentElement.classList.toggle(VISUALLY_IMPAIRED_CLASS, next);
+
+      if (next) {
+        syncImageAltCaptions();
+        startImageAltObserver();
+      } else {
+        stopImageAltObserver();
+        removeImageAltCaptions();
+      }
+
       return next;
     });
   }, []);

@@ -95,6 +95,7 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
       'Элемент <video> не содержит субтитров. Пользователи с нарушениями слуха не смогут ' +
       'получить доступ к звуковому содержанию.',
     fix: 'Добавьте <track kind="captions" src="subtitles.vtt" srclang="ru" label="Русский" />',
+    gost: 'ГОСТ Р 52872-2019, §5.1.1',
     post102: 'Постановление №102, п. г)',
     wcag: 'WCAG 2.1, 1.2.2 Captions (Prerecorded)',
     principle: 'perceivable',
@@ -153,6 +154,7 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     fix:
       'Измените цвет текста или фона, чтобы соотношение контраста было не ниже 4.5:1 для обычного текста. ' +
       'Используйте инструменты: contrast-ratio.com, WebAIM Contrast Checker или встроенные DevTools браузера.',
+    gost: 'ГОСТ Р 52872-2019, п. 7.2',
     post102: 'Постановление №102, п. в)',
     wcag: 'WCAG 2.1, 1.4.3 Contrast (Minimum)',
     principle: 'perceivable',
@@ -173,6 +175,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     fix:
       'Увеличьте контраст до 7:1 для обычного текста и до 4.5:1 для крупного. ' +
       'Используйте инструменты: contrast-ratio.com, WebAIM Contrast Checker или встроенные DevTools браузера.',
+    gost: 'ГОСТ Р 52872-2019, п. 7.2',
+    post102: 'Постановление №102, п. в)',
     wcag: 'WCAG 2.1, 1.4.6 Contrast (Enhanced)',
     principle: 'perceivable',
     severity: 'error',
@@ -191,6 +195,7 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     fix:
       'Удалите user-scalable=no и установите maximum-scale=5.0 или не указывайте его: ' +
       '<meta name="viewport" content="width=device-width, initial-scale=1.0" />',
+    gost: 'ГОСТ Р 52872-2019, п. 7.2',
     post102: 'Постановление №102, п. б)',
     wcag: 'WCAG 2.1, 1.4.4 Resize text',
     principle: 'perceivable',
@@ -851,6 +856,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     fix:
       'Сделайте значение id уникальным на всей странице. ' +
       'Используйте генераторы уникальных id или добавляйте суффикс к id.',
+    gost: 'ГОСТ Р 52872-2019, §5.2.4',
+    post102: 'Постановление №102, п. а)',
     wcag: 'WCAG 2.1, 4.1.2 Name, Role, Value',
     principle: 'robust',
     severity: 'error',
@@ -932,6 +939,8 @@ export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
     fix:
       'Оставьте только одну метку <label> для каждого поля. ' +
       'Дополнительную информацию разместите в aria-describedby.',
+    gost: 'ГОСТ Р 52872-2019, §5.1.3',
+    post102: 'Постановление №102, п. м)',
     wcag: 'WCAG 2.1, 3.3.2 Labels or Instructions',
     principle: 'understandable',
     severity: 'warning',

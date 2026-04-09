@@ -117,6 +117,19 @@
 }
 
 /*
+ * Alt-подпись под изображением в режиме для слабовидящих.
+ * Декоративные изображения с alt="" подпись не получают.
+ */
+.ru-a11y-visually-impaired .ru-a11y-visually-impaired-image-alt {
+  display: block !important;
+  margin-top: 0.5rem !important;
+  margin-bottom: 1rem !important;
+  font-size: 1.25rem !important;
+  line-height: 1.5 !important;
+  font-weight: 500 !important;
+}
+
+/*
  * SVG-иконки в кнопках и ссылках с aria-label — скрыть иконку, показать текстовую метку.
  * Работает ТОЛЬКО при наличии атрибута aria-label на родительском элементе.
  * Для корректной работы убедитесь, что используется ru-a11y-toolkit-eslint

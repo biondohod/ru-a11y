@@ -54,7 +54,7 @@ export const GOST_RULES: GostRuleDefinition[] = [
       'Добавьте в начало страницы ссылку вида <a href="#main">Перейти к содержанию</a> и соответствующий id у основного блока.',
     principle: 'управляемость',
     defaultSeverity: 'существенное',
-    gostRefs: ['ГОСТ Р 52872-2012, п. 5.2.3'],
+    gostRefs: ['ГОСТ Р 52872-2019, §5.2.3.1'],
     post102Refs: ['Постановление Правительства РФ №102 от 07.02.2026, п. а)'],
     wcagRefs: ['WCAG 2.1, 2.4.1 Bypass Blocks'],
   },
@@ -67,7 +67,7 @@ export const GOST_RULES: GostRuleDefinition[] = [
       'Измените цвет текста или фона так, чтобы достичь требуемого коэффициента контрастности (обычно не ниже 4.5:1).',
     principle: 'воспринимаемость',
     defaultSeverity: 'критичное',
-    gostRefs: ['ГОСТ Р 52872-2012, п. 5.1.4'],
+    gostRefs: ['ГОСТ Р 52872-2019, п. 7.2'],
     post102Refs: ['Постановление Правительства РФ №102 от 07.02.2026, п. в)'],
     wcagRefs: ['WCAG 2.1, 1.4.3 Contrast (Minimum)'],
   },
@@ -79,9 +79,152 @@ export const GOST_RULES: GostRuleDefinition[] = [
     recommendation: 'Добавьте информативный элемент <title> в блоке <head> с темой и назначением страницы.',
     principle: 'понятность',
     defaultSeverity: 'существенное',
-    gostRefs: ['ГОСТ Р 52872-2012, п. 5.2.2'],
+    gostRefs: ['ГОСТ Р 52872-2019, §5.2.3'],
     post102Refs: ['Постановление Правительства РФ №102 от 07.02.2026, п. е)'],
     wcagRefs: ['WCAG 2.1, 2.4.2 Page Titled'],
+  },
+  {
+    code: 'RU_GOST_TABLE_LAYOUT',
+    axeRuleIds: ['no-table-layout'],
+    title: 'Таблицы используются для вёрстки',
+    description:
+      'Таблица используется не для табличных данных, а для оформления страницы. ' +
+      'Это нарушает семантику и ухудшает работу скринридеров.',
+    recommendation: 'Используйте CSS Grid или Flexbox для вёрстки. Таблицы оставляйте только для табличных данных.',
+    principle: 'воспринимаемость',
+    defaultSeverity: 'существенное',
+    gostRefs: ['ГОСТ Р 52872-2019, §5.1.5'],
+    post102Refs: ['Постановление Правительства РФ №102 от 07.02.2026, п. а)'],
+    wcagRefs: ['WCAG 2.1, 1.3.1 Info and Relationships'],
+  },
+  {
+    code: 'RU_GOST_TABLE_HEADERS',
+    axeRuleIds: ['table-requires-th'],
+    title: 'Таблица данных не содержит корректных заголовков',
+    description:
+      'Таблица данных не содержит ячеек <th>, scope или caption, необходимых для корректного ' +
+      'восприятия структуры таблицы вспомогательными технологиями.',
+    recommendation:
+      'Добавьте <th> с корректным scope для строк и столбцов, а также <caption> для описания таблицы.',
+    principle: 'воспринимаемость',
+    defaultSeverity: 'критичное',
+    gostRefs: ['ГОСТ Р 52872-2019, §5.1.5'],
+    post102Refs: ['Постановление Правительства РФ №102 от 07.02.2026, п. а)'],
+    wcagRefs: ['WCAG 2.1, 1.3.1 Info and Relationships'],
+  },
+  {
+    code: 'RU_AXE_CLICK_EVENTS_HAVE_KEY_EVENTS',
+    axeRuleIds: ['click-events-have-key-events'],
+    title: 'Обработчик click не дублируется клавиатурным управлением',
+    description:
+      'Элемент реагирует на мышь, но не поддерживает эквивалентное управление с клавиатуры. ' +
+      'Пользователи без мыши не смогут активировать этот интерфейсный элемент.',
+    recommendation:
+      'Добавьте onKeyDown/onKeyUp или используйте нативный интерактивный элемент, например <button>.',
+    principle: 'управляемость',
+    defaultSeverity: 'критичное',
+    gostRefs: [],
+    post102Refs: ['Постановление Правительства РФ №102 от 07.02.2026, п. а)'],
+    wcagRefs: ['WCAG 2.1, 2.1.1 Keyboard'],
+  },
+  {
+    code: 'RU_AXE_HEADING_HAS_CONTENT',
+    axeRuleIds: ['heading-has-content'],
+    title: 'Заголовок не содержит текстового содержимого',
+    description:
+      'Элемент заголовка пуст или не имеет доступной текстовой альтернативы. ' +
+      'Это нарушает структуру страницы и делает навигацию по заголовкам бесполезной.',
+    recommendation: 'Добавьте информативный текст в заголовок или пересмотрите его семантическое использование.',
+    principle: 'понятность',
+    defaultSeverity: 'критичное',
+    gostRefs: ['ГОСТ Р 52872-2019, §5.2.3'],
+    post102Refs: ['Постановление Правительства РФ №102 от 07.02.2026, п. е)'],
+    wcagRefs: ['WCAG 2.1, 2.4.6 Headings and Labels'],
+  },
+  {
+    code: 'RU_AXE_ARIA_ACTIVEDESCENDANT_HAS_TABINDEX',
+    axeRuleIds: ['aria-activedescendant-has-tabindex'],
+    title: 'Элемент с aria-activedescendant не может получать фокус',
+    description:
+      'Составной виджет использует aria-activedescendant, но сам элемент не является фокусируемым. ' +
+      'Это ломает клавиатурную навигацию внутри компонента.',
+    recommendation: 'Добавьте tabIndex={0} или используйте нативный фокусируемый контейнер для виджета.',
+    principle: 'управляемость',
+    defaultSeverity: 'критичное',
+    gostRefs: [],
+    post102Refs: ['Постановление Правительства РФ №102 от 07.02.2026, п. а)'],
+    wcagRefs: ['WCAG 2.1, 4.1.2 Name, Role, Value'],
+  },
+  {
+    code: 'RU_AXE_NO_NONINTERACTIVE_ELEMENT_INTERACTIONS',
+    axeRuleIds: ['no-noninteractive-element-interactions'],
+    title: 'Неинтерактивный элемент используется как интерактивный',
+    description:
+      'Неинтерактивный элемент получил обработчики мыши или клавиатуры, из-за чего его поведение ' +
+      'не соответствует семантике и ожиданиям вспомогательных технологий.',
+    recommendation:
+      'Замените элемент на <button> или <a>, либо добавьте корректную роль и полную клавиатурную поддержку.',
+    principle: 'надежность',
+    defaultSeverity: 'существенное',
+    gostRefs: [],
+    post102Refs: [],
+    wcagRefs: ['WCAG 2.1, 4.1.2 Name, Role, Value'],
+  },
+  {
+    code: 'RU_AXE_NO_NONINTERACTIVE_TABINDEX',
+    axeRuleIds: ['no-noninteractive-tabindex'],
+    title: 'Неинтерактивный элемент включён в порядок фокуса',
+    description:
+      'Неинтерактивный элемент получил tabIndex и попадает в последовательность клавиатурного фокуса. ' +
+      'Это делает навигацию непредсказуемой.',
+    recommendation: 'Уберите tabIndex с неинтерактивного элемента или замените его на семантически подходящий интерактивный элемент.',
+    principle: 'управляемость',
+    defaultSeverity: 'существенное',
+    gostRefs: [],
+    post102Refs: ['Постановление Правительства РФ №102 от 07.02.2026, п. а)'],
+    wcagRefs: ['WCAG 2.1, 2.4.3 Focus Order'],
+  },
+  {
+    code: 'RU_AXE_NO_REDUNDANT_ROLES',
+    axeRuleIds: ['no-redundant-roles'],
+    title: 'Указана избыточная ARIA-роль',
+    description:
+      'Элемент уже имеет неявную нативную роль, поэтому явное дублирование role не даёт пользы ' +
+      'и может осложнить поддержку интерфейса.',
+    recommendation: 'Удалите избыточный атрибут role и сохраните нативную семантику HTML-элемента.',
+    principle: 'надежность',
+    defaultSeverity: 'незначительное',
+    gostRefs: [],
+    post102Refs: [],
+    wcagRefs: ['WCAG 2.1, 4.1.2 Name, Role, Value'],
+  },
+  {
+    code: 'RU_AXE_NO_STATIC_ELEMENT_INTERACTIONS',
+    axeRuleIds: ['no-static-element-interactions'],
+    title: 'Статический элемент содержит интерактивное поведение',
+    description:
+      'На статический элемент добавлены интерактивные обработчики без корректной семантики. ' +
+      'Это сбивает пользователей скринридеров и клавиатуры.',
+    recommendation: 'Используйте нативный интерактивный элемент или добавьте корректную роль вместе с клавиатурной поддержкой.',
+    principle: 'надежность',
+    defaultSeverity: 'существенное',
+    gostRefs: [],
+    post102Refs: [],
+    wcagRefs: ['WCAG 2.1, 4.1.2 Name, Role, Value'],
+  },
+  {
+    code: 'RU_AXE_NO_INTERACTIVE_ELEMENT_TO_NONINTERACTIVE_ROLE',
+    axeRuleIds: ['no-interactive-element-to-noninteractive-role'],
+    title: 'Интерактивному элементу назначена неинтерактивная роль',
+    description:
+      'Нативный интерактивный элемент получил неинтерактивную роль и потерял корректную семантику ' +
+      'для вспомогательных технологий.',
+    recommendation: 'Удалите конфликтующую role или замените элемент на действительно подходящий по смыслу.',
+    principle: 'надежность',
+    defaultSeverity: 'существенное',
+    gostRefs: [],
+    post102Refs: [],
+    wcagRefs: ['WCAG 2.1, 4.1.2 Name, Role, Value'],
   },
 ];
 
@@ -100,7 +243,7 @@ const FALLBACK_RULE: GostRuleDefinition = {
   recommendation: 'Проверьте элемент, указанный в отчете, и исправьте нарушение согласно рекомендациям axe-core и ГОСТ.',
   principle: 'надежность',
   defaultSeverity: 'незначительное',
-  gostRefs: ['ГОСТ Р 52872-2012 (требуется ручная классификация)'],
+  gostRefs: ['ГОСТ Р 52872-2019 (требуется ручная классификация)'],
   post102Refs: ['Постановление Правительства РФ №102 от 07.02.2026 (требуется ручная классификация)'],
   wcagRefs: [],
 };
@@ -153,10 +296,8 @@ function mapOverlayRuleToGostRule(meta: OverlayRuleMeta): GostRuleDefinition {
     recommendation: meta.fix,
     principle: toGostPrinciple(meta.principle),
     defaultSeverity: toDefaultSeverity(meta.severity),
-    gostRefs: meta.gost ? [meta.gost] : ['ГОСТ Р 52872-2012 (требуется уточнение в маппинге)'],
-    post102Refs: meta.post102
-      ? [meta.post102]
-      : ['Постановление Правительства РФ №102 от 07.02.2026 (требуется уточнение в маппинге)'],
+    gostRefs: meta.gost ? [meta.gost] : [],
+    post102Refs: meta.post102 ? [meta.post102] : [],
     wcagRefs: meta.wcag ? [meta.wcag] : [],
   };
 }
@@ -224,4 +365,3 @@ export function mapAxeResultToGost(axeResultItem: AxeResultItem): GostIssue {
     },
   };
 }
-
