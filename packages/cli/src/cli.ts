@@ -5,6 +5,7 @@ import { DEFAULT_CONFIG, STANDARD_TO_WCAG_TAGS } from './config/defaultConfig';
 import { buildConsoleReport } from './report/consoleReport';
 import { writeHtmlReport } from './report/htmlReport';
 import { buildJsonReport, writeJsonReport } from './report/jsonReport';
+import { writeJunitReport } from './report/junitReport';
 import { runEslintAudit } from './runner/eslintRunner';
 import { runPuppeteerAudit } from './runner/puppeteerRunner';
 import type { AuditRunResult, CliOptions, GostIssue, OutputFormat, StandardLevel } from './types';
@@ -20,7 +21,7 @@ const HELP_TEXT = `ru-a11y-cli - проверка доступности сай�
   --urls-file <путь>      Файл со списком URL (по одному на строку)
   --standard <уровень>    Целевой уровень: gost-a | gost-aa | gost-aaa (по умолчанию: gost-aa)
   --wcag-tags <теги>      Дополнительный фильтр правил axe по тегам (через запятую)
-  --format <формат>       Формат отчета: console | json | html (по умолчанию: console)
+  --format <формат>       Формат отчета: console | json | html | junit (по умолчанию: console)
   --output <директория>   Путь к директории для json/html отчетов
   --max-issues <число>    Порог нарушений для кода выхода 1
   --timeout <мс>          Таймаут проверки одной страницы в миллисекундах
@@ -171,8 +172,8 @@ export async function parseCliArgs(argv: string[]): Promise<CliOptions> {
         i += 1;
         break;
       case '--format':
-        if (!value || !['console', 'json', 'html'].includes(value)) {
-          throw new Error('Флаг --format принимает только: console, json или html.');
+        if (!value || !['console', 'json', 'html', 'junit'].includes(value)) {
+          throw new Error('Флаг --format принимает только: console, json, html или junit.');
         }
         options.format = value as OutputFormat;
         i += 1;
@@ -381,6 +382,11 @@ export async function runCli(argv: string[]): Promise<number> {
     process.stdout.write(`HTML-отчет сохранен: ${filePath}\n`);
   }
 
+  if (options.format === 'junit') {
+    const filePath = await writeJunitReport(filtered, options.outputDir);
+    process.stdout.write(`JUnit XML-отчет сохранен: ${filePath}\n`);
+  }
+
   return calculateExitCode(filtered, options.maxIssues);
 }
 
@@ -398,4 +404,3 @@ async function main(): Promise<void> {
 if (require.main === module) {
   void main();
 }
-

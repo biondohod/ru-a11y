@@ -1,6 +1,6 @@
 {
   "name": "ru-a11y-toolkit",
-  "version": "1.2.4",
+  "version": "1.3.0",
   "description": "Toolkit для автоматизированной проверки веб-доступности React/JS-приложений под российские нормативы (ГОСТ Р 52872-2019, Постановление №102)",
   "main": "index.js",
   "workspaces": [
@@ -15,10 +15,10 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "ru-a11y-toolkit-eslint": "1.2.1",
+    "ru-a11y-toolkit-eslint": "1.2.2",
     "ru-a11y-toolkit-overlay": "1.2.3",
     "ru-a11y-toolkit-visually-impaired": "1.1.1",
-    "ru-a11y-toolkit-cli": "1.2.2"
+    "ru-a11y-toolkit-cli": "1.3.0"
   },
   "peerDependencies": {
     "eslint": "^9.0.0 || ^10.0.0"

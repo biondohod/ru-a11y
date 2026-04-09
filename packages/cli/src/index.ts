@@ -6,6 +6,7 @@ export { mapEslintResultToGost } from './mapping/eslintMapping';
 export { buildConsoleReport } from './report/consoleReport';
 export { buildJsonReport, writeJsonReport } from './report/jsonReport';
 export { buildHtmlReport, writeHtmlReport } from './report/htmlReport';
+export { buildJunitReport, writeJunitReport } from './report/junitReport';
 export type {
   AuditRunResult,
   AxeIssueType,
@@ -20,4 +21,3 @@ export type {
   RuleSource,
   StandardLevel,
 } from './types';
-

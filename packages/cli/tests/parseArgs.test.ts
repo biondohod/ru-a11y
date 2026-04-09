@@ -49,5 +49,11 @@ describe('parseCliArgs', () => {
 
     expect(options.eslintTargets).toEqual(['src/**/*.{js,jsx}', 'tests/**/*.js']);
   });
+
+  it('должен принимать формат junit', async () => {
+    const options = await parseCliArgs(['https://example.com', '--format', 'junit']);
+
+    expect(options.format).toBe('junit');
+  });
 });
 

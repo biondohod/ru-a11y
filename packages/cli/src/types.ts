@@ -1,6 +1,6 @@
 export type StandardLevel = 'gost-a' | 'gost-aa' | 'gost-aaa';
 
-export type OutputFormat = 'console' | 'json' | 'html';
+export type OutputFormat = 'console' | 'json' | 'html' | 'junit';
 
 export type GostSeverity = 'критичное' | 'существенное' | 'незначительное';
 
@@ -81,4 +81,3 @@ export interface CliOptions {
   version: boolean;
   urlsFile?: string;
 }
-
