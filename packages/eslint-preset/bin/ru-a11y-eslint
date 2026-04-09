@@ -26,11 +26,16 @@ function resolveEslintBin() {
   return join(dirname(eslintPackageJsonPath), eslintBinRelativePath);
 }
 
+function resolveFormatterPath() {
+  return join(__dirname, '..', 'formatter-pretty.js');
+}
+
 function main() {
   const args = process.argv.slice(2);
+  const formatterPath = resolveFormatterPath();
   const formatterArgs = hasExplicitFormatter(args)
     ? args
-    : ['-f', 'ru-a11y-toolkit-eslint/formatter', ...args];
+    : ['-f', formatterPath, ...args];
 
   let eslintBin;
 

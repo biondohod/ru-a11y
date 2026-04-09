@@ -8,7 +8,7 @@
   },
   "exports": {
     ".": "./index.js",
-    "./formatter": "./formatter.js",
+    "./formatter": "./formatter-pretty.js",
     "./recommended": "./configs/recommended.js",
     "./gost-aa": "./configs/gost-aa.js",
     "./strict": "./configs/strict.js"
@@ -58,6 +58,7 @@
   "files": [
     "index.js",
     "formatter.js",
+    "formatter-pretty.js",
     "bin/",
     "configs/",
     "rules/",

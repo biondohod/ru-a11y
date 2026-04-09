@@ -1,6 +1,6 @@
 'use strict';
 
-const formatter = require('../formatter');
+const formatter = require('../formatter-pretty');
 const ANSI_PATTERN = /\u001B\[[0-9;]*m/g;
 
 describe('ru-a11y formatter', () => {
@@ -39,6 +39,34 @@ describe('ru-a11y formatter', () => {
     expect(plainOutput).toContain('<img src="/hero.png" />');
     expect(plainOutput).toContain('Постановление №102 п. г)');
     expect(plainOutput).toContain('WCAG 1.1.1');
+  });
+
+  test('выносит нормативные ссылки из текста ошибки в отдельный блок', () => {
+    const output = formatter([
+      {
+        filePath: 'src/App.jsx',
+        errorCount: 1,
+        warningCount: 0,
+        source: '<html>',
+        messages: [
+          {
+            ruleId: '@ru-a11y/gost-a11y/require-lang-attr',
+            severity: 2,
+            line: 1,
+            column: 1,
+            message:
+              'Отсутствует атрибут lang на элементе <html> (ГОСТ Р 52872-2019 §5.2.4, уровень A). Добавьте <html lang="ru"> для корректного объявления языка страницы. [Постановление №102 п. а) — информация должна быть доступна вспомогательным технологиям]',
+          },
+        ],
+      },
+    ]);
+
+    const plainOutput = output.replace(ANSI_PATTERN, '');
+
+    expect(plainOutput).toContain('Отсутствует атрибут lang на элементе <html>.');
+    expect(plainOutput).toContain('ГОСТ Р 52872-2019 §5.2.4, уровень A');
+    expect(plainOutput).toContain('Постановление №102 п. а)');
+    expect(plainOutput).not.toContain('Текст ошибки:\n        Отсутствует атрибут lang на элементе <html> (ГОСТ Р 52872-2019 §5.2.4, уровень A).');
   });
 
   test('печатает успешный отчёт без нарушений', () => {

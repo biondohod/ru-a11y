@@ -3,7 +3,6 @@
 const ANSI = {
   reset: '\u001B[0m',
   bold: '\u001B[1m',
-  dim: '\u001B[2m',
   red: '\u001B[31m',
   green: '\u001B[32m',
   yellow: '\u001B[33m',
@@ -45,6 +44,7 @@ function wrap(text, width = 100) {
       current = word;
       return;
     }
+
     current = candidate;
   });
 
@@ -68,7 +68,7 @@ function formatLabel(label) {
 
 function highlightSnippet(snippet) {
   return snippet
-    .replace(/(&lt;|<)\/?([A-Za-z][\w:-]*)/g, (match, bracket, tag) =>
+    .replace(/(&lt;|<)\/?([A-Za-z][\w:-]*)/g, (match, bracket) =>
       `${tone(bracket, ANSI.gray)}${tone(match.slice(bracket.length), ANSI.bold, ANSI.magenta)}`
     )
     .replace(/([A-Za-z_:-]+)=(".*?"|'.*?'|\{.*?\})/g, (_, attr, value) =>
@@ -135,18 +135,14 @@ function formatSeverity(severity) {
 function splitMessage(message) {
   const normalized = String(message || '').trim();
   const { cleanedText: body, refs } = extractNormativeRefs(normalized);
-
   const sentences = body
     .split(/(?<=[.!?])\s+/)
     .map((part) => part.trim())
     .filter(Boolean);
 
-  const errorText = sentences[0] || body;
-  const recommendation = sentences.slice(1).join(' ').trim();
-
   return {
-    errorText,
-    recommendation,
+    errorText: sentences[0] || body,
+    recommendation: sentences.slice(1).join(' ').trim(),
     refs,
   };
 }
@@ -165,13 +161,14 @@ function formatSourceSnippet(result, message) {
 
   const lineNumber = String(message.line).padStart(4, ' ');
   const column = Math.max(1, message.column || 1);
-  const gutter = `        ${tone(lineNumber, ANSI.gray)}  `;
-  const pointerIndent = ' '.repeat(gutter.length + column - 1);
+  const plainGutter = `        ${lineNumber}  `;
+  const coloredGutter = `        ${tone(lineNumber, ANSI.gray)}  `;
+  const pointerIndent = ' '.repeat(plainGutter.length + column - 1);
 
   return [
-    formatLabel('Фрагмент кода'),
-    `        ${tone(lineNumber, ANSI.gray)} ${highlightSnippet(snippet)}`,
-    `             ${' '.repeat(column - 1)}${tone('^', ANSI.bold, ANSI.red)}`,
+    `      ${formatLabel('Фрагмент кода')}`,
+    `${coloredGutter}${highlightSnippet(snippet)}`,
+    `${pointerIndent}${tone('^', ANSI.bold, ANSI.red)}`,
   ];
 }
 
