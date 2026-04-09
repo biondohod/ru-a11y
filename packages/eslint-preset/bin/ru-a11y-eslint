@@ -2,7 +2,9 @@
 'use strict';
 
 const { spawn } = require('node:child_process');
+const { readFileSync } = require('node:fs');
 const { createRequire } = require('node:module');
+const { dirname, join } = require('node:path');
 
 function hasExplicitFormatter(args) {
   return args.includes('-f') || args.includes('--format');
@@ -10,7 +12,18 @@ function hasExplicitFormatter(args) {
 
 function resolveEslintBin() {
   const localRequire = createRequire(`${process.cwd()}/package.json`);
-  return localRequire.resolve('eslint/bin/eslint.js');
+  const eslintPackageJsonPath = localRequire.resolve('eslint/package.json');
+  const eslintPackageJson = JSON.parse(readFileSync(eslintPackageJsonPath, 'utf-8'));
+  const eslintBinRelativePath =
+    typeof eslintPackageJson.bin === 'string'
+      ? eslintPackageJson.bin
+      : eslintPackageJson.bin?.eslint;
+
+  if (!eslintBinRelativePath) {
+    throw new Error('Не удалось определить путь к CLI-бинарю eslint из package.json.');
+  }
+
+  return join(dirname(eslintPackageJsonPath), eslintBinRelativePath);
 }
 
 function main() {

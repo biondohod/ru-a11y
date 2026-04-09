@@ -15,7 +15,7 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "ru-a11y-toolkit-eslint": "1.2.0",
+    "ru-a11y-toolkit-eslint": "1.2.1",
     "ru-a11y-toolkit-overlay": "1.2.3",
     "ru-a11y-toolkit-visually-impaired": "1.1.1",
     "ru-a11y-toolkit-cli": "1.2.2"
