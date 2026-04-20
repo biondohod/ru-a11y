@@ -56,6 +56,19 @@ export interface RuA11yOverlayProps {
    * По умолчанию: true.
    */
   autoScan?: boolean;
+
+  /**
+   * Запускать дополнительные DOM-проверки ru-a11y поверх axe-core.
+   * По умолчанию: true.
+   */
+  customRules?: boolean;
+
+  /**
+   * Запускать стандартные проверки axe-core.
+   * Можно отключить для демонстрации только дополнительных ru-a11y runtime-правил.
+   * По умолчанию: true.
+   */
+  axeRules?: boolean;
 }
 
 /**
@@ -71,6 +84,8 @@ export function RuA11yOverlay({
   preset = 'recommended',
   debounceMs = 1000,
   autoScan = true,
+  customRules = true,
+  axeRules = true,
 }: RuA11yOverlayProps = {}) {
   const [isOpen, setIsOpen] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
@@ -82,6 +97,8 @@ export function RuA11yOverlay({
     excludeSelector: excludeSelector ?? '[data-ru-a11y-overlay]',
     preset,
     debounceMs,
+    customRules,
+    axeRules,
   };
 
   const handleScanResult = useCallback((scanResult: ScanResult) => {

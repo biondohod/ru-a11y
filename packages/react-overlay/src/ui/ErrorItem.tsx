@@ -56,6 +56,7 @@ export function ErrorItem({ violation, isActive, onSelect }: ErrorItemProps) {
   const [expanded, setExpanded] = useState(false);
   const { meta } = violation;
   const isError = meta.severity === 'error';
+  const isCustomRule = violation.key.startsWith('custom:');
 
   const dotColor = isError ? COLORS.errorBorder : COLORS.warningBorder;
   const contrastData =
@@ -96,6 +97,24 @@ export function ErrorItem({ violation, isActive, onSelect }: ErrorItemProps) {
           aria-hidden="true"
         />
         <span style={itemTitleConfig}>{meta.title}</span>
+        {isCustomRule && (
+          <span
+            style={{
+              flexShrink: 0,
+              borderRadius: '3px',
+              border: `1px solid ${COLORS.link}`,
+              color: COLORS.link,
+              fontSize: '10px',
+              fontWeight: 700,
+              lineHeight: 1,
+              padding: '3px 5px',
+              textTransform: 'uppercase',
+            }}
+            title="Ð”Ð¾Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ð¾Ðµ runtime-Ð¿Ñ€Ð°Ð²Ð¸Ð»Ð¾ ru-a11y"
+          >
+            ru-a11y
+          </span>
+        )}
         {contrastData && (
           <span
             style={{

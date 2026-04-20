@@ -669,6 +669,7 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     wcag: 'WCAG 2.1, 1.4.2 Audio Control',
     principle: 'perceivable',
     severity: 'error',
+    aliases: ['@ru-a11y/gost-a11y/no-autoplay-media', 'no-autoplay-media'],
   },
 
   /**
@@ -766,6 +767,7 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     wcag: 'WCAG 2.1, 2.4.6 Headings and Labels',
     principle: 'operable',
     severity: 'warning',
+    aliases: ['@ru-a11y/gost-a11y/require-h1', 'require-h1'],
   },
 
   /**
@@ -1313,6 +1315,7 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     fix: 'Оберните основной контент в <main id="main">...</main>.',
     principle: 'operable',
     severity: 'warning',
+    aliases: ['@ru-a11y/gost-a11y/require-main-landmark', 'require-main-landmark'],
   },
 
   /**

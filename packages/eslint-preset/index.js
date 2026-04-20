@@ -46,6 +46,9 @@ const requireTitleSemantic = require('./rules/require-title-semantic');
 const zoom200Warning = require('./rules/zoom-200-warning');
 const noFrameStructure = require('./rules/no-frame-structure');
 const tableRequiresTh = require('./rules/table-requires-th');
+const requireMainLandmark = require('./rules/require-main-landmark');
+const requireH1 = require('./rules/require-h1');
+const noAutoplayMedia = require('./rules/no-autoplay-media');
 const ruA11yCore = require('ru-a11y-toolkit-core');
 
 // Обёрнутые правила eslint-plugin-jsx-a11y с русскоязычными сообщениями
@@ -80,6 +83,9 @@ const plugin = {
     'zoom-200-warning': zoom200Warning,
     'no-frame-structure': noFrameStructure,
     'table-requires-th': tableRequiresTh,
+    'require-main-landmark': requireMainLandmark,
+    'require-h1': requireH1,
+    'no-autoplay-media': noAutoplayMedia,
     // Обёрнутые правила jsx-a11y с русскими сообщениями
     // Доступны как @ru-a11y/gost-a11y/jsx-a11y/alt-text и т.д.
     ...Object.fromEntries(

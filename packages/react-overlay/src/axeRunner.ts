@@ -13,6 +13,7 @@
 
 import axe from 'axe-core';
 import { getRuleMeta, type RuA11yRuleMeta } from './mapping/rulesMap';
+import { runCustomRules } from './customRules';
 
 /** Одно конкретное нарушение (узел DOM + правило) */
 export interface A11yViolationNode {
@@ -76,12 +77,18 @@ export interface AxeRunnerConfig {
   tags?: string[];
   /** Дебаунс в мс перед повторным запуском после изменений DOM */
   debounceMs?: number;
+  /** Запускать дополнительные DOM-проверки ru-a11y поверх axe-core */
+  customRules?: boolean;
+  /** Запускать стандартные проверки axe-core. Можно отключить для проверки только ru-a11y custom rules. */
+  axeRules?: boolean;
 }
 
 const DEFAULT_CONFIG = {
   excludeSelector: '[data-ru-a11y-overlay]',
   preset: 'recommended' as AxePreset,
   debounceMs: 1000,
+  customRules: true,
+  axeRules: true,
 };
 
 /** Получает итоговый список тегов с учётом пресета и явных тегов */
@@ -154,6 +161,7 @@ export async function runAxeScan(config: AxeRunnerConfig = {}): Promise<ScanResu
   try {
     const tags = resolveTags(config);
     const excludeSelector = config.excludeSelector ?? DEFAULT_CONFIG.excludeSelector;
+    const shouldRunAxeRules = config.axeRules ?? DEFAULT_CONFIG.axeRules;
 
     const runOptions: axe.RunOptions = {
       runOnly: {
@@ -170,9 +178,9 @@ export async function runAxeScan(config: AxeRunnerConfig = {}): Promise<ScanResu
       ? { exclude: [[excludeSelector]] }
       : document;
 
-    const results = await axe.run(context, runOptions);
+    const results = shouldRunAxeRules ? await axe.run(context, runOptions) : null;
 
-    if (results.violations.length > 0) {
+    if (results && results.violations.length > 0) {
       console.table(
         results.violations.map((v) => ({
           id: v.id,
@@ -181,12 +189,14 @@ export async function runAxeScan(config: AxeRunnerConfig = {}): Promise<ScanResu
           nodes: v.nodes.length,
         })),
       );
-    } else {
-      console.warn('⚠️ violations пустой! Проверь теги и контекст выше.');
     }
-    console.groupEnd();
 
-    const violations = mapAxeViolations(results.violations);
+    const axeViolations = results ? mapAxeViolations(results.violations) : [];
+    const shouldRunCustomRules = config.customRules ?? DEFAULT_CONFIG.customRules;
+    const customViolations = shouldRunCustomRules
+      ? runCustomRules(document, config.preset ?? DEFAULT_CONFIG.preset, excludeSelector)
+      : [];
+    const violations = dedupeViolations([...axeViolations, ...customViolations]);
 
     violations.forEach((v) => {
       console.log(
@@ -209,6 +219,17 @@ export async function runAxeScan(config: AxeRunnerConfig = {}): Promise<ScanResu
   } finally {
     axeRunning = false;
   }
+}
+
+function dedupeViolations(violations: A11yViolationNode[]): A11yViolationNode[] {
+  const seen = new Set<string>();
+
+  return violations.filter((violation) => {
+    const key = `${violation.ruleId}::${violation.selector}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 /**

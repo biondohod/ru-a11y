@@ -163,6 +163,11 @@ ru-a11y ESLint report
 | `table-requires-th`      | A       | §5.1.5            | п. а)              | Таблицы данных должны иметь `<th scope="...">`               |
 | `no-table-layout`        | A       | §5.1.5            | п. а)              | Запрет таблиц для вёрстки, только для табличных данных       |
 | `zoom-200-warning`       | AA      | —                 | п. б)              | Запрет блокировки масштабирования, `maximum-scale` ≥ 2       |
+| `require-main-landmark`  | AA      | §5.1.5            | п. а)              | Основной контент должен быть в `<main>` или `role="main"`    |
+| `require-h1`             | AA      | §5.2.3            | п. е)              | На странице должен быть информативный заголовок `<h1>`       |
+| `no-autoplay-media`      | AA      | —                 | п. г)              | Запрет autoplay-аудио/видео без `controls` или `muted`       |
+
+Итого собственных правил ESLint: **10**. В этом обновлении добавлены `require-main-landmark`, `require-h1`, `no-autoplay-media`; ещё **8 существующих связок** уточнены через общий `ru-a11y-toolkit-core` и единые алиасы правил (`no-table-layout`, `table-requires-th`, keyboard/ARIA-правила jsx-a11y).
 
 ### Правила из `eslint-plugin-jsx-a11y` (подключаются в `gost-aa` и `strict`)
 
@@ -609,6 +614,9 @@ npm test -- --watch
 │   ├── table-requires-th.js        # <th scope> в таблицах данных
 │   ├── no-table-layout.js          # Запрет таблиц для вёрстки
 │   ├── zoom-200-warning.js         # Масштабирование 200%
+│   ├── require-main-landmark.js    # Основной landmark <main>/role="main"
+│   ├── require-h1.js               # Обязательный заголовок первого уровня
+│   ├── no-autoplay-media.js        # Запрет autoplay-медиа без управления
 │   ├── jsx-a11y-ru.js              # 26 правил jsx-a11y с русскими сообщениями
 │   └── wrap-jsx-rule.js            # Утилита перехвата context.report для перевода
 └── tests/                          # Jest-тесты для каждого правила

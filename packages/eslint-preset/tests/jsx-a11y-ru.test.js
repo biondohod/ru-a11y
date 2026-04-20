@@ -83,8 +83,8 @@ describe('jsx-a11y-ru: регистрация правил', () => {
     }
   });
 
-  test('итоговое количество правил плагина: 7 кастомных + 26 jsx-a11y = 33', () => {
-    expect(Object.keys(plugin.rules)).toHaveLength(33);
+  test('итоговое количество правил плагина: 10 кастомных + 26 jsx-a11y = 36', () => {
+    expect(Object.keys(plugin.rules)).toHaveLength(36);
   });
 
   test('каждое обёрнутое правило имеет meta и create', () => {
