@@ -1,159 +1,161 @@
 /*
- * ru-a11y-toolkit-visually-impaired — стили режима повышенной читабельности
+ * ru-a11y-toolkit-visually-impaired
  *
- * Активируются добавлением класса `ru-a11y-visually-impaired` на элемент <html>.
- * Используйте хук useVisuallyImpaired() для управления классом.
- *
- * Стили реализуют требования к режиму для слабовидящих согласно:
- * — ГОСТ Р 52872-2019 (раздел 7.2: цветовой контраст, размер шрифта)
- * — Постановление Правительства РФ №102 (требования к версии для слабовидящих)
- *
- * Три уровня стилей:
- * 1. Глобальный сброс оформления (цвета, тени, анимации)
- * 2. Типографика через rem (по семантическим элементам)
- * 3. Интерактивные элементы и формы
+ * Full mode uses the `ru-a11y-visually-impaired` class on <html>.
+ * Individual settings work independently through data attributes on <html>.
  */
 
-/* =============================================================================
-   УРОВЕНЬ 1: Глобальный сброс оформления
-   Убирает все фоновые цвета, тени и анимации.
-   Обеспечивает высококонтрастный режим: чёрный текст на белом фоне.
-   ============================================================================= */
+:root {
+  --ru-a11y-vi-font-scale: 1;
+  --ru-a11y-vi-line-height: 1.5;
+  --ru-a11y-vi-letter-spacing: 0;
+  --ru-a11y-vi-bg: Canvas;
+  --ru-a11y-vi-text: CanvasText;
+  --ru-a11y-vi-link: LinkText;
+  --ru-a11y-vi-border: CanvasText;
+  --ru-a11y-vi-focus: #ffbf00;
+  --ru-a11y-vi-surface: Canvas;
+}
 
-.ru-a11y-visually-impaired *,
-.ru-a11y-visually-impaired *::before,
-.ru-a11y-visually-impaired *::after {
-  background-color: #ffffff !important;
-  color: #000000 !important;
-  border-color: #000000 !important;
-  text-shadow: none !important;
-  box-shadow: none !important;
+:root[data-ru-a11y-vi-color-scheme],
+:root[data-ru-a11y-vi-color-scheme] body {
+  background-color: var(--ru-a11y-vi-bg) !important;
+  color: var(--ru-a11y-vi-text) !important;
+}
+
+:root[data-ru-a11y-vi-color-scheme]
+  :where(*:not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *)) {
+  background-color: var(--ru-a11y-vi-bg) !important;
   background-image: none !important;
-  /* Отключаем анимации — ГОСТ Р 52872, п. 6.11: контент не должен мигать */
-  transition-duration: 0.001ms !important;
-  animation-duration: 0.001ms !important;
+  border-color: var(--ru-a11y-vi-border) !important;
+  box-shadow: none !important;
+  color: var(--ru-a11y-vi-text) !important;
+  text-shadow: none !important;
 }
 
-/* =============================================================================
-   УРОВЕНЬ 2: Типографика через rem
-   Увеличенный шрифт для читабельности.
-   rem гарантирует масштабирование относительно системного размера шрифта браузера.
-   ============================================================================= */
-
-/* Основной текст — минимум 1.5rem (≈24px при базе 16px) */
-.ru-a11y-visually-impaired p,
-.ru-a11y-visually-impaired span,
-.ru-a11y-visually-impaired li,
-.ru-a11y-visually-impaired td,
-.ru-a11y-visually-impaired th,
-.ru-a11y-visually-impaired label,
-.ru-a11y-visually-impaired caption {
-  font-size: 1.5rem !important;
-  /* Межстрочный интервал 1.6 — рекомендация WCAG 1.4.12 (Text Spacing) */
-  line-height: 1.6 !important;
+:root[data-ru-a11y-vi-font-size]
+  :where(p, span, li, td, th, label, caption, blockquote, dd, dt):not(
+    [data-ru-a11y-vi-overlay],
+    [data-ru-a11y-vi-overlay] *
+  ),
+:root[data-ru-a11y-vi-font-size]
+  :where(input, textarea, select, button, a):not(
+    [data-ru-a11y-vi-overlay],
+    [data-ru-a11y-vi-overlay] *
+  ) {
+  font-size: calc(1rem * var(--ru-a11y-vi-font-scale)) !important;
 }
 
-/* Заголовки — иерархия размеров для чёткой структуры страницы */
-.ru-a11y-visually-impaired h1 {
-  font-size: 3rem !important;
-  font-weight: bold !important;
+:root[data-ru-a11y-vi-font-size]
+  h1:not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *) {
+  font-size: calc(2rem * var(--ru-a11y-vi-font-scale)) !important;
+  font-weight: 700 !important;
 }
 
-.ru-a11y-visually-impaired h2 {
-  font-size: 2.5rem !important;
-  font-weight: bold !important;
+:root[data-ru-a11y-vi-font-size]
+  h2:not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *) {
+  font-size: calc(1.65rem * var(--ru-a11y-vi-font-scale)) !important;
+  font-weight: 700 !important;
 }
 
-.ru-a11y-visually-impaired h3 {
-  font-size: 2rem !important;
-  font-weight: bold !important;
+:root[data-ru-a11y-vi-font-size]
+  :where(h3, h4, h5, h6):not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *) {
+  font-size: calc(1.35rem * var(--ru-a11y-vi-font-scale)) !important;
+  font-weight: 700 !important;
 }
 
-.ru-a11y-visually-impaired h4,
-.ru-a11y-visually-impaired h5,
-.ru-a11y-visually-impaired h6 {
-  font-size: 1.75rem !important;
-  font-weight: bold !important;
+:root[data-ru-a11y-vi-line-height]
+  :where(p, span, li, td, th, label, caption, blockquote, dd, dt, input, textarea, select, button, a):not(
+    [data-ru-a11y-vi-overlay],
+    [data-ru-a11y-vi-overlay] *
+  ) {
+  line-height: var(--ru-a11y-vi-line-height) !important;
 }
 
-/* Ссылки — крупный шрифт с явным подчёркиванием (WCAG 1.4.1: Use of Color) */
-.ru-a11y-visually-impaired a {
-  font-size: 1.5rem !important;
+:root[data-ru-a11y-vi-letter-spacing]
+  :where(*:not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *)) {
+  letter-spacing: var(--ru-a11y-vi-letter-spacing) !important;
+}
+
+:root[data-ru-a11y-vi-color-scheme]
+  a:not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *) {
+  color: var(--ru-a11y-vi-link) !important;
+  font-weight: 700 !important;
+}
+
+:root[data-ru-a11y-vi-underline-links]
+  a:not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *) {
   text-decoration: underline !important;
-  text-underline-offset: 3px !important;
-  font-weight: 500 !important;
+  text-decoration-thickness: 2px !important;
+  text-underline-offset: 0.18em !important;
 }
 
-/* =============================================================================
-   УРОВЕНЬ 3: Интерактивные элементы и формы
-   Увеличенные touch-цели, чёткие границы, усиленный фокус.
-   Требования к минимальному размеру интерактивных элементов: WCAG 2.5.5 (Target Size).
-   ============================================================================= */
+:root[data-ru-a11y-vi-highlight-links]
+  a:not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *) {
+  background-color: var(--ru-a11y-vi-link) !important;
+  color: var(--ru-a11y-vi-bg) !important;
+  padding: 0.08em 0.18em !important;
+}
 
-/* Кнопки — минимальный размер 3rem × 3rem (≈48px × 48px) */
-.ru-a11y-visually-impaired button {
-  font-size: 1.5rem !important;
-  border: 2px solid #000 !important;
-  padding: 0.5rem 1rem !important;
+.ru-a11y-visually-impaired
+  :where(button, input, textarea, select):not(
+    [data-ru-a11y-vi-overlay],
+    [data-ru-a11y-vi-overlay] *
+  ) {
+  border: 2px solid var(--ru-a11y-vi-border) !important;
   min-height: 3rem !important;
   min-width: 3rem !important;
+  padding: 0.5rem 0.75rem !important;
 }
 
-/* Поля форм — минимальная высота 3rem для удобного взаимодействия */
-.ru-a11y-visually-impaired input,
-.ru-a11y-visually-impaired textarea,
-.ru-a11y-visually-impaired select {
-  font-size: 1.5rem !important;
-  border: 2px solid #000 !important;
-  min-height: 3rem !important;
+:root[data-ru-a11y-vi-image-mode='grayscale']
+  img:not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *) {
+  filter: grayscale(100%) contrast(125%) !important;
 }
 
-/*
- * Изображения — обесцветить и усилить контраст.
- * Монохромный режим снижает нагрузку при нарушениях цветовосприятия.
- */
-.ru-a11y-visually-impaired img {
-  filter: grayscale(100%) contrast(120%) !important;
-}
-
-/*
- * Alt-подпись под изображением в режиме для слабовидящих.
- * Декоративные изображения с alt="" подпись не получают.
- */
-.ru-a11y-visually-impaired .ru-a11y-visually-impaired-image-alt {
-  display: block !important;
-  margin-top: 0.5rem !important;
-  margin-bottom: 1rem !important;
-  font-size: 1.25rem !important;
-  line-height: 1.5 !important;
-  font-weight: 500 !important;
-}
-
-/*
- * SVG-иконки в кнопках и ссылках с aria-label — скрыть иконку, показать текстовую метку.
- * Работает ТОЛЬКО при наличии атрибута aria-label на родительском элементе.
- * Для корректной работы убедитесь, что используется ru-a11y-toolkit-eslint
- * (правило jsx-a11y/aria-label проверяет наличие aria-label у кнопок с иконками).
- */
-.ru-a11y-visually-impaired button[aria-label] svg,
-.ru-a11y-visually-impaired a[aria-label] svg {
+:root[data-ru-a11y-vi-image-mode='hidden']
+  img:not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *) {
   display: none !important;
 }
 
-.ru-a11y-visually-impaired button[aria-label]::before,
-.ru-a11y-visually-impaired a[aria-label]::before {
-  content: attr(aria-label) !important;
-  font-size: 1.25rem !important;
-  display: inline-block !important;
+.ru-a11y-visually-impaired-image-alt {
+  display: block !important;
+  margin-top: 0.5rem !important;
+  margin-bottom: 1rem !important;
+  border: 2px solid var(--ru-a11y-vi-border) !important;
+  padding: 0.5rem !important;
+  font-size: calc(0.9rem * var(--ru-a11y-vi-font-scale)) !important;
+  line-height: var(--ru-a11y-vi-line-height) !important;
+  font-weight: 700 !important;
 }
 
-/*
- * Индикатор фокуса — жирный контур 3px.
- * WCAG 2.4.11 (Focus Appearance): минимальная видимость фокуса.
- * ГОСТ Р 52872, п. 6.6: все интерактивные элементы должны иметь видимый фокус.
- */
-.ru-a11y-visually-impaired *:focus,
-.ru-a11y-visually-impaired *:focus-visible {
-  outline: 3px solid #000 !important;
-  outline-offset: 2px !important;
+:root[data-ru-a11y-vi-reduced-motion]
+  :where(*:not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *)) {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+  transition-duration: 0.001ms !important;
+}
+
+:root[data-ru-a11y-vi-strong-focus]
+  :where(*:focus, *:focus-visible):not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *) {
+  outline: 4px solid var(--ru-a11y-vi-focus) !important;
+  outline-offset: 3px !important;
+}
+
+.ru-a11y-visually-impaired
+  :where(button[aria-label] svg, a[aria-label] svg):not(
+    [data-ru-a11y-vi-overlay],
+    [data-ru-a11y-vi-overlay] *
+  ) {
+  display: none !important;
+}
+
+.ru-a11y-visually-impaired
+  :where(button[aria-label], a[aria-label]):not(
+    [data-ru-a11y-vi-overlay],
+    [data-ru-a11y-vi-overlay] *
+  )::before {
+  content: attr(aria-label) !important;
+  display: inline-block !important;
 }

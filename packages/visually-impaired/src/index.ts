@@ -1,15 +1,78 @@
-/**
- * ru-a11y-toolkit-visually-impaired
- *
- * Модуль повышенной читабельности для пользователей с нарушениями зрения.
- * Часть монорепозитория ru-a11y-toolkit.
- *
- * Публичный API:
- * - useVisuallyImpaired — React-хук для управления режимом
- * - UseVisuallyImpairedReturn — тип возвращаемого значения хука
- *
- * CSS-стили подключаются отдельно:
- * import 'ru-a11y-toolkit-visually-impaired/styles/visually-impaired.css';
- */
-export { useVisuallyImpaired } from './useVisuallyImpaired';
-export type { UseVisuallyImpairedReturn } from './useVisuallyImpaired';
+export {
+  DEFAULT_VISUALLY_IMPAIRED_SETTINGS,
+  VISUALLY_IMPAIRED_CLASS,
+  VISUALLY_IMPAIRED_STORAGE_KEY,
+  getVisuallyImpairedSettings,
+  initializeVisuallyImpaired,
+  resetVisuallyImpairedSettings,
+  setVisuallyImpairedSettings,
+  useColorScheme,
+  useFocusSettings,
+  useFontSize,
+  useImageSettings,
+  useLinkSettings,
+  useMotionSettings,
+  useVisuallyImpaired,
+  useVisuallyImpairedMode,
+  useVisuallyImpairedSettings,
+} from './useVisuallyImpaired';
+
+export type {
+  ColorScheme,
+  FontSizeLevel,
+  ImageMode,
+  LetterSpacingLevel,
+  LineHeightLevel,
+  UseColorSchemeReturn,
+  UseFocusSettingsReturn,
+  UseFontSizeReturn,
+  UseImageSettingsReturn,
+  UseLinkSettingsReturn,
+  UseMotionSettingsReturn,
+  UseVisuallyImpairedReturn,
+  UseVisuallyImpairedSettingsReturn,
+  VisuallyImpairedSettings,
+} from './useVisuallyImpaired';
+
+export { VisuallyImpairedOverlay } from './VisuallyImpairedOverlay';
+export type { VisuallyImpairedOverlayProps } from './VisuallyImpairedOverlay';
+
+import { VisuallyImpairedOverlay } from './VisuallyImpairedOverlay';
+import {
+  DEFAULT_VISUALLY_IMPAIRED_SETTINGS,
+  getVisuallyImpairedSettings,
+  initializeVisuallyImpaired,
+  resetVisuallyImpairedSettings,
+  setVisuallyImpairedSettings,
+  useColorScheme,
+  useFocusSettings,
+  useFontSize,
+  useImageSettings,
+  useLinkSettings,
+  useMotionSettings,
+  useVisuallyImpaired,
+  useVisuallyImpairedMode,
+  useVisuallyImpairedSettings,
+} from './useVisuallyImpaired';
+
+export const visuallyImpaired = {
+  Overlay: VisuallyImpairedOverlay,
+  hooks: {
+    useVisuallyImpaired,
+    useVisuallyImpairedSettings,
+    useVisuallyImpairedMode,
+    useFontSize,
+    useColorScheme,
+    useLinkSettings,
+    useImageSettings,
+    useMotionSettings,
+    useFocusSettings,
+  },
+  settings: {
+    defaults: DEFAULT_VISUALLY_IMPAIRED_SETTINGS,
+    get: getVisuallyImpairedSettings,
+    set: setVisuallyImpairedSettings,
+    reset: resetVisuallyImpairedSettings,
+    initialize: initializeVisuallyImpaired,
+  },
+};

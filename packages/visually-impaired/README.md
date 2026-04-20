@@ -1,168 +1,168 @@
 # ru-a11y-toolkit-visually-impaired
 
-[![npm version](https://badge.fury.io/js/ru-a11y-toolkit-visually-impaired.svg)](https://www.npmjs.com/package/ru-a11y-toolkit-visually-impaired)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+Модуль пользовательских настроек отображения для версии сайта для слабовидящих. Часть `ru-a11y-toolkit`.
 
-Модуль повышенной читабельности для пользователей с нарушениями зрения. Часть [ru-a11y-toolkit](https://www.npmjs.com/package/ru-a11y-toolkit).
+Пакет решает две задачи:
 
-> **⚠️ Важно:** этот модуль **не является** заменой соответствию ГОСТ Р 52872-2019 / WCAG на уровне верстки. Он — дополнение к [`ru-a11y-toolkit-eslint`](https://www.npmjs.com/package/ru-a11y-toolkit-eslint) и [`ru-a11y-toolkit-overlay`](https://www.npmjs.com/package/ru-a11y-toolkit-overlay), которое даёт конечному **пользователю сайта** возможность переключиться в режим повышенной читабельности.
->
-> Для полноценного соответствия ГОСТ Р 52872-2019 используйте `ru-a11y-toolkit-eslint` (статический анализ) и `ru-a11y-toolkit-overlay` (runtime-проверка). Лучший результат достигается при вёрстке сайта с относительными единицами (`rem`/`em`).
+- дает готовый минимальный левый overlay `VisuallyImpairedOverlay`;
+- экспортирует хуки и низкоуровневые функции, чтобы разработчик мог встроить те же настройки в собственную шапку, профиль пользователя или дизайн-систему.
 
----
+Настройки сохраняются в `localStorage` и автоматически применяются ко всем страницам SPA между сессиями.
 
-## Что это
+Важно: отдельные настройки можно использовать без полного режима `ru-a11y-visually-impaired`. Например, пользователь может только подчеркнуть ссылки или увеличить интервал, не включая черно-белую версию сайта. Полный режим остается отдельной кнопкой и включает готовый набор усилений.
 
-`ru-a11y-toolkit-visually-impaired` — лёгкий React-хук + CSS-файл, которые позволяют добавить на сайт кнопку «Версия для слабовидящих». При нажатии на кнопку на `<html>` добавляется CSS-класс `ru-a11y-visually-impaired`, который активирует режим повышенной читабельности:
-
-- чёрный текст на белом фоне (высокий контраст)
-- увеличенный шрифт (от 1.5rem)
-- усиленный индикатор фокуса
-- обесцвеченные изображения с повышенным контрастом
-- alt-подписи под изображениями в режиме для слабовидящих
-- отключённые анимации и переходы
-
----
-
-## Установка
-
-```bash
-npm install ru-a11y-toolkit-visually-impaired
-# или
-yarn add ru-a11y-toolkit-visually-impaired
-# или
-pnpm add ru-a11y-toolkit-visually-impaired
-```
-
-React `>=17` и `react-dom` `>=17` — обязательные peer-зависимости.
-
----
-
-## Быстрый старт
-
-1. Подключите CSS-файл один раз (например, в корневом компоненте или `main.tsx`):
+## Быстрый Старт
 
 ```tsx
+import { VisuallyImpairedOverlay } from 'ru-a11y-toolkit-visually-impaired';
 import 'ru-a11y-toolkit-visually-impaired/styles/visually-impaired.css';
-```
 
-2. Используйте хук в компоненте кнопки:
-
-```tsx
-import { useVisuallyImpaired } from 'ru-a11y-toolkit-visually-impaired';
-
-function AccessibilityButton() {
-  const { toggle, isEnabled } = useVisuallyImpaired();
-
+export function App() {
   return (
-    <button onClick={toggle} aria-pressed={isEnabled}>
-      {isEnabled ? 'Обычная версия' : 'Версия для слабовидящих'}
-    </button>
+    <>
+      <Routes />
+      <VisuallyImpairedOverlay />
+    </>
   );
 }
 ```
 
-> CSS импортируется отдельно и **не инжектируется через JS** — это сделано намеренно для совместимости с SSR и для явного контроля разработчика над стилями.
+Overlay закреплен слева, имеет крупные текстовые кнопки и исключен из собственных глобальных стилей через `data-ru-a11y-vi-overlay`, поэтому панель остается читаемой после применения пользовательских настроек.
 
----
+## Два Слоя
 
-## Что делает режим
+| Слой | Как включается | Что делает |
+| --- | --- | --- |
+| Отдельные настройки | `data-ru-a11y-vi-*` на `<html>` | Размер текста, интервал, ссылки, изображения, motion, фокус и цветовая схема применяются независимо |
+| Полный режим | класс `ru-a11y-visually-impaired` | Включает готовый пресет: крупный текст, высокий контраст, ссылки, alt-подписи, reduced motion и сильный фокус |
 
-| Что меняется                                 | Зачем                                                           | Связь с ГОСТ / №102                             |
-| -------------------------------------------- | --------------------------------------------------------------- | ----------------------------------------------- |
-| Белый фон, чёрный текст для всех элементов   | Обеспечивает контрастность минимум 21:1 (максимально возможный) | ГОСТ Р 52872, п. 7.2; WCAG 1.4.3 Contrast (AA)  |
-| Шрифт от 1.5rem для основного текста         | Читабельность для людей с пониженной остротой зрения            | Постановление №102: размер шрифта не менее 18pt |
-| Шрифт заголовков от 1.75rem до 3rem          | Визуальная иерархия страницы                                    | WCAG 1.4.4 Resize text                          |
-| Межстрочный интервал 1.6                     | Снижение нагрузки при чтении длинных текстов                    | WCAG 1.4.12 Text Spacing                        |
-| Кнопки и поля форм min-height 3rem           | Крупные touch-цели для пользователей с нарушениями моторики     | WCAG 2.5.5 Target Size                          |
-| Outline 3px на всех элементах в фокусе       | Видимая навигация с клавиатуры                                  | ГОСТ Р 52872, п. 6.6; WCAG 2.4.7, 2.4.11        |
-| Изображения: grayscale + повышенный контраст | Читабельность при нарушениях цветовосприятия                    | WCAG 1.4.11 Non-text Contrast                   |
-| Текст aria-label вместо SVG-иконок в кнопках | Текстовое обозначение для кнопок без видимой подписи            | WCAG 1.1.1 Non-text Content                     |
-| Alt-текст под изображениями                  | Показывает текстовую альтернативу прямо на странице             | WCAG 1.1.1 Non-text Content                     |
-| Отключены анимации и переходы                | Исключение мигания контента                                     | ГОСТ Р 52872, п. 6.11; WCAG 2.3.1               |
+Пример: `useLinkSettings().setUnderlineLinks(true)` добавит только `data-ru-a11y-vi-underline-links`, но не добавит класс `ru-a11y-visually-impaired`.
 
----
+## Что Настраивается
 
-## Ограничения
+| Настройка | API | Что меняется | Нормативная логика |
+| --- | --- | --- | --- |
+| Полный режим | `useVisuallyImpairedMode`, `useVisuallyImpaired` | Класс `ru-a11y-visually-impaired` на `<html>` | Пользователь должен иметь доступ к версии/режиму повышенной читаемости |
+| Размер текста | `useFontSize` | `normal`, `large`, `xlarge` | Размер шрифта для слабовидящих, масштабирование текста |
+| Межстрочный интервал | `setSettings({ lineHeight })` | `normal`, `wide`, `extra` | Читаемость длинного текста, WCAG Text Spacing |
+| Межбуквенный интервал | `setSettings({ letterSpacing })` | `normal`, `wide` | Дополнительная читаемость при низкой остроте зрения |
+| Цветовая схема | `useColorScheme` | `default`, белая, черная, синяя, бежевая схемы | Пользовательская настройка контраста и цветового восприятия |
+| Ссылки | `useLinkSettings` | Подчеркивание и дополнительное выделение | Ссылки различимы не только цветом |
+| Изображения | `useImageSettings` | Обычные, ч/б, скрытые | Учет цветового восприятия; возможность убрать визуальный шум |
+| Alt-подписи | `useImageSettings` | Выводит подписи из `alt` под изображениями | Текстовая альтернатива становится видимой пользователю |
+| Анимации | `useMotionSettings` | Отключает transitions/animations | Требования к отсутствию мигания и снижению движения |
+| Фокус | `useFocusSettings` | Крупный контур фокуса | Видимая клавиатурная навигация |
 
-> Перед использованием прочитайте этот раздел — он поможет избежать неожиданного поведения.
-
-1. **Горизонтальный скролл** — если сайт свёрстан с фиксированными размерами в `px`, увеличенный шрифт может вызвать горизонтальный скролл. **Рекомендация:** используйте `rem`/`em` при вёрстке. Модуль работает наилучшим образом в изначально доступно свёрстанном проекте.
-
-2. **Кнопки с иконками** — замена SVG-иконки на текст работает **только при наличии атрибута `aria-label`** на кнопке или ссылке. Без `aria-label` иконка скроется, но текст не появится. Используйте [`ru-a11y-toolkit-eslint`](../eslint-preset) для проверки наличия `aria-label` на этапе разработки.
-
-3. **Подписи под изображениями** — подпись показывается только для `<img>` с непустым `alt`. Для декоративных изображений оставляйте `alt=""`, тогда подпись не будет добавлена.
-
-4. **Размер системного курсора** — CSS-свойство `cursor` меняет вид курсора, но не его **системный размер**. Увеличение размера курсора — ограничение браузера, оно доступно только через настройки ОС пользователя.
-
-5. **Состояние сбрасывается при перезагрузке страницы** — по умолчанию состояние не сохраняется. Реализуйте сохранение самостоятельно (см. раздел «Опциональное сохранение состояния»).
-
-6. **Конфликт со стилями `!important`** — если в проекте уже используются стили с `!important`, они могут переопределить стили режима. Проверьте специфичность ваших стилей.
-
----
-
-## Связь с другими модулями ru-a11y-toolkit
-
-Все три модуля дополняют друг друга на разных уровнях:
-
-```
-Этап разработки          Runtime (в браузере)       Конечный пользователь
-       │                         │                          │
-       ▼                         ▼                          ▼
-ru-a11y-toolkit-eslint   ru-a11y-toolkit-overlay   ru-a11y-toolkit-visually-impaired
-  Найти нарушения          Увидеть нарушения          Переключить удобный
-  в коде на этапе          прямо в браузере           режим просмотра
-  написания                во время разработки        на боевом сайте
-```
-
-| Модуль                                        | Для кого                    | Когда работает                        |
-| --------------------------------------------- | --------------------------- | ------------------------------------- |
-| [`ru-a11y-toolkit-eslint`](https://www.npmjs.com/package/ru-a11y-toolkit-eslint)  | Разработчик                 | Во время написания кода (lint)        |
-| [`ru-a11y-toolkit-overlay`](https://www.npmjs.com/package/ru-a11y-toolkit-overlay) | Разработчик                 | В dev-режиме в браузере               |
-| `ru-a11y-toolkit-visually-impaired`           | Конечный пользователь сайта | В production, по запросу пользователя |
-
----
-
-## Опциональное сохранение состояния
-
-По умолчанию хук не сохраняет состояние — это намеренное решение: разработчик сам выбирает механизм хранения (localStorage, cookie, пользовательские настройки аккаунта и т.д.).
-
-Пример сохранения в `localStorage`:
+## Хуки
 
 ```tsx
-import { useState, useCallback, useEffect } from 'react';
+import {
+  useVisuallyImpaired,
+  useFontSize,
+  useColorScheme,
+  useLinkSettings,
+} from 'ru-a11y-toolkit-visually-impaired';
 
-const CLASS = 'ru-a11y-visually-impaired';
-const STORAGE_KEY = 'ru-a11y-vi-enabled';
+function CustomControls() {
+  const { isEnabled, toggle, reset } = useVisuallyImpaired();
+  const { fontSize, setFontSize } = useFontSize();
+  const { colorScheme, setColorScheme } = useColorScheme();
+  const { underlineLinks, toggleUnderlineLinks } = useLinkSettings();
 
-function useVisuallyImpairedPersisted() {
-  const [isEnabled, setIsEnabled] = useState<boolean>(() => {
-    // Читаем состояние при инициализации
-    return localStorage.getItem(STORAGE_KEY) === 'true';
-  });
-
-  // Применяем класс при первом рендере (восстановление из localStorage)
-  useEffect(() => {
-    document.documentElement.classList.toggle(CLASS, isEnabled);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const toggle = useCallback(() => {
-    setIsEnabled((prev) => {
-      const next = !prev;
-      document.documentElement.classList.toggle(CLASS, next);
-      localStorage.setItem(STORAGE_KEY, String(next));
-      return next;
-    });
-  }, []);
-
-  return { toggle, isEnabled };
+  return (
+    <section>
+      <button onClick={toggle} aria-pressed={isEnabled}>
+        {isEnabled ? 'Выключить полный режим' : 'Полный режим'}
+      </button>
+      <button onClick={() => setFontSize('xlarge')}>Текст 150%</button>
+      <button onClick={() => setColorScheme('default')}>Цвета сайта</button>
+      <button onClick={() => setColorScheme('black-white')}>Черная схема</button>
+      <button onClick={toggleUnderlineLinks} aria-pressed={underlineLinks}>
+        Подчеркнуть ссылки
+      </button>
+      <button onClick={reset}>Сброс</button>
+      <p>Текущий размер: {fontSize}. Цветовая схема: {colorScheme}.</p>
+    </section>
+  );
 }
 ```
 
-> Пример выше можно скопировать в свой проект и адаптировать под нужный механизм хранения.
+Основной хук `useVisuallyImpaired()` возвращает:
 
----
+```ts
+{
+  settings,
+  setSettings,
+  reset,
+  isEnabled,
+  enable,
+  disable,
+  toggle
+}
+```
 
-## Лицензия
+Дополнительные хуки:
 
-MIT © [biondohod](https://github.com/biondohod)
+- `useVisuallyImpairedSettings()`
+- `useVisuallyImpairedMode()`
+- `useFontSize()`
+- `useColorScheme()`
+- `useLinkSettings()`
+- `useImageSettings()`
+- `useMotionSettings()`
+- `useFocusSettings()`
+
+## Низкоуровневый API
+
+```ts
+import {
+  getVisuallyImpairedSettings,
+  setVisuallyImpairedSettings,
+  resetVisuallyImpairedSettings,
+  initializeVisuallyImpaired,
+} from 'ru-a11y-toolkit-visually-impaired';
+```
+
+Эти функции полезны, если настройки нужно синхронизировать с профилем пользователя, cookie consent или серверным состоянием.
+
+## Объектный Экспорт
+
+```tsx
+import { visuallyImpaired } from 'ru-a11y-toolkit-visually-impaired';
+
+const Overlay = visuallyImpaired.Overlay;
+const { useFontSize } = visuallyImpaired.hooks;
+```
+
+## Формат Настроек
+
+```ts
+type VisuallyImpairedSettings = {
+  enabled: boolean;
+  fontSize: 'normal' | 'large' | 'xlarge';
+  lineHeight: 'normal' | 'wide' | 'extra';
+  letterSpacing: 'normal' | 'wide';
+  colorScheme: 'default' | 'white-black' | 'black-white' | 'blue-yellow' | 'beige-brown';
+  underlineLinks: boolean;
+  highlightLinks: boolean;
+  imageMode: 'normal' | 'grayscale' | 'hidden';
+  showImageAlt: boolean;
+  reducedMotion: boolean;
+  strongFocus: boolean;
+};
+```
+
+Ключ localStorage: `ru-a11y-visually-impaired-settings`.
+
+## Ограничения
+
+Модуль не заменяет доступную верстку. Он помогает пользователю настроить отображение, но сайт все равно должен быть семантичным, масштабируемым, управляемым с клавиатуры и проверенным через `ru-a11y-toolkit-eslint` и `ru-a11y-toolkit-overlay`.
+
+Лучший результат будет на сайтах, где размеры заданы в `rem`/`em`, layout не ломается при увеличении текста, а интерактивные элементы имеют корректные имена и фокус.
+
+## Проверка
+
+```bash
+npm test -w ru-a11y-toolkit-visually-impaired -- --runInBand
+npm run build -w ru-a11y-toolkit-visually-impaired
+```
