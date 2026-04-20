@@ -1,6 +1,6 @@
 {
   "name": "ru-a11y-toolkit-eslint",
-  "version": "1.2.2",
+  "version": "2.0.0",
   "description": "ESLint-плагин для проверки веб-доступности согласно ГОСТ Р 52872-2019 и Постановлению Правительства РФ №102. Часть ru-a11y-toolkit.",
   "main": "index.js",
   "bin": {
@@ -37,7 +37,7 @@
   "license": "MIT",
   "dependencies": {
     "eslint-plugin-jsx-a11y": "^6.0.0",
-    "ru-a11y-toolkit-core": "1.3.0"
+    "ru-a11y-toolkit-core": "1.0.0"
   },
   "peerDependencies": {
     "eslint": "^9.0.0 || ^10.0.0"
