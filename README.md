@@ -17,6 +17,7 @@
 | Пакет | Кратко |
 | --- | --- |
 | [`ru-a11y-toolkit-eslint`](https://www.npmjs.com/package/ru-a11y-toolkit-eslint) | Статический lint-доступности с русскими сообщениями и пресетами ГОСТ/№102. |
+| [`ru-a11y-toolkit-core`](https://www.npmjs.com/package/ru-a11y-toolkit-core) | Единый каталог правил, переводов, алиасов axe/ESLint и нормативных ссылок. |
 | [`ru-a11y-toolkit-overlay`](https://www.npmjs.com/package/ru-a11y-toolkit-overlay) | Runtime-панель в браузере для визуализации нарушений в dev-режиме. |
 | [`ru-a11y-toolkit-cli`](https://www.npmjs.com/package/ru-a11y-toolkit-cli) | CLI-аудит готовых URL (Puppeteer + axe-core) с отчетами `console/json/html`. |
 | [`ru-a11y-toolkit-visually-impaired`](https://www.npmjs.com/package/ru-a11y-toolkit-visually-impaired) | Режим повышенной читабельности для конечных пользователей сайта. |
@@ -35,6 +36,7 @@ npm install --save-dev ru-a11y-toolkit
 
 ```bash
 npm install --save-dev ru-a11y-toolkit-eslint
+npm install --save-dev ru-a11y-toolkit-core
 npm install --save-dev ru-a11y-toolkit-cli
 npm install --save-dev ru-a11y-toolkit-overlay
 npm install ru-a11y-toolkit-visually-impaired
@@ -153,4 +155,3 @@ npm run test:all
 ## Лицензия
 
 MIT © [biondohod](https://github.com/biondohod)
-

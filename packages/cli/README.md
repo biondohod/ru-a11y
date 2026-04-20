@@ -205,7 +205,7 @@ ru-a11y-cli https://example.com --with-eslint --project-root ../ru-a11y-playgrou
 - `severity`, `principle`
 - `gostRefs`, `post102Refs`, `wcagRefs`
 - `origin` (`runtime-axe` или `static-eslint`)
-- `ruleSource` (`overlay-rules-map`, `cli-gost-map`, `eslint-rules`, `fallback`)
+- `ruleSource` (`core-rules-map`, `eslint-rules`, `fallback`)
 - `source` (для ESLint обычно `filePath/line/column`, для runtime — `selector/snippet`)
 
 ### HTML
@@ -291,7 +291,7 @@ ru-a11y-cli --urls-file ./urls.txt --format json --output ./artifacts/a11y --max
 
 ## Нормативная логика и маппинг
 
-CLI использует `axe-core` как технический движок и нормализует результаты через `src/mapping/gostMapping.ts`.
+CLI использует `axe-core` как технический движок и нормализует результаты через общий пакет `ru-a11y-toolkit-core`.
 
 Маппинг связывает каждое нарушение с:
 
@@ -300,7 +300,7 @@ CLI использует `axe-core` как технический движок �
 - рекомендацией по исправлению;
 - принципом доступности и уровнем серьезности.
 
-Если доступен экспорт `RU_A11Y_RULES` из `ru-a11y-toolkit-overlay`, CLI использует этот маппинг как приоритетный источник (`ruleSource=overlay-rules-map`).
+Тот же каталог правил использует overlay, поэтому runtime-отчеты, CLI-отчеты и ESLint-результаты получают одинаковые названия, рекомендации и нормативные ссылки.
 
 ---
 

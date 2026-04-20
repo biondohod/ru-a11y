@@ -554,6 +554,7 @@ npm test -- --watch
 
 ## Связанные пакеты
 
+- **[`ru-a11y-toolkit-core`](https://www.npmjs.com/package/ru-a11y-toolkit-core)** — Единый каталог правил, переводов и нормативных ссылок для ESLint, CLI и overlay
 - **[`ru-a11y-toolkit-overlay`](https://www.npmjs.com/package/ru-a11y-toolkit-overlay)** — Runtime-визуализатор ошибок доступности в браузере
 - **[`ru-a11y-toolkit-cli`](https://www.npmjs.com/package/ru-a11y-toolkit-cli)** — CLI-сканер для проверки готовых страниц (Puppeteer + axe-core)
 - **[`ru-a11y-toolkit-visually-impaired`](https://www.npmjs.com/package/ru-a11y-toolkit-visually-impaired)** — Плагин для внедрения в интерфейс режимов для слабовидящих (увеличение, контраст, монохром и т.д.)

@@ -46,6 +46,7 @@ const requireTitleSemantic = require('./rules/require-title-semantic');
 const zoom200Warning = require('./rules/zoom-200-warning');
 const noFrameStructure = require('./rules/no-frame-structure');
 const tableRequiresTh = require('./rules/table-requires-th');
+const ruA11yCore = require('ru-a11y-toolkit-core');
 
 // Обёрнутые правила eslint-plugin-jsx-a11y с русскоязычными сообщениями
 const jsxA11yRu = require('./rules/jsx-a11y-ru');
@@ -64,6 +65,11 @@ const plugin = {
     name: '@ru-a11y/gost-a11y',
     version: '1.0.0-alpha.1',
   },
+
+  rulesMeta: ruA11yCore.RU_A11Y_RULES,
+  customRulesMeta: ruA11yCore.RU_A11Y_CUSTOM_RULES,
+  getRuleMeta: ruA11yCore.getRuleMeta,
+  eslintRuleToAxeId: ruA11yCore.ESLINT_RULE_TO_AXE_ID,
 
   // Все кастомные правила
   rules: {

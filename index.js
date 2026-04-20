@@ -12,6 +12,7 @@
  */
 
 const eslint = require('ru-a11y-toolkit-eslint');
+const core = require('ru-a11y-toolkit-core');
 
 /**
  * React Overlay — runtime-визуализатор нарушений доступности.
@@ -40,6 +41,9 @@ try {
 module.exports = {
   /** ESLint-плагин с правилами и конфигами */
   eslint,
+
+  /** Единый каталог правил, переводов и нормативных ссылок */
+  core,
 
   /**
    * React Overlay — runtime-визуализатор нарушений доступности.

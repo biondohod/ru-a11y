@@ -16,7 +16,7 @@ export type AuditIssueType = AxeIssueType | 'lint';
 
 export type IssueOrigin = 'runtime-axe' | 'static-eslint';
 
-export type RuleSource = 'cli-gost-map' | 'overlay-rules-map' | 'eslint-rules' | 'fallback';
+export type RuleSource = 'core-rules-map' | 'cli-gost-map' | 'overlay-rules-map' | 'eslint-rules' | 'fallback';
 
 export interface IssueSourceLocation {
   filePath?: string;
