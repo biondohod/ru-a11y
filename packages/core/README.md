@@ -1,5 +1,8 @@
 # ru-a11y-toolkit-core
 
+[![npm version](https://img.shields.io/npm/v/ru-a11y-toolkit-core)](https://www.npmjs.com/package/ru-a11y-toolkit-core)
+[![license](https://img.shields.io/npm/l/ru-a11y-toolkit-cli)](../../LICENSE)
+
 Единое ядро ru-a11y-toolkit: каталог правил axe-core, кастомных правил ESLint,
 русскоязычных описаний, рекомендаций и ссылок на ГОСТ Р 52872-2019, Постановление
 №102 и WCAG.
