@@ -196,11 +196,14 @@ export function buildHtmlReport(result: AuditRunResult): string {
         justify-content: space-between;
         align-items: center;
         gap: 10px;
+        min-width: 0;
       }
       .toc-label {
+        min-width: 0;
         overflow: hidden;
         text-overflow: ellipsis;
-        white-space: nowrap;
+        overflow-wrap: anywhere;
+        white-space: normal;
       }
       .status-badge {
         border-radius: 999px;
@@ -217,6 +220,11 @@ export function buildHtmlReport(result: AuditRunResult): string {
         justify-content: space-between;
         align-items: flex-start;
         gap: 10px;
+        min-width: 0;
+      }
+      .entity-head h3 {
+        min-width: 0;
+        overflow-wrap: anywhere;
       }
       .entity-meta {
         margin-top: 10px;
@@ -249,10 +257,19 @@ export function buildHtmlReport(result: AuditRunResult): string {
         padding: 10px 12px;
         background: #f9fbff;
       }
+      .issue-title {
+        min-width: 0;
+        overflow-wrap: anywhere;
+      }
       .issue-card > summary::-webkit-details-marker { display: none; }
       .issue-body { padding: 0 12px 12px; border-top: 1px solid #d8e0ef; }
       .issue-body p { margin: 8px 0 0; }
-      .issue-body code { background: #f1f4fb; padding: 2px 5px; border-radius: 6px; }
+      .issue-body code {
+        background: #f1f4fb;
+        padding: 2px 5px;
+        border-radius: 6px;
+        overflow-wrap: anywhere;
+      }
       .issue-body pre {
         margin: 6px 0 0;
         padding: 10px;

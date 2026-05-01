@@ -1,6 +1,7 @@
 export type StandardLevel = 'gost-a' | 'gost-aa' | 'gost-aaa';
 
 export type OutputFormat = 'console' | 'json' | 'html' | 'junit';
+export type CliOutputFormat = OutputFormat | 'all';
 
 export type GostSeverity = 'критичное' | 'существенное' | 'незначительное';
 
@@ -65,7 +66,7 @@ export interface CliOptions {
   urls: string[];
   standard: StandardLevel;
   wcagTags: string[];
-  format: OutputFormat;
+  format: CliOutputFormat;
   outputDir: string;
   maxIssues: number;
   timeoutMs: number;

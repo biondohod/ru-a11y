@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import { readFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { access, readFile } from 'node:fs/promises';
+import { join, resolve } from 'node:path';
 import { DEFAULT_CONFIG, STANDARD_TO_WCAG_TAGS } from './config/defaultConfig';
 import { buildConsoleReport } from './report/consoleReport';
 import { writeHtmlReport } from './report/htmlReport';
@@ -8,9 +8,9 @@ import { buildJsonReport, writeJsonReport } from './report/jsonReport';
 import { writeJunitReport } from './report/junitReport';
 import { runEslintAudit } from './runner/eslintRunner';
 import { runPuppeteerAudit } from './runner/puppeteerRunner';
-import type { AuditRunResult, CliOptions, GostIssue, OutputFormat, StandardLevel } from './types';
+import type { AuditRunResult, CliOptions, CliOutputFormat, GostIssue, OutputFormat, StandardLevel } from './types';
 
-const VERSION = '0.2.0';
+const VERSION = '2.0.2';
 
 const HELP_TEXT = `ru-a11y-cli - проверка доступности сайтов по ГОСТ и Постановлению №102
 
@@ -41,6 +41,12 @@ const HELP_TEXT = `ru-a11y-cli - проверка доступности сай�
   ru-a11y-cli https://example.com https://example.com/catalog --format json --output ./reports
   ru-a11y-cli --urls-file ./urls.txt --standard gost-aaa --max-issues 0
 `;
+
+const ALL_FORMATS: OutputFormat[] = ['console', 'json', 'html', 'junit'];
+const DEFAULT_URLS_FILE = 'ru-a11y.urls.txt';
+const DEFAULT_ESLINT_CONFIG = 'eslint.ru-a11y.config.mjs';
+const DEFAULT_ESLINT_TARGETS = 'src/**/*.{js,jsx,ts,tsx}';
+const DEFAULT_BASE_URL = 'http://localhost:3000';
 
 function splitList(value: string | undefined): string[] {
   if (!value) {
@@ -110,10 +116,50 @@ async function readUrlsFromFile(filePath: string): Promise<string[]> {
     .filter((line) => line.length > 0 && !line.startsWith('#'));
 }
 
+async function pathExists(filePath: string): Promise<boolean> {
+  try {
+    await access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function applyBaseUrl(urls: string[]): string[] {
+  const baseUrl = process.env.RU_A11Y_BASE_URL;
+  if (!baseUrl) {
+    return urls;
+  }
+
+  return urls.map((url) => url.replace(DEFAULT_BASE_URL, baseUrl));
+}
+
+async function applyProjectDefaults(options: CliOptions): Promise<void> {
+  const projectRoot = resolve(options.projectRoot);
+  const urlsFile = resolve(projectRoot, DEFAULT_URLS_FILE);
+  const eslintConfig = resolve(projectRoot, DEFAULT_ESLINT_CONFIG);
+
+  options.projectRoot = projectRoot;
+  options.format = 'all';
+  options.outputDir = resolve(projectRoot, DEFAULT_CONFIG.outputDir);
+  options.concurrency = 1;
+
+  if (await pathExists(urlsFile)) {
+    options.urlsFile = urlsFile;
+  }
+
+  if (await pathExists(eslintConfig)) {
+    options.withEslint = true;
+    options.eslintConfigFile = eslintConfig;
+    options.eslintTargets = [DEFAULT_ESLINT_TARGETS];
+  }
+}
+
 /**
  * Разбирает аргументы CLI в единый объект настроек.
  */
 export async function parseCliArgs(argv: string[]): Promise<CliOptions> {
+  const useProjectDefaults = argv.length === 0;
   const options: CliOptions = {
     urls: [],
     standard: DEFAULT_CONFIG.standard,
@@ -132,6 +178,10 @@ export async function parseCliArgs(argv: string[]): Promise<CliOptions> {
     help: false,
     version: false,
   };
+
+  if (useProjectDefaults) {
+    await applyProjectDefaults(options);
+  }
 
   for (let i = 0; i < argv.length; i += 1) {
     const token = argv[i];
@@ -172,10 +222,10 @@ export async function parseCliArgs(argv: string[]): Promise<CliOptions> {
         i += 1;
         break;
       case '--format':
-        if (!value || !['console', 'json', 'html', 'junit'].includes(value)) {
-          throw new Error('Флаг --format принимает только: console, json, html или junit.');
+        if (!value || !['console', 'json', 'html', 'junit', 'all'].includes(value)) {
+          throw new Error('Флаг --format принимает только: console, json, html, junit или all.');
         }
-        options.format = value as OutputFormat;
+        options.format = value as CliOutputFormat;
         i += 1;
         break;
       case '--output':
@@ -261,6 +311,7 @@ export async function parseCliArgs(argv: string[]): Promise<CliOptions> {
     options.urls = [...options.urls, ...fileUrls];
   }
 
+  options.urls = applyBaseUrl(options.urls);
   options.urls = Array.from(new Set(options.urls));
 
   if (!options.help && !options.version && options.urls.length === 0 && !options.withEslint) {
@@ -335,6 +386,14 @@ function printReport(result: AuditRunResult, format: OutputFormat): void {
   process.stdout.write(`Выявлено нарушений: ${json.totalIssues}\n`);
 }
 
+function getFormats(format: CliOutputFormat): OutputFormat[] {
+  return format === 'all' ? ALL_FORMATS : [format];
+}
+
+function getFormatOutputDir(outputDir: string, format: OutputFormat, isMultiFormat: boolean): string {
+  return isMultiFormat && format !== 'console' ? join(outputDir, format) : outputDir;
+}
+
 /**
  * Основной запуск CLI.
  */
@@ -370,21 +429,26 @@ export async function runCli(argv: string[]): Promise<number> {
   };
 
   const filtered = applyIssueFilters(mergedAudit, options.include, options.exclude);
-  printReport(filtered, options.format);
+  const formats = getFormats(options.format);
+  const isMultiFormat = formats.length > 1;
 
-  if (options.format === 'json') {
-    const filePath = await writeJsonReport(filtered, options.outputDir);
-    process.stdout.write(`JSON-отчет сохранен: ${filePath}\n`);
-  }
+  for (const format of formats) {
+    printReport(filtered, format);
 
-  if (options.format === 'html') {
-    const filePath = await writeHtmlReport(filtered, options.outputDir);
-    process.stdout.write(`HTML-отчет сохранен: ${filePath}\n`);
-  }
+    if (format === 'json') {
+      const filePath = await writeJsonReport(filtered, getFormatOutputDir(options.outputDir, format, isMultiFormat));
+      process.stdout.write(`JSON-отчет сохранен: ${filePath}\n`);
+    }
 
-  if (options.format === 'junit') {
-    const filePath = await writeJunitReport(filtered, options.outputDir);
-    process.stdout.write(`JUnit XML-отчет сохранен: ${filePath}\n`);
+    if (format === 'html') {
+      const filePath = await writeHtmlReport(filtered, getFormatOutputDir(options.outputDir, format, isMultiFormat));
+      process.stdout.write(`HTML-отчет сохранен: ${filePath}\n`);
+    }
+
+    if (format === 'junit') {
+      const filePath = await writeJunitReport(filtered, getFormatOutputDir(options.outputDir, format, isMultiFormat));
+      process.stdout.write(`JUnit XML-отчет сохранен: ${filePath}\n`);
+    }
   }
 
   return calculateExitCode(filtered, options.maxIssues);
