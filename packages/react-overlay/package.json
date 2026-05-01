@@ -1,6 +1,6 @@
 {
   "name": "ru-a11y-toolkit-overlay",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Runtime-визуализатор ошибок доступности в браузере для React-приложений. Часть ru-a11y-toolkit.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",

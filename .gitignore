@@ -1,4 +1,6 @@
 node_modules/
+.npm-cache/
+.npm-pack-cache-*/
 .idea/
 .vscode/
 **/build/
