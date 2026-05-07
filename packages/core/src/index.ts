@@ -24,3 +24,5 @@ export {
   type GostRuleDefinition,
   type GostSeverity,
 } from './gostRules';
+
+export { RU_A11Y_TOOLKIT_STATS, type RuA11yToolkitStats } from './stats';

@@ -56,5 +56,7 @@ export const ESLINT_RULE_TO_AXE_ID: Record<string, string> = {
 };
 
 export function getAxeRuleIdForEslintRule(ruleId: string): string | undefined {
-  return ESLINT_RULE_TO_AXE_ID[ruleId];
+  const legacyRuleId = ruleId.replace(/^ru-a11y\//, '@ru-a11y/gost-a11y/');
+
+  return ESLINT_RULE_TO_AXE_ID[ruleId] ?? ESLINT_RULE_TO_AXE_ID[legacyRuleId];
 }

@@ -201,10 +201,37 @@ function formatMessage(result, message, index) {
   return lines;
 }
 
+function isRuA11yRule(ruleId) {
+  return (
+    typeof ruleId === 'string' &&
+    (ruleId.startsWith('@ru-a11y/') || ruleId.startsWith('ru-a11y/') || ruleId.startsWith('jsx-a11y/'))
+  );
+}
+
+function getDisplayResults(results) {
+  const showAllRules = process.env.RU_A11Y_ESLINT_SHOW_ALL === '1';
+
+  return results.map((result) => {
+    const messages = Array.isArray(result.messages)
+      ? result.messages.filter(
+          (message) => message && message.severity > 0 && (showAllRules || isRuA11yRule(message.ruleId)),
+        )
+      : [];
+
+    return {
+      ...result,
+      messages,
+      errorCount: messages.filter((message) => message.severity === 2).length,
+      warningCount: messages.filter((message) => message.severity === 1).length,
+    };
+  });
+}
+
 module.exports = function ruA11yFormatter(results) {
-  const errorCount = results.reduce((sum, result) => sum + (result.errorCount || 0), 0);
-  const warningCount = results.reduce((sum, result) => sum + (result.warningCount || 0), 0);
-  const relevantResults = results.filter((result) => Array.isArray(result.messages) && result.messages.length > 0);
+  const displayResults = getDisplayResults(results);
+  const errorCount = displayResults.reduce((sum, result) => sum + (result.errorCount || 0), 0);
+  const warningCount = displayResults.reduce((sum, result) => sum + (result.warningCount || 0), 0);
+  const relevantResults = displayResults.filter((result) => Array.isArray(result.messages) && result.messages.length > 0);
 
   const lines = [];
   lines.push(tone('ru-a11y ESLint report', ANSI.bold, ANSI.white));

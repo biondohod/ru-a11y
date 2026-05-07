@@ -94,8 +94,21 @@ const plugin = {
   },
 };
 
-// Flat Config-объекты строятся после plugin, чтобы избежать циклических зависимостей
-const flatPlugins = { '@ru-a11y/gost-a11y': plugin };
+function toFlatRuleId(ruleId) {
+  return ruleId.replace(/^@ru-a11y\/gost-a11y\//, 'ru-a11y/');
+}
+
+function toFlatRules(rules) {
+  return Object.fromEntries(
+    Object.entries(rules).map(([ruleId, ruleConfig]) => [toFlatRuleId(ruleId), ruleConfig]),
+  );
+}
+
+// Flat Config-объекты строятся после plugin, чтобы избежать циклических зависимостей.
+// В flat config ESLint разбирает scoped rule id по слешам, поэтому rule id вида
+// @ru-a11y/gost-a11y/jsx-a11y/alt-text воспринимается как отдельный плагин.
+// Короткий namespace ru-a11y позволяет оставить rule name jsx-a11y/alt-text.
+const flatPlugins = { 'ru-a11y': plugin };
 
 plugin.configs = {
   // === Legacy Config (ESLint 8, .eslintrc.js) ===
@@ -115,7 +128,7 @@ plugin.configs = {
   'recommended/flat': {
     name: '@ru-a11y/gost-a11y/recommended',
     plugins: flatPlugins,
-    rules: recommended.rules,
+    rules: toFlatRules(recommended.rules),
   },
 
   // Полный уровень — ГОСТ AA + Постановление №102
@@ -124,7 +137,7 @@ plugin.configs = {
   'gost-aa/flat': {
     name: '@ru-a11y/gost-a11y/gost-aa',
     plugins: flatPlugins,
-    rules: gostAA.rules,
+    rules: toFlatRules(gostAA.rules),
   },
 
   // Максимальный уровень — ГОСТ AAA
@@ -134,7 +147,7 @@ plugin.configs = {
     linterOptions: {
       reportUnusedDisableDirectives: 'error',
     },
-    rules: strict.rules,
+    rules: toFlatRules(strict.rules),
   },
 };
 

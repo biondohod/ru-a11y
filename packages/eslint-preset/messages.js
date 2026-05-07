@@ -352,6 +352,12 @@ const messages = {
     // ГОСТ Р 52872-2019 §5.1.3; Постановление №102 п. м)
     labelHasAssociatedControl: [
       {
+        match: 'form label must have accessible text',
+        replace:
+          'Элемент <label> должен содержать доступный текст метки. Добавьте видимый текст, aria-label или aria-labelledby. ' +
+          '[ГОСТ Р 52872-2019 §5.1.3; Постановление №102 п. м) — элементы управления должны иметь понятные метки]',
+      },
+      {
         match: 'form label must be associated with a control',
         replace:
           'Элемент <label> должен быть связан с полем ввода через атрибут htmlFor или путём вложения поля внутрь метки. ' +

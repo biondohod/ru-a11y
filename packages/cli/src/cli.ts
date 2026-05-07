@@ -10,7 +10,7 @@ import { runEslintAudit } from './runner/eslintRunner';
 import { runPuppeteerAudit } from './runner/puppeteerRunner';
 import type { AuditRunResult, CliOptions, CliOutputFormat, GostIssue, OutputFormat, StandardLevel } from './types';
 
-const VERSION = '2.0.2';
+const VERSION = '2.0.3';
 
 const HELP_TEXT = `ru-a11y-cli - проверка доступности сайтов по ГОСТ и Постановлению №102
 

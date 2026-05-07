@@ -2,12 +2,26 @@
 'use strict';
 
 const { spawn } = require('node:child_process');
-const { readFileSync } = require('node:fs');
+const { existsSync, readFileSync } = require('node:fs');
 const { createRequire } = require('node:module');
 const { dirname, join } = require('node:path');
 
 function hasExplicitFormatter(args) {
   return args.includes('-f') || args.includes('--format');
+}
+
+function hasExplicitConfig(args) {
+  return args.includes('-c') || args.includes('--config') || args.includes('--no-config-lookup');
+}
+
+function resolveProjectConfig() {
+  const candidates = [
+    'eslint.ru-a11y.config.mjs',
+    'eslint.ru-a11y.config.js',
+    'eslint.ru-a11y.config.cjs',
+  ];
+
+  return candidates.map((candidate) => join(process.cwd(), candidate)).find((candidate) => existsSync(candidate));
 }
 
 function resolveEslintBin() {
@@ -33,9 +47,11 @@ function resolveFormatterPath() {
 function main() {
   const args = process.argv.slice(2);
   const formatterPath = resolveFormatterPath();
+  const projectConfig = hasExplicitConfig(args) ? undefined : resolveProjectConfig();
+  const configArgs = projectConfig ? ['--config', projectConfig] : [];
   const formatterArgs = hasExplicitFormatter(args)
-    ? args
-    : ['-f', formatterPath, ...args];
+    ? [...configArgs, ...args]
+    : ['-f', formatterPath, ...configArgs, ...args];
 
   let eslintBin;
 
@@ -51,7 +67,10 @@ function main() {
 
   const child = spawn(process.execPath, [eslintBin, ...formatterArgs], {
     stdio: 'inherit',
-    env: process.env,
+    env: {
+      ...process.env,
+      ...(projectConfig ? { ESLINT_USE_FLAT_CONFIG: 'true' } : null),
+    },
   });
 
   child.on('exit', (code, signal) => {
