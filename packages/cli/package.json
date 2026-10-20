@@ -2,11 +2,11 @@
   "name": "ru-a11y-toolkit-cli",
   "version": "2.1.0",
   "description": "CLI-аудит веб-доступности по ГОСТ и Постановлению №102 на базе Puppeteer + axe-core.",
-  "main": "dist/cli.js",
+  "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "ru-a11y": "bin/ru-a11y",
-    "ru-a11y-cli": "bin/ru-a11y-cli"
+    "ru-a11y": "bin/ru-a11y.js",
+    "ru-a11y-cli": "bin/ru-a11y.js"
   },
   "files": [
     "dist",
@@ -66,5 +66,13 @@
     "testMatch": [
       "**/tests/**/*.test.ts"
     ]
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
   }
 }

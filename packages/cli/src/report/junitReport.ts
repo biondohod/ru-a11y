@@ -1,6 +1,20 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { AuditRunResult, GostIssue, PageAuditResult } from '../types';
+import { getEntityName, getIssueLocation, msToSeconds } from './shared';
+
+export const JUNIT_REPORT_FILE = 'ru-a11y-junit.xml';
+
+interface SuiteStats {
+  tests: number;
+  failures: number;
+  errors: number;
+}
+
+interface Suite {
+  xml: string;
+  stats: SuiteStats;
+}
 
 function escapeXml(value: string): string {
   return value
@@ -11,28 +25,14 @@ function escapeXml(value: string): string {
     .replace(/'/g, '&apos;');
 }
 
-function isEslintPage(url: string): boolean {
-  return url.startsWith('eslint://');
-}
+function buildFailureText(issue: GostIssue): string {
+  const optional: Array<[label: string, refs: string[]]> = [
+    ['GOST', issue.gostRefs],
+    ['Post102', issue.post102Refs],
+    ['WCAG', issue.wcagRefs],
+  ];
 
-function getEntityName(page: PageAuditResult): string {
-  return isEslintPage(page.url) ? page.url.replace(/^eslint:\/\//, '') : page.url;
-}
-
-function getIssueLocation(issue: GostIssue): string {
-  if (issue.source?.filePath) {
-    return `${issue.source.filePath}:${issue.source.line ?? '?'}:${issue.source.column ?? '?'}`;
-  }
-
-  if (issue.source?.selector) {
-    return issue.source.selector;
-  }
-
-  return issue.selector;
-}
-
-function buildIssueFailureText(issue: GostIssue): string {
-  const lines = [
+  return [
     `Title: ${issue.title}`,
     `Rule: ${issue.ruRuleCode} / ${issue.axeRuleId}`,
     `Severity: ${issue.severity}`,
@@ -42,110 +42,96 @@ function buildIssueFailureText(issue: GostIssue): string {
     `Location: ${getIssueLocation(issue)}`,
     `Description: ${issue.description}`,
     `Recommendation: ${issue.recommendation}`,
-  ];
-
-  if (issue.gostRefs.length > 0) {
-    lines.push(`GOST: ${issue.gostRefs.join('; ')}`);
-  }
-
-  if (issue.post102Refs.length > 0) {
-    lines.push(`Post102: ${issue.post102Refs.join('; ')}`);
-  }
-
-  if (issue.wcagRefs.length > 0) {
-    lines.push(`WCAG: ${issue.wcagRefs.join('; ')}`);
-  }
-
-  lines.push(`Message: ${issue.sourceMessage}`);
-
-  return lines.join('\n');
+    ...optional
+      .filter(([, refs]) => refs.length > 0)
+      .map(([label, refs]) => `${label}: ${refs.join('; ')}`),
+    `Message: ${issue.sourceMessage}`,
+  ].join('\n');
 }
 
-interface JunitSuiteStats {
-  tests: number;
-  failures: number;
-  errors: number;
+function testCase(className: string, name: string, body = ''): string {
+  const attributes = `name="${escapeXml(name)}" classname="${escapeXml(className)}" time="0"`;
+
+  return body
+    ? `    <testcase ${attributes}>\n      ${body}\n    </testcase>`
+    : `    <testcase ${attributes} />`;
 }
 
-function buildTestCaseXml(page: PageAuditResult, issue: GostIssue, index: number): string {
-  const name = `${index + 1}. ${issue.title}`;
+function testSuite(page: PageAuditResult, stats: SuiteStats, testCases: string[]): Suite {
+  const name = escapeXml(getEntityName(page));
+  const xml = [
+    `  <testsuite name="${name}" tests="${stats.tests}" failures="${stats.failures}" errors="${stats.errors}" time="${msToSeconds(page.durationMs)}">`,
+    ...testCases,
+    '  </testsuite>',
+  ].join('\n');
 
-  return `    <testcase name="${escapeXml(name)}" classname="${escapeXml(getEntityName(page))}" time="0">
-      <failure message="${escapeXml(issue.title)}" type="${escapeXml(issue.ruRuleCode)}">${escapeXml(buildIssueFailureText(issue))}</failure>
-    </testcase>`;
+  return { xml, stats };
 }
 
-function buildPageSuite(page: PageAuditResult): { xml: string; stats: JunitSuiteStats } {
-  const suiteName = getEntityName(page);
+function buildPageSuite(page: PageAuditResult): Suite {
+  const className = getEntityName(page);
 
   if (page.error) {
-    return {
-      xml: `  <testsuite name="${escapeXml(suiteName)}" tests="1" failures="0" errors="1" time="${(
-        page.durationMs / 1000
-      ).toFixed(3)}">
-    <testcase name="Audit execution" classname="${escapeXml(suiteName)}" time="0">
-      <error message="${escapeXml(page.error)}" type="audit-error">${escapeXml(page.error)}</error>
-    </testcase>
-  </testsuite>`,
-      stats: { tests: 1, failures: 0, errors: 1 },
-    };
+    const error = escapeXml(page.error);
+    return testSuite(page, { tests: 1, failures: 0, errors: 1 }, [
+      testCase(
+        className,
+        'Audit execution',
+        `<error message="${error}" type="audit-error">${error}</error>`,
+      ),
+    ]);
   }
 
   if (page.issues.length === 0) {
-    return {
-      xml: `  <testsuite name="${escapeXml(suiteName)}" tests="1" failures="0" errors="0" time="${(
-        page.durationMs / 1000
-      ).toFixed(3)}">
-    <testcase name="No accessibility issues" classname="${escapeXml(suiteName)}" time="0" />
-  </testsuite>`,
-      stats: { tests: 1, failures: 0, errors: 0 },
-    };
+    return testSuite(page, { tests: 1, failures: 0, errors: 0 }, [
+      testCase(className, 'No accessibility issues'),
+    ]);
   }
 
-  const testcases = page.issues
-    .map((issue, index) => buildTestCaseXml(page, issue, index))
-    .join('\n');
+  const failures = page.issues.map((issue, index) =>
+    testCase(
+      className,
+      `${index + 1}. ${issue.title}`,
+      `<failure message="${escapeXml(issue.title)}" type="${escapeXml(issue.ruRuleCode)}">${escapeXml(buildFailureText(issue))}</failure>`,
+    ),
+  );
 
-  return {
-    xml: `  <testsuite name="${escapeXml(suiteName)}" tests="${page.issues.length}" failures="${page.issues.length}" errors="0" time="${(
-      page.durationMs / 1000
-    ).toFixed(3)}">
-${testcases}
-  </testsuite>`,
-    stats: { tests: page.issues.length, failures: page.issues.length, errors: 0 },
-  };
+  return testSuite(
+    page,
+    { tests: page.issues.length, failures: page.issues.length, errors: 0 },
+    failures,
+  );
 }
 
-/**
- * Формирует JUnit XML для CI-систем.
- */
-export function buildJunitReport(result: AuditRunResult): string {
-  const suites = result.pages.map((page) => buildPageSuite(page));
-  const stats = suites.reduce(
-    (acc, suite) => ({
-      tests: acc.tests + suite.stats.tests,
-      failures: acc.failures + suite.stats.failures,
-      errors: acc.errors + suite.stats.errors,
+function sumStats(suites: readonly Suite[]): SuiteStats {
+  return suites.reduce<SuiteStats>(
+    (total, { stats }) => ({
+      tests: total.tests + stats.tests,
+      failures: total.failures + stats.failures,
+      errors: total.errors + stats.errors,
     }),
     { tests: 0, failures: 0, errors: 0 },
   );
-
-  const totalTimeMs = result.pages.reduce((acc, page) => acc + page.durationMs, 0);
-
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="ru-a11y CLI" tests="${stats.tests}" failures="${stats.failures}" errors="${stats.errors}" time="${(
-    totalTimeMs / 1000
-  ).toFixed(3)}">
-${suites.map((suite) => suite.xml).join('\n')}
-</testsuites>`;
 }
 
-/**
- * Сохраняет JUnit XML-отчет на диск и возвращает путь к файлу.
- */
+/** JUnit XML: one test suite per page/file, one failing test case per issue. */
+export function buildJunitReport(result: AuditRunResult): string {
+  const suites = result.pages.map(buildPageSuite);
+  const { tests, failures, errors } = sumStats(suites);
+  const totalMs = result.pages.reduce((total, page) => total + page.durationMs, 0);
+
+  return [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    `<testsuites name="ru-a11y CLI" tests="${tests}" failures="${failures}" errors="${errors}" time="${msToSeconds(totalMs)}">`,
+    ...suites.map((suite) => suite.xml),
+    '</testsuites>',
+  ].join('\n');
+}
+
+/** Writes the JUnit report to `outputDir` and returns the file path. */
 export async function writeJunitReport(result: AuditRunResult, outputDir: string): Promise<string> {
   await mkdir(outputDir, { recursive: true });
-  const reportPath = join(outputDir, 'ru-a11y-junit.xml');
+  const reportPath = join(outputDir, JUNIT_REPORT_FILE);
   await writeFile(reportPath, buildJunitReport(result), 'utf-8');
   return reportPath;
 }

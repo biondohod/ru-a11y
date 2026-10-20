@@ -1,4 +1,7 @@
+import { countIssues } from '../audit/summary';
 import type { AuditRunResult, GostIssue, GostPrinciple, GostSeverity } from '../types';
+import { ANSI, indentBlock, tone } from '../utils/terminal';
+import { getIssueLocation } from './shared';
 
 const PRINCIPLE_LABELS: Record<GostPrinciple, string> = {
   воспринимаемость: 'Воспринимаемость',
@@ -6,68 +9,6 @@ const PRINCIPLE_LABELS: Record<GostPrinciple, string> = {
   понятность: 'Понятность',
   надежность: 'Надежность',
 };
-
-const ANSI = {
-  reset: '\u001B[0m',
-  bold: '\u001B[1m',
-  dim: '\u001B[2m',
-  red: '\u001B[31m',
-  green: '\u001B[32m',
-  yellow: '\u001B[33m',
-  blue: '\u001B[34m',
-  magenta: '\u001B[35m',
-  cyan: '\u001B[36m',
-  white: '\u001B[37m',
-  gray: '\u001B[90m',
-  bgRed: '\u001B[41m',
-  bgYellow: '\u001B[43m',
-  bgBlue: '\u001B[44m',
-} as const;
-
-function supportsColor(): boolean {
-  return process.env.NO_COLOR === undefined && process.stdout.isTTY !== false;
-}
-
-function tone(text: string, ...styles: string[]): string {
-  if (!supportsColor()) {
-    return text;
-  }
-
-  return `${styles.join('')}${text}${ANSI.reset}`;
-}
-
-function wrap(text: string, width = 100): string[] {
-  if (text.length <= width) {
-    return [text];
-  }
-
-  const words = text.split(/\s+/);
-  const lines: string[] = [];
-  let current = '';
-
-  words.forEach((word) => {
-    const candidate = current ? `${current} ${word}` : word;
-    if (candidate.length > width && current) {
-      lines.push(current);
-      current = word;
-      return;
-    }
-    current = candidate;
-  });
-
-  if (current) {
-    lines.push(current);
-  }
-
-  return lines;
-}
-
-function indentBlock(text: string, indent: string): string[] {
-  return text
-    .split('\n')
-    .flatMap((line) => wrap(line))
-    .map((line) => `${indent}${line}`);
-}
 
 function formatLabel(label: string): string {
   return tone(label, ANSI.bold, ANSI.cyan);
@@ -77,16 +18,16 @@ function formatInlineCode(text: string): string {
   return text.replace(/`([^`]+)`/g, (_, code: string) => tone(code, ANSI.bold, ANSI.yellow));
 }
 
+const SEVERITY_BACKGROUND: Readonly<
+  Record<GostSeverity, typeof ANSI.bgRed | typeof ANSI.bgYellow | typeof ANSI.bgBlue>
+> = {
+  критичное: ANSI.bgRed,
+  существенное: ANSI.bgYellow,
+  незначительное: ANSI.bgBlue,
+};
+
 function formatSeverity(severity: GostSeverity): string {
-  if (severity === 'критичное') {
-    return tone(` ${severity.toUpperCase()} `, ANSI.bold, ANSI.white, ANSI.bgRed);
-  }
-
-  if (severity === 'существенное') {
-    return tone(` ${severity.toUpperCase()} `, ANSI.bold, ANSI.white, ANSI.bgYellow);
-  }
-
-  return tone(` ${severity.toUpperCase()} `, ANSI.bold, ANSI.white, ANSI.bgBlue);
+  return tone(` ${severity.toUpperCase()} `, ANSI.bold, ANSI.white, SEVERITY_BACKGROUND[severity]);
 }
 
 function groupByPrinciple(issues: GostIssue[]): Record<GostPrinciple, GostIssue[]> {
@@ -138,25 +79,13 @@ function formatSourceSnippet(issue: GostIssue): string[] {
   ];
 }
 
-function formatIssueLocation(issue: GostIssue): string {
-  if (issue.source?.filePath) {
-    return `${issue.source.filePath}:${issue.source.line ?? '?'}:${issue.source.column ?? '?'}`;
-  }
-
-  if (issue.source?.selector) {
-    return issue.source.selector;
-  }
-
-  return issue.selector;
-}
-
 function formatIssue(issue: GostIssue, index: number): string[] {
   const lines: string[] = [];
 
   lines.push(
     `    ${tone(`Нарушение #${index}`, ANSI.bold, ANSI.magenta)} ${formatSeverity(issue.severity)} ${tone(issue.title, ANSI.bold)}`,
   );
-  lines.push(`      ${formatLabel('Где')}: ${tone(formatIssueLocation(issue), ANSI.yellow)}`);
+  lines.push(`      ${formatLabel('Где')}: ${tone(getIssueLocation(issue), ANSI.yellow)}`);
   lines.push(
     `      ${formatLabel('Правило')}: ${tone(issue.ruRuleCode, ANSI.bold, ANSI.blue)} ${tone('/', ANSI.gray)} ${tone(issue.axeRuleId, ANSI.blue)}`,
   );
@@ -181,11 +110,9 @@ function formatIssue(issue: GostIssue, index: number): string[] {
   return lines;
 }
 
-/**
- * Генерирует человекочитаемый отчет для терминала.
- */
+/** Human readable terminal report grouped by page and WCAG principle. */
 export function buildConsoleReport(result: AuditRunResult): string {
-  const totalIssues = result.pages.reduce((acc, page) => acc + page.issues.length, 0);
+  const totalIssues = countIssues(result);
   const lines: string[] = [];
 
   lines.push(tone('ru-a11y CLI report', ANSI.bold, ANSI.white));

@@ -2,7 +2,7 @@ import { buildConsoleReport } from '../src/report/consoleReport';
 import type { AuditRunResult } from '../src/types';
 
 describe('buildConsoleReport', () => {
-  it('должен печатать секции описания, нормативки и рекомендации для ESLint-ошибки', () => {
+  it('prints description, references and recommendation sections for an ESLint issue', () => {
     const result: AuditRunResult = {
       startedAt: '2026-04-09T10:00:00.000Z',
       finishedAt: '2026-04-09T10:00:02.000Z',
@@ -54,7 +54,7 @@ describe('buildConsoleReport', () => {
     expect(report).toContain('WCAG 1.1.1');
   });
 
-  it('должен показывать успешный результат без нарушений', () => {
+  it('reports a clean run', () => {
     const result: AuditRunResult = {
       startedAt: '2026-04-09T10:00:00.000Z',
       finishedAt: '2026-04-09T10:00:02.000Z',

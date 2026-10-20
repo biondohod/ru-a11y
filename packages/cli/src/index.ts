@@ -1,21 +1,32 @@
-export { runCli, parseCliArgs, applyIssueFilters } from './cli';
+export { runCli, type CliIO } from './cli';
+export { parseCliArgs, type ParseArgsContext } from './args/parseArgs';
+export { applyIssueFilters, calculateExitCode, countIssues } from './audit/summary';
+export { EXIT_CODE } from './config/defaultConfig';
 export { runPuppeteerAudit } from './runner/puppeteerRunner';
 export { runEslintAudit } from './runner/eslintRunner';
 export { GOST_RULES, mapAxeResultToGost, findGostRuleByAxeId } from './mapping/gostMapping';
 export { mapEslintResultToGost } from './mapping/eslintMapping';
-export { buildConsoleReport } from './report/consoleReport';
-export { buildJsonReport, writeJsonReport } from './report/jsonReport';
-export { buildHtmlReport, writeHtmlReport } from './report/htmlReport';
-export { buildJunitReport, writeJunitReport } from './report/junitReport';
+export {
+  buildConsoleReport,
+  buildHtmlReport,
+  buildJsonReport,
+  buildJunitReport,
+  writeHtmlReport,
+  writeJsonReport,
+  writeJunitReport,
+  type JsonReport,
+} from './report';
+export { VERSION } from './version';
 export type {
   AuditRunResult,
   AxeIssueType,
   CliOptions,
-  IssueOrigin,
-  IssueSourceLocation,
+  CliOutputFormat,
   GostIssue,
   GostPrinciple,
   GostSeverity,
+  IssueOrigin,
+  IssueSourceLocation,
   OutputFormat,
   PageAuditResult,
   RuleSource,

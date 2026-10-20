@@ -1,15 +1,14 @@
 #!/usr/bin/env node
-
 'use strict';
 
-const { runCli } = require('../dist/cli.js');
+const { runCli, EXIT_CODE } = require('../dist/index.js');
 
 runCli(process.argv.slice(2))
   .then((code) => {
-    process.exit(code);
+    process.exitCode = code;
   })
   .catch((error) => {
-    const message = error instanceof Error ? error.message : 'Internal CLI error.';
-    process.stderr.write(`Error: ${message}\n`);
-    process.exit(2);
+    const message = error instanceof Error ? error.message : 'Внутренняя ошибка CLI.';
+    process.stderr.write(`Ошибка: ${message}\n`);
+    process.exitCode = EXIT_CODE.auditFailed;
   });

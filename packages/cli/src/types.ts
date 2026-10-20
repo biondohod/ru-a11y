@@ -1,18 +1,20 @@
+import type { GostPrinciple, GostSeverity } from 'ru-a11y-toolkit-core';
+
+export type { GostPrinciple, GostSeverity };
+
 export type StandardLevel = 'gost-a' | 'gost-aa' | 'gost-aaa';
 
 export type OutputFormat = 'console' | 'json' | 'html' | 'junit';
 export type CliOutputFormat = OutputFormat | 'all';
 
-export type GostSeverity = 'критичное' | 'существенное' | 'незначительное';
-
-export type GostPrinciple = 'воспринимаемость' | 'управляемость' | 'понятность' | 'надежность';
-
 export type AxeIssueType = 'violation' | 'incomplete' | 'inapplicable' | 'pass';
 
 export type AuditIssueType = AxeIssueType | 'lint';
 
+/** Where an issue was found: in a running page (axe) or in source code (ESLint). */
 export type IssueOrigin = 'runtime-axe' | 'static-eslint';
 
+/** Which catalog provided the issue metadata. */
 export type RuleSource =
   | 'core-rules-map'
   | 'cli-gost-map'
@@ -29,6 +31,7 @@ export interface IssueSourceLocation {
   note?: string;
 }
 
+/** A single violation normalized to the ru-a11y report model. */
 export interface GostIssue {
   url: string;
   selector: string;
@@ -49,6 +52,7 @@ export interface GostIssue {
   source?: IssueSourceLocation;
 }
 
+/** Result for one audited entity: a page URL or, for ESLint, a source file. */
 export interface PageAuditResult {
   url: string;
   issues: GostIssue[];

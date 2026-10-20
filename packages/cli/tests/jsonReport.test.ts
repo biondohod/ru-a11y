@@ -1,7 +1,7 @@
 import { buildJsonReport } from '../src/report/jsonReport';
 
 describe('buildJsonReport', () => {
-  it('должен формировать агрегированный JSON-отчет', () => {
+  it('aggregates totals', () => {
     const report = buildJsonReport({
       startedAt: '2026-03-24T10:00:00.000Z',
       finishedAt: '2026-03-24T10:01:00.000Z',

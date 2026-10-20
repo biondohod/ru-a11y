@@ -1,4 +1,4 @@
-import { getAxeRuleIdForEslintRule } from 'ru-a11y-toolkit-core';
+import { getAxeRuleIdForEslintRule, toRuleCode } from 'ru-a11y-toolkit-core';
 import type { GostIssue, GostPrinciple, GostSeverity } from '../types';
 import { findGostRuleByAxeId } from './gostMapping';
 
@@ -32,9 +32,7 @@ function principleFromRuleId(ruleId: string): GostPrinciple {
   return 'надежность';
 }
 
-/**
- * Converts ESLint finding to unified ru-a11y issue shape for merged reports.
- */
+/** Converts an ESLint message to the ru-a11y issue model used by every report. */
 export function mapEslintResultToGost(input: EslintIssueInput): GostIssue {
   const mappedAxeRuleId = getAxeRuleIdForEslintRule(input.ruleId);
   const mappedRule = mappedAxeRuleId ? findGostRuleByAxeId(mappedAxeRuleId) : null;
@@ -42,9 +40,7 @@ export function mapEslintResultToGost(input: EslintIssueInput): GostIssue {
   return {
     url: `file://${input.filePath}`,
     selector: `${input.filePath}:${input.line}:${input.column}`,
-    ruRuleCode: mappedRule
-      ? mappedRule.code
-      : `RU_ESLINT_${input.ruleId.toUpperCase().replace(/[^A-Z0-9]+/g, '_')}`,
+    ruRuleCode: mappedRule ? mappedRule.code : toRuleCode('RU_ESLINT', input.ruleId),
     axeRuleId: mappedAxeRuleId ?? input.ruleId,
     title: mappedRule ? mappedRule.title : `Нарушение ESLint: ${input.ruleId}`,
     description: mappedRule

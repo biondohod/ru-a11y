@@ -1,7 +1,7 @@
 import { mapAxeResultToGost } from '../src/mapping/gostMapping';
 
 describe('mapAxeResultToGost', () => {
-  it('должен маппить известное правило bypass в RU_GOST_NAV_SKIP_LINK', () => {
+  it('maps the bypass rule to RU_GOST_NAV_SKIP_LINK', () => {
     const issue = mapAxeResultToGost({
       url: 'https://example.com',
       id: 'bypass',
@@ -19,7 +19,7 @@ describe('mapAxeResultToGost', () => {
     expect(issue.post102Refs[0]).toContain('№102');
   });
 
-  it('должен использовать fallback для неизвестного правила axe', () => {
+  it('falls back for an unknown axe rule', () => {
     const issue = mapAxeResultToGost({
       url: 'https://example.com',
       id: 'unknown-rule',

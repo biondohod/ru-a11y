@@ -2,54 +2,56 @@ import axe from 'axe-core';
 import puppeteer, { type Browser } from 'puppeteer';
 import { mapAxeResultToGost } from '../mapping/gostMapping';
 import type { AuditRunResult, CliOptions, GostIssue, PageAuditResult } from '../types';
+import { mapWithConcurrency } from '../utils/concurrency';
 
-interface AxeNodeResult {
-  target: string[];
-  failureSummary?: string;
-  html?: string;
-}
+type AxeFinding = Pick<axe.Result, 'id' | 'impact' | 'help' | 'nodes'>;
+type AxeFindings = Pick<axe.AxeResults, 'violations' | 'incomplete'>;
 
-interface AxeRunResponse {
-  incomplete: Array<{
-    id: string;
-    impact?: string | null;
-    help: string;
-    nodes: AxeNodeResult[];
-  }>;
-  violations: Array<{
-    id: string;
-    impact?: string | null;
-    help: string;
-    nodes: AxeNodeResult[];
-  }>;
-}
-
-function normalizeAxeConfig(options: CliOptions): Record<string, unknown> {
-  const config: Record<string, unknown> = {};
+/** Translates CLI options to axe-core run options. */
+export function buildAxeRunOptions(
+  options: Pick<CliOptions, 'wcagTags' | 'disabledRules'>,
+): axe.RunOptions {
+  const runOptions: axe.RunOptions = {};
 
   if (options.wcagTags.length > 0) {
-    config.runOnly = {
-      type: 'tag',
-      values: options.wcagTags,
-    };
+    runOptions.runOnly = { type: 'tag', values: options.wcagTags };
   }
 
   if (options.disabledRules.length > 0) {
-    const rules = options.disabledRules.reduce<Record<string, { enabled: boolean }>>(
-      (acc, ruleId) => {
-        acc[ruleId] = { enabled: false };
-        return acc;
-      },
-      {},
+    runOptions.rules = Object.fromEntries(
+      options.disabledRules.map((ruleId) => [ruleId, { enabled: false }]),
     );
-
-    config.rules = rules;
   }
 
-  return config;
+  return runOptions;
 }
 
-async function runSingleUrl(
+function toIssues(url: string, finding: AxeFinding, type: 'violation' | 'incomplete'): GostIssue[] {
+  const base = { url, id: finding.id, impact: finding.impact, type };
+
+  // axe may report a page-level finding without nodes, e.g. a missing landmark.
+  if (finding.nodes.length === 0) {
+    return [mapAxeResultToGost({ ...base, message: finding.help, target: ['document'] })];
+  }
+
+  return finding.nodes.map((node) =>
+    mapAxeResultToGost({
+      ...base,
+      message: node.failureSummary ?? finding.help,
+      target: node.target.map(String),
+      html: node.html,
+    }),
+  );
+}
+
+export function collectIssues(url: string, findings: AxeFindings): GostIssue[] {
+  return [
+    ...findings.violations.flatMap((finding) => toIssues(url, finding, 'violation')),
+    ...findings.incomplete.flatMap((finding) => toIssues(url, finding, 'incomplete')),
+  ];
+}
+
+async function auditUrl(
   browser: Browser,
   url: string,
   options: CliOptions,
@@ -60,122 +62,47 @@ async function runSingleUrl(
   try {
     page.setDefaultNavigationTimeout(options.timeoutMs);
     await page.goto(url, { waitUntil: 'networkidle2', timeout: options.timeoutMs });
-
     await page.evaluate(axe.source);
 
-    const axeConfig = normalizeAxeConfig(options);
-    const result = await page.evaluate(async (config: Record<string, unknown>) => {
-      const axeApi = (
-        window as unknown as {
-          axe: { run: (context: Document, options?: unknown) => Promise<AxeRunResponse> };
-        }
-      ).axe;
-      return axeApi.run(document, config);
-    }, axeConfig);
-
-    const groups: Array<{ items: AxeRunResponse['violations']; type: 'violation' | 'incomplete' }> =
-      [
-        { items: result.violations, type: 'violation' },
-        { items: result.incomplete, type: 'incomplete' },
-      ];
-
-    const issues: GostIssue[] = groups.flatMap(({ items, type }) =>
-      items.flatMap((violation: AxeRunResponse['violations'][number]) => {
-        if (!violation.nodes.length) {
-          return [
-            mapAxeResultToGost({
-              url,
-              id: violation.id,
-              impact: violation.impact,
-              message: violation.help,
-              target: ['document'],
-              type,
-            }),
-          ];
-        }
-
-        return violation.nodes.map((node: AxeNodeResult) =>
-          mapAxeResultToGost({
-            url,
-            id: violation.id,
-            impact: violation.impact,
-            message: node.failureSummary ?? violation.help,
-            target: node.target,
-            type,
-            html: node.html,
-          }),
-        );
-      }),
+    const findings = await page.evaluate(
+      (runOptions) => (window as unknown as { axe: typeof axe }).axe.run(document, runOptions),
+      buildAxeRunOptions(options),
     );
 
-    return {
-      url,
-      issues,
-      durationMs: Date.now() - startedAt,
-    };
+    return { url, issues: collectIssues(url, findings), durationMs: Date.now() - startedAt };
   } catch (error) {
-    const errorMessage =
+    const reason =
       error instanceof Error ? error.message : 'Неизвестная ошибка запуска проверки страницы.';
 
     return {
       url,
       issues: [],
       durationMs: Date.now() - startedAt,
-      error: `Не удалось проверить страницу: ${errorMessage}`,
+      error: `Не удалось проверить страницу: ${reason}`,
     };
   } finally {
     await page.close();
   }
 }
 
-async function runWithConcurrency<T>(
-  items: string[],
-  worker: (item: string) => Promise<T>,
-  concurrency: number,
-): Promise<T[]> {
-  const results: T[] = [];
-  let index = 0;
-
-  const runners = Array.from({ length: Math.max(1, concurrency) }, async () => {
-    while (index < items.length) {
-      const current = index;
-      index += 1;
-      results[current] = await worker(items[current]);
-    }
+/** Audits every URL in a shared headless Chromium instance. */
+export async function runPuppeteerAudit(options: CliOptions): Promise<AuditRunResult> {
+  const startedAt = new Date().toISOString();
+  const browser = await puppeteer.launch({
+    headless: true,
+    // Chromium's sandbox is unavailable in most Docker/CI images the CLI runs in.
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
 
-  await Promise.all(runners);
-  return results;
-}
-
-/**
- * Запускает аудит по списку URL с использованием headless Chromium через Puppeteer.
- */
-export async function runPuppeteerAudit(options: CliOptions): Promise<AuditRunResult> {
-  const startedAt = new Date();
-
-  let browser: Browser | undefined;
   try {
-    browser = await puppeteer.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    });
-
-    const pages = await runWithConcurrency(
+    const pages = await mapWithConcurrency(
       options.urls,
-      (url) => runSingleUrl(browser as Browser, url, options),
+      (url) => auditUrl(browser, url, options),
       options.concurrency,
     );
 
-    return {
-      startedAt: startedAt.toISOString(),
-      finishedAt: new Date().toISOString(),
-      scannedPages: pages.length,
-      pages,
-    };
+    return { startedAt, finishedAt: new Date().toISOString(), scannedPages: pages.length, pages };
   } finally {
-    if (browser) {
-      await browser.close();
-    }
+    await browser.close();
   }
 }

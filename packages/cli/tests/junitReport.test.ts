@@ -1,7 +1,7 @@
 import { buildJunitReport } from '../src/report/junitReport';
 
 describe('buildJunitReport', () => {
-  it('формирует junit xml для страниц с нарушениями, чистых страниц и ошибок аудита', () => {
+  it('covers failing pages, clean pages and audit errors', () => {
     const xml = buildJunitReport({
       startedAt: '2026-04-09T10:00:00.000Z',
       finishedAt: '2026-04-09T10:01:00.000Z',

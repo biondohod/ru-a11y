@@ -1,6 +1,8 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { AuditRunResult, GostIssue, PageAuditResult } from '../types';
+import { countIssues } from '../audit/summary';
+import type { AuditRunResult, GostIssue, GostSeverity, PageAuditResult } from '../types';
+import { getEntityName, getIssueLocation, isEslintEntity } from './shared';
 
 function escapeHtml(value: string): string {
   return value
@@ -11,16 +13,8 @@ function escapeHtml(value: string): string {
     .replace(/'/g, '&#039;');
 }
 
-function isEslintPage(url: string): boolean {
-  return url.startsWith('eslint://');
-}
-
 function getEntityLabel(page: PageAuditResult): string {
-  return isEslintPage(page.url) ? 'Файл' : 'Страница';
-}
-
-function getEntityValue(page: PageAuditResult): string {
-  return isEslintPage(page.url) ? page.url.replace(/^eslint:\/\//, '') : page.url;
+  return isEslintEntity(page) ? 'Файл' : 'Страница';
 }
 
 function getPageStatus(page: PageAuditResult): { label: string; cssClass: string } {
@@ -35,30 +29,11 @@ function getPageStatus(page: PageAuditResult): { label: string; cssClass: string
   return { label: 'Без нарушений', cssClass: 'status-good' };
 }
 
-function getSeverityClass(severity: string): string {
-  const normalized = severity.toLowerCase();
-  if (normalized.includes('крит')) {
-    return 'sev-critical';
-  }
-
-  if (normalized.includes('суще')) {
-    return 'sev-major';
-  }
-
-  return 'sev-minor';
-}
-
-function renderSource(issue: GostIssue): string {
-  if (issue.source?.filePath) {
-    return `${issue.source.filePath}:${issue.source.line ?? '?'}:${issue.source.column ?? '?'}`;
-  }
-
-  if (issue.source?.selector) {
-    return issue.source.selector;
-  }
-
-  return '-';
-}
+const SEVERITY_CLASS: Readonly<Record<GostSeverity, string>> = {
+  критичное: 'sev-critical',
+  существенное: 'sev-major',
+  незначительное: 'sev-minor',
+};
 
 function renderIssue(issue: GostIssue, issueIndex: number): string {
   const issueTitle = `${issueIndex + 1}. ${issue.title}`;
@@ -66,14 +41,14 @@ function renderIssue(issue: GostIssue, issueIndex: number): string {
     <details class="issue-card">
       <summary>
         <span class="issue-title">${escapeHtml(issueTitle)}</span>
-        <span class="severity ${getSeverityClass(issue.severity)}">${escapeHtml(issue.severity)}</span>
+        <span class="severity ${SEVERITY_CLASS[issue.severity]}">${escapeHtml(issue.severity)}</span>
       </summary>
       <div class="issue-body">
         <p><strong>Origin:</strong> ${escapeHtml(issue.origin)}</p>
         <p><strong>Принцип:</strong> ${escapeHtml(issue.principle)}</p>
         <p><strong>Код:</strong> ${escapeHtml(issue.ruRuleCode)} / ${escapeHtml(issue.axeRuleId)}</p>
         <p><strong>Селектор:</strong> <code>${escapeHtml(issue.selector)}</code></p>
-        <p><strong>Источник:</strong> <code>${escapeHtml(renderSource(issue))}</code></p>
+        <p><strong>Источник:</strong> <code>${escapeHtml(getIssueLocation(issue))}</code></p>
         <p><strong>Описание:</strong> ${escapeHtml(issue.description)}</p>
         <p><strong>Рекомендация:</strong> ${escapeHtml(issue.recommendation)}</p>
         <p><strong>ГОСТ:</strong> ${escapeHtml(issue.gostRefs.join('; '))}</p>
@@ -89,7 +64,7 @@ function renderPage(page: PageAuditResult, pageIndex: number): string {
   const pageId = `entity-${pageIndex + 1}`;
   const status = getPageStatus(page);
   const entityLabel = getEntityLabel(page);
-  const entityValue = getEntityValue(page);
+  const entityValue = getEntityName(page);
   const runtimeCount = page.issues.filter((issue) => issue.origin === 'runtime-axe').length;
   const eslintCount = page.issues.filter((issue) => issue.origin === 'static-eslint').length;
 
@@ -117,19 +92,11 @@ function renderPage(page: PageAuditResult, pageIndex: number): string {
     </section>`;
 }
 
-/**
- * Формирует HTML-представление отчета.
- */
+/** Self-contained HTML report (inline CSS, no scripts) for QA and auditors. */
 export function buildHtmlReport(result: AuditRunResult): string {
-  const totalIssues = result.pages.reduce((acc, page) => acc + page.issues.length, 0);
-  const runtimeIssues = result.pages.reduce(
-    (acc, page) => acc + page.issues.filter((issue) => issue.origin === 'runtime-axe').length,
-    0,
-  );
-  const eslintIssues = result.pages.reduce(
-    (acc, page) => acc + page.issues.filter((issue) => issue.origin === 'static-eslint').length,
-    0,
-  );
+  const totalIssues = countIssues(result);
+  const runtimeIssues = countIssues(result, 'runtime-axe');
+  const eslintIssues = countIssues(result, 'static-eslint');
   const pagesWithErrors = result.pages.filter((page) => Boolean(page.error)).length;
   const pagesWithIssues = result.pages.filter(
     (page) => !page.error && page.issues.length > 0,
@@ -140,7 +107,7 @@ export function buildHtmlReport(result: AuditRunResult): string {
     .map((page, index) => {
       const status = getPageStatus(page);
       const entityLabel = getEntityLabel(page);
-      const entityValue = getEntityValue(page);
+      const entityValue = getEntityName(page);
       return `<a class="toc-item" href="#entity-${index + 1}">
         <span class="toc-label">${escapeHtml(`${entityLabel}: ${entityValue}`)}</span>
         <span class="status-badge ${status.cssClass}">${escapeHtml(status.label)}</span>
@@ -324,9 +291,7 @@ export function buildHtmlReport(result: AuditRunResult): string {
 </html>`;
 }
 
-/**
- * Сохраняет HTML-отчет на диск и возвращает путь к файлу.
- */
+/** Writes the HTML report to `outputDir` and returns the file path. */
 export async function writeHtmlReport(result: AuditRunResult, outputDir: string): Promise<string> {
   await mkdir(outputDir, { recursive: true });
   const reportPath = join(outputDir, 'ru-a11y-report.html');

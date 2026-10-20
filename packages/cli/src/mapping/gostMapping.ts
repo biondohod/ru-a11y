@@ -3,7 +3,6 @@ import {
   GOST_RULES,
   findGostRuleByAxeId,
   type GostRuleDefinition,
-  type GostSeverity as CoreGostSeverity,
 } from 'ru-a11y-toolkit-core';
 import type { AxeIssueType, GostIssue, GostSeverity } from '../types';
 
@@ -19,27 +18,23 @@ export interface AxeResultItem {
   html?: string;
 }
 
+const SEVERITY_BY_IMPACT: Readonly<Record<string, GostSeverity>> = {
+  critical: 'критичное',
+  serious: 'критичное',
+  moderate: 'существенное',
+  minor: 'незначительное',
+};
+
+/** axe impact wins over the catalog default because it reflects the concrete node. */
 function mapImpactToSeverity(
-  impact?: string | null,
-  fallback: CoreGostSeverity = 'существенное',
+  impact: string | null | undefined,
+  fallback: GostSeverity,
 ): GostSeverity {
-  if (impact === 'critical' || impact === 'serious') {
-    return 'критичное';
-  }
-
-  if (impact === 'moderate') {
-    return 'существенное';
-  }
-
-  if (impact === 'minor') {
-    return 'незначительное';
-  }
-
-  return fallback;
+  return (impact && SEVERITY_BY_IMPACT[impact]) || fallback;
 }
 
 /**
- * Преобразует элемент результата axe-core в нормализованный объект ru-a11y.
+ * Converts one axe-core result node to the ru-a11y issue model.
  */
 export function mapAxeResultToGost(axeResultItem: AxeResultItem): GostIssue {
   const rule = findGostRuleByAxeId(axeResultItem.id);

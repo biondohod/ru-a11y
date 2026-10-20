@@ -1,7 +1,7 @@
 import { mapEslintResultToGost } from '../src/mapping/eslintMapping';
 
 describe('mapEslintResultToGost', () => {
-  it('маппит кастомное правило no-table-layout на нормативные ссылки ГОСТ/№102', () => {
+  it('maps the custom no-table-layout rule to GOST / Decree 102 references', () => {
     const issue = mapEslintResultToGost({
       filePath: 'C:\\repo\\src\\Layout.jsx',
       line: 10,
@@ -17,7 +17,7 @@ describe('mapEslintResultToGost', () => {
     expect(issue.post102Refs).toContain('Постановление Правительства РФ №102 от 07.02.2026, п. а)');
   });
 
-  it('маппит bare jsx-a11y правило heading-has-content на осмысленный нормативный маппинг', () => {
+  it('maps the bare jsx-a11y heading-has-content rule to catalog metadata', () => {
     const issue = mapEslintResultToGost({
       filePath: 'C:\\repo\\src\\Page.jsx',
       line: 4,

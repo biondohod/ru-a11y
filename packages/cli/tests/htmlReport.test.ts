@@ -2,7 +2,7 @@ import { buildHtmlReport } from '../src/report/htmlReport';
 import type { AuditRunResult } from '../src/types';
 
 describe('buildHtmlReport', () => {
-  it('рендерит расширенный HTML с навигацией и блоками по ESLint/runtime', () => {
+  it('renders navigation and runtime/ESLint counters', () => {
     const report: AuditRunResult = {
       startedAt: '2026-03-25T10:00:00.000Z',
       finishedAt: '2026-03-25T10:01:00.000Z',
@@ -72,7 +72,7 @@ describe('buildHtmlReport', () => {
     expect(html).toContain('Файл: C:\\repo\\src\\App.jsx');
   });
 
-  it('экранирует опасный HTML в тексте нарушений', () => {
+  it('escapes HTML in issue texts', () => {
     const report: AuditRunResult = {
       startedAt: '2026-03-25T10:00:00.000Z',
       finishedAt: '2026-03-25T10:01:00.000Z',

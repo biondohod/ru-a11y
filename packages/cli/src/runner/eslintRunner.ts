@@ -1,8 +1,11 @@
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { PROJECT_DEFAULTS } from '../config/defaultConfig';
 import { mapEslintResultToGost } from '../mapping/eslintMapping';
+import { toEslintEntityUrl } from '../report/shared';
 import type { CliOptions, PageAuditResult } from '../types';
 
+/** The subset of ESLint's public API the CLI relies on. */
 interface EslintMessage {
   ruleId: string | null;
   message: string;
@@ -16,73 +19,65 @@ interface EslintFileResult {
   messages: EslintMessage[];
 }
 
+interface EslintInstance {
+  lintFiles(patterns: string[]): Promise<EslintFileResult[]>;
+}
+
+type EslintConstructor = new (options: Record<string, unknown>) => EslintInstance;
+
+type ReportableMessage = EslintMessage & { ruleId: string; severity: 1 | 2 };
+
+function isReportable(message: EslintMessage): message is ReportableMessage {
+  return message.ruleId !== null && message.severity > 0;
+}
+
 async function readSourceLines(filePath: string): Promise<string[]> {
   try {
-    const content = await readFile(filePath, 'utf-8');
-    return content.split(/\r?\n/);
+    return (await readFile(filePath, 'utf-8')).split(/\r?\n/);
   } catch {
     return [];
   }
 }
 
-async function loadEslintConstructor(): Promise<
-  new (options?: Record<string, unknown>) => {
-    lintFiles: (patterns: string[]) => Promise<EslintFileResult[]>;
-  }
-> {
-  // Dynamic import keeps eslint optional for runtime-only mode.
-  const eslintModule = (await import('eslint')) as {
-    ESLint: new (options?: Record<string, unknown>) => {
-      lintFiles: (patterns: string[]) => Promise<EslintFileResult[]>;
-    };
-  };
-
-  return eslintModule.ESLint;
+/** ESLint is loaded lazily so runtime-only audits do not pay for its startup. */
+async function loadEslint(): Promise<EslintConstructor> {
+  const { ESLint } = (await import('eslint')) as unknown as { ESLint: EslintConstructor };
+  return ESLint;
 }
 
-/**
- * Runs ESLint-based static checks and converts findings to unified ru-a11y issues.
- */
+async function toPageResult(fileResult: EslintFileResult): Promise<PageAuditResult> {
+  const sourceLines = await readSourceLines(fileResult.filePath);
+  const issues = fileResult.messages.filter(isReportable).map((message) =>
+    mapEslintResultToGost({
+      filePath: fileResult.filePath,
+      line: message.line,
+      column: message.column,
+      ruleId: message.ruleId,
+      message: message.message,
+      severity: message.severity,
+      snippet: sourceLines[message.line - 1],
+    }),
+  );
+
+  return { url: toEslintEntityUrl(fileResult.filePath), issues, durationMs: 0 };
+}
+
+/** Runs ESLint over the project and converts findings to ru-a11y issues, one entity per file. */
 export async function runEslintAudit(options: CliOptions): Promise<PageAuditResult[]> {
   if (!options.withEslint) {
     return [];
   }
 
-  const ESLint = await loadEslintConstructor();
-  const cwd = resolve(options.projectRoot || process.cwd());
-  const patterns =
-    options.eslintTargets.length > 0 ? options.eslintTargets : ['src/**/*.{js,jsx,ts,tsx}'];
-
+  const ESLint = await loadEslint();
   const eslint = new ESLint({
-    cwd,
+    cwd: resolve(options.projectRoot),
     errorOnUnmatchedPattern: false,
     overrideConfigFile: options.eslintConfigFile ? resolve(options.eslintConfigFile) : undefined,
   });
 
+  const patterns =
+    options.eslintTargets.length > 0 ? options.eslintTargets : [PROJECT_DEFAULTS.eslintTargets];
   const lintResults = await eslint.lintFiles(patterns);
 
-  return Promise.all(
-    lintResults.map(async (fileResult) => {
-      const sourceLines = await readSourceLines(fileResult.filePath);
-      const issues = fileResult.messages
-        .filter((message) => message.ruleId && message.severity > 0)
-        .map((message) =>
-          mapEslintResultToGost({
-            filePath: fileResult.filePath,
-            line: message.line,
-            column: message.column,
-            ruleId: message.ruleId as string,
-            message: message.message,
-            severity: message.severity === 2 ? 2 : 1,
-            snippet: sourceLines[message.line - 1],
-          }),
-        );
-
-      return {
-        url: `eslint://${fileResult.filePath}`,
-        issues,
-        durationMs: 0,
-      };
-    }),
-  );
+  return Promise.all(lintResults.map(toPageResult));
 }
