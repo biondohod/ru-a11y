@@ -1,14 +1,10 @@
-/**
- * RuA11yOverlay.test.tsx — тесты компонента оверлея
- */
-
 import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { RuA11yOverlay } from '../src/RuA11yOverlay';
 import axe from 'axe-core';
 
-// Мокируем axe-core, чтобы не запускать реальное сканирование в тестах
+// Keep tests fast: no real axe-core scan.
 jest.mock('axe-core', () => ({
   __esModule: true,
   default: {
@@ -21,11 +17,18 @@ jest.mock('axe-core', () => ({
   },
 }));
 
-// Мокируем createPortal чтобы рендерить в обычное дерево React
+// Render portals inline so Testing Library can query them.
 jest.mock('react-dom', () => ({
   ...jest.requireActual('react-dom'),
   createPortal: (node: React.ReactNode) => node,
 }));
+
+/** The scan awaits several promises in a row; let all of them settle. */
+async function flushPromises(rounds = 10): Promise<void> {
+  for (let round = 0; round < rounds; round += 1) {
+    await Promise.resolve();
+  }
+}
 
 describe('RuA11yOverlay', () => {
   beforeEach(() => {
@@ -37,7 +40,7 @@ describe('RuA11yOverlay', () => {
     jest.useRealTimers();
   });
 
-  it('рендерит кнопку-переключатель', async () => {
+  it('renders the toggle button', async () => {
     await act(async () => {
       render(<RuA11yOverlay />);
     });
@@ -46,7 +49,7 @@ describe('RuA11yOverlay', () => {
     expect(button).toBeInTheDocument();
   });
 
-  it('открывает панель при нажатии на кнопку', async () => {
+  it('opens the panel on click', async () => {
     await act(async () => {
       render(<RuA11yOverlay />);
     });
@@ -60,7 +63,7 @@ describe('RuA11yOverlay', () => {
     expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
 
-  it('закрывает панель при повторном нажатии', async () => {
+  it('closes the panel', async () => {
     await act(async () => {
       render(<RuA11yOverlay />);
     });
@@ -82,8 +85,8 @@ describe('RuA11yOverlay', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('показывает состояние загрузки во время сканирования', async () => {
-    // Задерживаем ответ axe
+  it('shows a loading state while scanning', async () => {
+    // Delay the axe response
     const mockedRun = axe.run as jest.MockedFunction<typeof axe.run>;
     mockedRun.mockImplementation(
       () =>
@@ -103,10 +106,10 @@ describe('RuA11yOverlay', () => {
 
     await act(async () => {
       render(<RuA11yOverlay />);
-      jest.advanceTimersByTime(350); // запускаем начальное сканирование
+      jest.advanceTimersByTime(350); // trigger the initial scan
     });
 
-    // Открываем панель
+    // Open the panel
     const toggleBtn = screen.getByRole('button', { name: /открыть отчёт/i });
     await act(async () => {
       fireEvent.click(toggleBtn);
@@ -115,7 +118,7 @@ describe('RuA11yOverlay', () => {
     expect(screen.getByRole('status')).toBeInTheDocument();
   });
 
-  it('показывает пустое состояние когда нарушений нет', async () => {
+  it('shows the empty state when there are no violations', async () => {
     await act(async () => {
       render(<RuA11yOverlay />);
       jest.advanceTimersByTime(2000);
@@ -133,7 +136,36 @@ describe('RuA11yOverlay', () => {
     expect(screen.getByText(/нарушений не обнаружено/i)).toBeInTheDocument();
   });
 
-  it('кнопка имеет корректный aria-expanded', async () => {
+  it('renders violation cards without nested interactive controls', async () => {
+    (axe.run as unknown as jest.Mock).mockResolvedValue({
+      violations: [
+        {
+          id: 'image-alt',
+          impact: 'critical',
+          nodes: [{ target: ['img'], html: '<img>', impact: 'critical', failureSummary: 'fix' }],
+        },
+      ],
+    } as unknown as axe.AxeResults);
+    document.body.innerHTML = '<main><h1>Страница</h1><img src="a.png"></main>';
+
+    await act(async () => {
+      render(<RuA11yOverlay customRules={false} />);
+    });
+    // Effects (and the initial scan timer) are registered when the first act() exits.
+    await act(async () => {
+      jest.advanceTimersByTime(1000);
+      await flushPromises();
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /открыть отчёт/i }));
+    });
+
+    const card = screen.getByRole('button', { name: /подсветить элемент/i });
+    expect(card.tagName).toBe('BUTTON');
+    expect(card.querySelector('button, [role="button"]')).toBeNull();
+  });
+
+  it('keeps aria-expanded in sync', async () => {
     await act(async () => {
       render(<RuA11yOverlay />);
     });

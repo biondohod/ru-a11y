@@ -37,6 +37,19 @@ describe('rule registry', () => {
     expect(allRules).toHaveLength(RU_A11Y_TOOLKIT_STATS.canonicalRules);
   });
 
+  it.each([
+    ['gost', /^ГОСТ Р 52872-2019, (§|п\. )/],
+    ['post102', /^Постановление №102, п\. /],
+    ['wcag', /^WCAG 2\.[12]\b/],
+  ] as const)('formats %s references consistently', (field, pattern) => {
+    const references = allRules.map((rule) => rule[field]).filter(Boolean);
+
+    expect(references.length).toBeGreaterThan(0);
+    for (const reference of references) {
+      expect(reference).toMatch(pattern);
+    }
+  });
+
   it('describes every rule with non-empty Russian texts', () => {
     for (const rule of allRules) {
       expect(rule.title.trim()).not.toBe('');

@@ -1,47 +1,37 @@
 /**
- * axeRunner.ts — модуль запуска axe-core и преобразования результатов
+ * Runs axe-core plus the ru-a11y custom rules and maps results to Russian metadata.
  *
- * Стратегия проверки: MutationObserver
- * Выбрана вместо setInterval по следующим причинам:
- * - Реагирует только на реальные изменения DOM, не опрашивает DOM впустую
- * - Меньше нагрузка на CPU в состоянии покоя
- * - Более предсказуемое поведение в SPA с частыми обновлениями
- *
- * Недостаток: не реагирует на изменения атрибутов глубоко вложенных элементов
- * без subtree: true (что учтено в конфигурации).
+ * Re-scans are driven by a MutationObserver rather than polling: it reacts only to
+ * real DOM changes, costs nothing while the page is idle and behaves predictably
+ * in SPAs with frequent updates.
  */
 
 import axe from 'axe-core';
-import { getRuleMeta, type RuA11yRuleMeta } from './mapping/rulesMap';
-import { runCustomRules } from './customRules';
+import { getRuleMeta, type RuA11yRuleMeta } from 'ru-a11y-toolkit-core';
+import { runCustomRules } from './rules';
 
-/** Одно конкретное нарушение (узел DOM + правило) */
+/** One violation: a rule failing on a specific DOM node. */
 export interface A11yViolationNode {
-  /** Уникальный ключ для React (ruleId + xpath) */
+  /** Stable key: rule id + selector. */
   key: string;
-  /** Правило axe-core */
   ruleId: string;
-  /** Метаданные правила с русскоязычным описанием */
+  /** `axe` for axe-core rules, `ru-a11y` for the toolkit's own runtime checks. */
+  source: 'axe' | 'ru-a11y';
+  /** Russian rule metadata from ru-a11y-toolkit-core. */
   meta: RuA11yRuleMeta;
-  /** CSS-селектор проблемного элемента */
+  /** CSS selector of the failing element. */
   selector: string;
-  /** Полное дерево целевых элементов для подсветки */
+  /** Full axe target list, used for highlighting. */
   targets: string[][];
-  /** HTML-сниппет проблемного элемента */
   html: string;
-  /** Оценка влияния от axe-core ('critical' | 'serious' | 'moderate' | 'minor') */
   impact: axe.ImpactValue;
-  /** Дополнительное сообщение от axe о конкретном нарушении */
+  /** axe's explanation for this particular node. */
   failureSummary?: string;
 }
 
-/** Результат одного сканирования */
 export interface ScanResult {
-  /** Список всех нарушений */
   violations: A11yViolationNode[];
-  /** Время последнего сканирования */
   scannedAt: Date;
-  /** Количество ошибок по severity */
   counts: {
     error: number;
     warning: number;
@@ -49,260 +39,219 @@ export interface ScanResult {
 }
 
 /**
- * Пресеты проверки — соответствуют пресетам eslint-preset:
- * - recommended: базовый уровень WCAG 2.1 AA (wcag2a + wcag21a + wcag2aa + wcag21aa)
- * - gost-aa: уровень AA + best-practice, ориентирован на ГОСТ/Постановление №102
- * - strict: максимально строгий, включает AAA и experimental
+ * Rule presets, aligned with the ESLint plugin configs:
+ * - recommended: WCAG 2.1 AA;
+ * - gost-aa: WCAG 2.1 AA + best practices, targeting GOST / Decree 102;
+ * - strict: adds AAA.
  */
 export type AxePreset = 'recommended' | 'gost-aa' | 'strict';
 
-/** Маппинг пресетов на теги axe-core */
-export const PRESET_TAGS: Record<AxePreset, string[]> = {
+export const PRESET_TAGS: Readonly<Record<AxePreset, readonly string[]>> = {
   recommended: ['wcag2a', 'wcag21a', 'wcag2aa', 'wcag21aa'],
   'gost-aa': ['wcag2a', 'wcag21a', 'wcag2aa', 'wcag21aa', 'best-practice'],
   strict: ['wcag2a', 'wcag21a', 'wcag2aa', 'wcag21aa', 'wcag2aaa', 'wcag21aaa', 'best-practice'],
 };
 
-/** Конфигурация axe-runner */
 export interface AxeRunnerConfig {
-  /** Элемент, который нужно исключить из сканирования (сам оверлей) */
+  /** Elements to skip, normally the overlay itself. */
   excludeSelector?: string;
-  /**
-   * Пресет правил: 'recommended' | 'gost-aa' | 'strict'.
-   * Если не указан — используется 'recommended'.
-   * Если указаны явные tags — они имеют приоритет над пресетом.
-   */
+  /** Rule preset; ignored when `tags` are given. */
   preset?: AxePreset;
-  /** Явный список тегов axe-core (переопределяет preset) */
+  /** Explicit axe-core tags, take precedence over `preset`. */
   tags?: string[];
-  /** Дебаунс в мс перед повторным запуском после изменений DOM */
+  /** Delay before re-scanning after DOM changes. */
   debounceMs?: number;
-  /** Запускать дополнительные DOM-проверки ru-a11y поверх axe-core */
+  /** Run the ru-a11y DOM checks in addition to axe-core. */
   customRules?: boolean;
-  /** Запускать стандартные проверки axe-core. Можно отключить для проверки только ru-a11y custom rules. */
+  /** Run axe-core rules. Disable to see only the ru-a11y checks. */
   axeRules?: boolean;
+  /** Log every scan to the console. */
+  debug?: boolean;
 }
 
-const DEFAULT_CONFIG = {
+const DEFAULTS = {
   excludeSelector: '[data-ru-a11y-overlay]',
-  preset: 'recommended' as AxePreset,
+  preset: 'recommended',
   debounceMs: 1000,
   customRules: true,
   axeRules: true,
-};
+  debug: false,
+} as const satisfies Required<Omit<AxeRunnerConfig, 'tags'>>;
 
-/** Получает итоговый список тегов с учётом пресета и явных тегов */
+/** Attributes whose changes can affect accessibility and trigger a re-scan. */
+const OBSERVED_ATTRIBUTES = [
+  'alt',
+  'aria-label',
+  'aria-labelledby',
+  'aria-describedby',
+  'aria-hidden',
+  'role',
+  'tabindex',
+  'href',
+  'lang',
+  'title',
+  'for',
+  'id',
+  'type',
+  'disabled',
+];
+
+const LOG_PREFIX = '[ru-a11y-overlay]';
+
+/** axe-core cannot run concurrently in one document. */
+let isScanning = false;
+
 function resolveTags(config: AxeRunnerConfig): string[] {
   if (config.tags && config.tags.length > 0) return config.tags;
-  const preset = config.preset ?? DEFAULT_CONFIG.preset;
-  return PRESET_TAGS[preset];
+  return [...PRESET_TAGS[config.preset ?? DEFAULTS.preset]];
 }
 
-/** Флаг для предотвращения параллельных запусков axe-core */
-let axeRunning = false;
-
-/**
- * Преобразует результаты axe-core в плоский список нарушений с русскоязычными метаданными
- */
 function mapAxeViolations(violations: axe.Result[]): A11yViolationNode[] {
-  const result: A11yViolationNode[] = [];
-
-  for (const violation of violations) {
-    for (const node of violation.nodes) {
+  return violations.flatMap((violation) =>
+    violation.nodes.map((node) => {
       const selector = node.target.join(', ');
-      const key = `${violation.id}::${selector}`;
 
-      result.push({
-        key,
+      return {
+        key: `${violation.id}::${selector}`,
         ruleId: violation.id,
+        source: 'axe' as const,
         meta: getRuleMeta(violation.id),
         selector,
-        targets: node.target.map((t) => (Array.isArray(t) ? t : [t as string])),
+        targets: node.target.map((target) => (Array.isArray(target) ? target : [String(target)])),
         html: node.html,
         impact: node.impact ?? violation.impact ?? 'minor',
         failureSummary: node.failureSummary,
-      });
-    }
-  }
-
-  return result;
-}
-
-/**
- * Подсчитывает количество нарушений по severity
- */
-function countViolations(violations: A11yViolationNode[]): ScanResult['counts'] {
-  return violations.reduce(
-    (acc, v) => {
-      if (v.meta.severity === 'error') acc.error++;
-      else acc.warning++;
-      return acc;
-    },
-    { error: 0, warning: 0 },
+      };
+    }),
   );
 }
 
-/**
- * Запускает axe-core на текущем документе.
- * Возвращает промис с результатами сканирования.
- *
- * Защита от параллельных запусков: axe-core не поддерживает одновременный запуск
- * нескольких экземпляров. Если сканирование уже идёт — возвращаем пустой результат.
- */
-export async function runAxeScan(config: AxeRunnerConfig = {}): Promise<ScanResult> {
-  // Защита от параллельных запусков (React StrictMode монтирует дважды)
-  if (axeRunning) {
-    console.warn('[ru-a11y-overlay] ⚠️ axeRunning=true — пропускаем запуск');
-    return { violations: [], scannedAt: new Date(), counts: { error: 0, warning: 0 } };
-  }
-
-  axeRunning = true;
-
-  try {
-    const tags = resolveTags(config);
-    const excludeSelector = config.excludeSelector ?? DEFAULT_CONFIG.excludeSelector;
-    const shouldRunAxeRules = config.axeRules ?? DEFAULT_CONFIG.axeRules;
-
-    const runOptions: axe.RunOptions = {
-      runOnly: {
-        type: 'tag',
-        values: tags,
-      },
-      // Отключаем сканирование iframes — предотвращает ошибки с cross-origin фреймами
-      iframes: false,
-    };
-
-    // Контекст сканирования: исключаем сам оверлей.
-    // axe-core требует формат exclude как массив массивов CSS-селекторов: [[selector]].
-    const context: axe.ElementContext = excludeSelector
-      ? { exclude: [[excludeSelector]] }
-      : document;
-
-    const results = shouldRunAxeRules ? await axe.run(context, runOptions) : null;
-
-    if (results && results.violations.length > 0) {
-      console.table(
-        results.violations.map((v) => ({
-          id: v.id,
-          impact: v.impact,
-          description: v.description,
-          nodes: v.nodes.length,
-        })),
-      );
-    }
-
-    const axeViolations = results ? mapAxeViolations(results.violations) : [];
-    const shouldRunCustomRules = config.customRules ?? DEFAULT_CONFIG.customRules;
-    const customViolations = shouldRunCustomRules
-      ? runCustomRules(document, config.preset ?? DEFAULT_CONFIG.preset, excludeSelector)
-      : [];
-    const violations = dedupeViolations([...axeViolations, ...customViolations]);
-
-    violations.forEach((v) => {
-      console.log(
-        `  → [${v.meta.severity}] ${v.ruleId}: ${v.meta.title} | selector: ${v.selector}`,
-      );
-    });
-
-    return {
-      violations,
-      scannedAt: new Date(),
-      counts: countViolations(violations),
-    };
-  } catch (error) {
-    console.error('[ru-a11y-overlay] ❌ axe.run упал с ошибкой:', error);
-    return {
-      violations: [],
-      scannedAt: new Date(),
-      counts: { error: 0, warning: 0 },
-    };
-  } finally {
-    axeRunning = false;
-  }
-}
-
-function dedupeViolations(violations: A11yViolationNode[]): A11yViolationNode[] {
+function dedupe(violations: A11yViolationNode[]): A11yViolationNode[] {
   const seen = new Set<string>();
 
-  return violations.filter((violation) => {
-    const key = `${violation.ruleId}::${violation.selector}`;
+  return violations.filter(({ ruleId, selector }) => {
+    const key = `${ruleId}::${selector}`;
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
   });
 }
 
+function countBySeverity(violations: A11yViolationNode[]): ScanResult['counts'] {
+  const error = violations.filter((violation) => violation.meta.severity === 'error').length;
+  return { error, warning: violations.length - error };
+}
+
+function createResult(violations: A11yViolationNode[]): ScanResult {
+  return { violations, scannedAt: new Date(), counts: countBySeverity(violations) };
+}
+
+async function runAxeRules(
+  config: AxeRunnerConfig,
+  excludeSelector: string,
+): Promise<A11yViolationNode[]> {
+  if (!(config.axeRules ?? DEFAULTS.axeRules)) return [];
+
+  // axe expects `exclude` as an array of selector arrays.
+  const context: axe.ElementContext = excludeSelector ? { exclude: [[excludeSelector]] } : document;
+  const results = await axe.run(context, {
+    runOnly: { type: 'tag', values: resolveTags(config) },
+    // Cross-origin frames make axe throw.
+    iframes: false,
+  });
+
+  return mapAxeViolations(results.violations);
+}
+
+function logScan(result: ScanResult): void {
+  console.groupCollapsed?.(`${LOG_PREFIX} ${result.violations.length} violation(s)`);
+  console.table(
+    result.violations.map(({ ruleId, source, impact, selector, meta }) => ({
+      ruleId,
+      source,
+      impact,
+      severity: meta.severity,
+      selector,
+    })),
+  );
+  console.groupEnd?.();
+}
+
 /**
- * Создаёт MutationObserver, который перезапускает axe при изменениях DOM.
- * Использует дебаунс для предотвращения лишних запусков при множественных изменениях.
- *
- * @param onResult — колбэк, вызываемый с новыми результатами
- * @param config — конфигурация
- * @returns функция отключения наблюдателя
+ * Scans the current document.
+ * Resolves with `null` when another scan is still running, so callers can keep
+ * the previous result instead of flashing an empty one.
+ */
+export async function runAxeScan(config: AxeRunnerConfig = {}): Promise<ScanResult | null> {
+  if (isScanning) return null;
+  isScanning = true;
+
+  const excludeSelector = config.excludeSelector ?? DEFAULTS.excludeSelector;
+
+  try {
+    const axeViolations = await runAxeRules(config, excludeSelector);
+    const customViolations =
+      (config.customRules ?? DEFAULTS.customRules)
+        ? runCustomRules(document, config.preset ?? DEFAULTS.preset, excludeSelector)
+        : [];
+
+    const result = createResult(dedupe([...axeViolations, ...customViolations]));
+    if (config.debug) logScan(result);
+    return result;
+  } catch (error) {
+    console.error(`${LOG_PREFIX} scan failed:`, error);
+    return createResult([]);
+  } finally {
+    isScanning = false;
+  }
+}
+
+function isOverlayMutation(mutation: MutationRecord, excludeSelector: string): boolean {
+  const target =
+    mutation.target instanceof Element ? mutation.target : mutation.target.parentElement;
+  return Boolean(target?.closest(excludeSelector));
+}
+
+/**
+ * Re-runs the scan (debounced) whenever the page DOM changes.
+ * Mutations inside the overlay are ignored. Returns a cleanup function.
  */
 export function createDomObserver(
   onResult: (result: ScanResult) => void,
   config: AxeRunnerConfig = {},
 ): () => void {
-  const excludeSelector = config.excludeSelector ?? DEFAULT_CONFIG.excludeSelector;
-  const debounceMs = config.debounceMs ?? DEFAULT_CONFIG.debounceMs;
-  let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+  const excludeSelector = config.excludeSelector ?? DEFAULTS.excludeSelector;
+  const debounceMs = config.debounceMs ?? DEFAULTS.debounceMs;
+  let timer: ReturnType<typeof setTimeout> | undefined;
 
-  const scheduleRun = () => {
-    if (debounceTimer) clearTimeout(debounceTimer);
-
-    // Если сканирование уже идёт — планируем следующее на момент его завершения
-    // (ждём debounceMs после того, как axeRunning станет false)
-    const delay = axeRunning ? debounceMs + 500 : debounceMs;
-
-    debounceTimer = setTimeout(async () => {
-      // На случай если предыдущий скан ещё не успел завершиться — ждём ещё
-      if (axeRunning) {
-        scheduleRun();
+  const scheduleScan = () => {
+    clearTimeout(timer);
+    timer = setTimeout(async () => {
+      const result = await runAxeScan(config);
+      // A scan was already in progress: try again once it is likely done.
+      if (result === null) {
+        scheduleScan();
         return;
       }
-      const result = await runAxeScan(config);
       onResult(result);
-    }, delay);
+    }, debounceMs);
   };
 
   const observer = new MutationObserver((mutations) => {
-    // Фильтруем мутации, которые исходят от самого оверлея
-    const isOverlayMutation = mutations.every((m) => {
-      const target = m.target as Element;
-      return target.closest?.(excludeSelector) !== null;
-    });
-
-    if (!isOverlayMutation) {
-      scheduleRun();
+    if (!mutations.every((mutation) => isOverlayMutation(mutation, excludeSelector))) {
+      scheduleScan();
     }
   });
 
   observer.observe(document.body, {
-    childList: true, // отслеживаем добавление/удаление элементов
-    subtree: true, // включая вложенные элементы
-    attributes: true, // отслеживаем изменение атрибутов (alt, aria-*, role и т.д.)
-    attributeFilter: [
-      // только значимые для доступности атрибуты
-      'alt',
-      'aria-label',
-      'aria-labelledby',
-      'aria-describedby',
-      'aria-hidden',
-      'role',
-      'tabindex',
-      'href',
-      'lang',
-      'title',
-      'for',
-      'id',
-      'type',
-      'disabled',
-    ],
+    childList: true,
+    subtree: true,
+    attributes: true,
+    attributeFilter: OBSERVED_ATTRIBUTES,
   });
 
   return () => {
     observer.disconnect();
-    if (debounceTimer) clearTimeout(debounceTimer);
+    clearTimeout(timer);
   };
 }

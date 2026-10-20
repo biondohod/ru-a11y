@@ -1,15 +1,11 @@
-/**
- * tokens.ts — дизайн-токены оверлея: цвета, z-index, типографика.
- * Единственный источник правды для всех значений.
- * Правьте здесь — изменения автоматически применятся везде.
- */
+/** Design tokens of the overlay: colors, z-index and typography. */
 
 import type { CSSProperties } from 'react';
 
-// ─── Цвета ────────────────────────────────────────────────────────────────────
+// ─── Colors ──────────────────────────────────────────────────────────────────
 
 export const COLORS = {
-  // Панель
+  // Panel
   panelBg: '#1e1e2e',
   panelText: '#cdd6f4',
   panelBorder: '#313244',
@@ -21,16 +17,16 @@ export const COLORS = {
   errorBg: 'rgba(239, 68, 68, 0.25)',
   warningBg: 'rgba(245, 158, 11, 0.25)',
 
-  // Кнопка-переключатель
+  // Toggle button
   btnPrimary: '#89b4fa',
   btnPrimaryText: '#1e1e2e',
 
-  // Бейджи
+  // Badges
   badgeError: '#f38ba8',
   badgeWarning: '#fab387',
   badgeText: '#1e1e2e',
 
-  // Прочее
+  // Misc
   groupHeaderBg: '#313244',
   itemHover: '#2a2a3e',
   link: '#89dceb',
@@ -49,7 +45,7 @@ export const Z = {
   tooltip: 1000000,
 } as const;
 
-// ─── Типографика ──────────────────────────────────────────────────────────────
+// ─── Typography ──────────────────────────────────────────────────────────────
 
 export const FONTS = {
   base: 'system-ui, -apple-system, sans-serif',
@@ -60,6 +56,6 @@ export const FONTS = {
   sizeLg: '16px',
 } as const;
 
-// ─── Вспомогательные типы ─────────────────────────────────────────────────────
+// ─── Helper types ────────────────────────────────────────────────────────────
 
 export type Styles = Record<string, CSSProperties>;

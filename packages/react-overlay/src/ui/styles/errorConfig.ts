@@ -1,17 +1,10 @@
-/**
- * errorConfig.ts — стили элементов списка нарушений.
- *
- * Содержит конфиги для:
- * - Пустого состояния (emptyState*)
- * - Заголовков групп WCAG (groupHeader*)
- * - Карточки нарушения (item*, severity*, selector, details*)
- */
+/** Styles of the violation list: empty state, WCAG group headers and violation cards. */
 
 import type { CSSProperties } from 'react';
 import { COLORS, FONTS } from './tokens';
 import { badgeBaseConfig } from './panelConfig';
 
-// ─── Пустое состояние ─────────────────────────────────────────────────────────
+// ─── Empty state ─────────────────────────────────────────────────────────────
 
 export const emptyStateConfig: CSSProperties = {
   display: 'flex',
@@ -40,7 +33,7 @@ export const emptySubtextConfig: CSSProperties = {
   margin: 0,
 };
 
-// ─── Заголовок группы нарушений ───────────────────────────────────────────────
+// ─── Group header ────────────────────────────────────────────────────────────
 
 export const groupHeaderConfig: CSSProperties = {
   display: 'flex',
@@ -66,7 +59,7 @@ export const groupHeaderRightConfig: CSSProperties = {
   gap: '6px',
 };
 
-/** Бейдж внутри заголовка группы (переиспользует базовый) */
+/** Badge in a group header. */
 export const groupBadgeErrorConfig: CSSProperties = {
   ...badgeBaseConfig,
   backgroundColor: COLORS.badgeError,
@@ -79,13 +72,55 @@ export const groupBadgeWarningConfig: CSSProperties = {
   color: COLORS.badgeText,
 };
 
-// ─── Карточка нарушения ───────────────────────────────────────────────────────
+// ─── Violation card ──────────────────────────────────────────────────────────
 
 export const itemConfig: CSSProperties = {
   padding: '10px 16px',
   borderBottom: `1px solid ${COLORS.panelBorder}`,
-  cursor: 'pointer',
   transition: 'background-color 0.15s ease',
+};
+
+/** Native button reset: the clickable summary of a card. */
+export const itemSelectButtonConfig: CSSProperties = {
+  display: 'block',
+  width: '100%',
+  padding: 0,
+  margin: 0,
+  background: 'none',
+  border: 'none',
+  color: 'inherit',
+  font: 'inherit',
+  textAlign: 'left',
+  cursor: 'pointer',
+};
+
+/** Marks findings of the ru-a11y runtime checks (as opposed to axe-core). */
+export const sourceBadgeConfig: CSSProperties = {
+  flexShrink: 0,
+  borderRadius: '3px',
+  border: `1px solid ${COLORS.link}`,
+  color: COLORS.link,
+  fontSize: '10px',
+  fontWeight: 700,
+  lineHeight: 1,
+  padding: '3px 5px',
+  textTransform: 'uppercase',
+};
+
+export const contrastConfig: CSSProperties = {
+  fontSize: FONTS.sizeSm,
+  fontWeight: 700,
+  color: COLORS.badgeError,
+  flexShrink: 0,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-end',
+  gap: '1px',
+};
+
+export const contrastRequiredConfig: CSSProperties = {
+  color: COLORS.mutedText,
+  fontWeight: 400,
 };
 
 export const itemActiveConfig: CSSProperties = {
@@ -93,7 +128,7 @@ export const itemActiveConfig: CSSProperties = {
   backgroundColor: COLORS.itemHover,
 };
 
-/** Строка-заголовок внутри карточки */
+/** Header row of a card. */
 export const itemHeaderConfig: CSSProperties = {
   display: 'flex',
   alignItems: 'center',
@@ -101,7 +136,7 @@ export const itemHeaderConfig: CSSProperties = {
   marginBottom: '4px',
 };
 
-// ─── Цветная точка severity ───────────────────────────────────────────────────
+// ─── Severity dot ────────────────────────────────────────────────────────────
 
 export const severityDotBaseConfig: CSSProperties = {
   width: '8px',
@@ -120,7 +155,7 @@ export const severityDotWarningConfig: CSSProperties = {
   backgroundColor: COLORS.warningBorder,
 };
 
-// ─── Заголовок и мета нарушения ───────────────────────────────────────────────
+// ─── Title and meta ──────────────────────────────────────────────────────────
 
 export const itemTitleConfig: CSSProperties = {
   fontWeight: 600,
@@ -135,7 +170,7 @@ export const impactLabelConfig: CSSProperties = {
   flexShrink: 0,
 };
 
-// ─── CSS-селектор ─────────────────────────────────────────────────────────────
+// ─── CSS selector ────────────────────────────────────────────────────────────
 
 export const selectorConfig: CSSProperties = {
   display: 'block',
@@ -153,7 +188,7 @@ export const selectorConfig: CSSProperties = {
   maxWidth: '100%',
 };
 
-// ─── Раскрываемые детали ──────────────────────────────────────────────────────
+// ─── Expandable details ──────────────────────────────────────────────────────
 
 export const detailsConfig: CSSProperties = {
   marginTop: '8px',
@@ -166,7 +201,7 @@ export const descriptionConfig: CSSProperties = {
   margin: '0 0 6px',
 };
 
-// ─── Блок «Как исправить» ─────────────────────────────────────────────────────
+// ─── "How to fix" block ──────────────────────────────────────────────────────
 
 export const fixBlockConfig: CSSProperties = {
   backgroundColor: COLORS.panelBg,
@@ -192,7 +227,7 @@ export const fixTextConfig: CSSProperties = {
   margin: 0,
 };
 
-// ─── Нормативные теги ─────────────────────────────────────────────────────────
+// ─── Normative tags ──────────────────────────────────────────────────────────
 
 export const tagListConfig: CSSProperties = {
   display: 'flex',
@@ -212,7 +247,7 @@ export const tagConfig: CSSProperties = {
   border: `1px solid ${COLORS.panelBorder}`,
 };
 
-// ─── Кнопка «Подробнее / Скрыть» ─────────────────────────────────────────────
+// ─── "Details / Hide" button ─────────────────────────────────────────────────
 
 export const expandButtonConfig: CSSProperties = {
   display: 'block',

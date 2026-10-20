@@ -1,84 +1,68 @@
 /**
- * RuA11yOverlay.tsx — главный компонент оверлея проверки доступности
+ * Development overlay that shows accessibility violations on top of the page.
  *
- * Интеграция:
- * ```tsx
- * import { RuA11yOverlay } from 'ru-a11y-toolkit-overlay';
- *
+ * @example
  * root.render(
- *   <React.StrictMode>
+ *   <>
  *     <App />
  *     {process.env.NODE_ENV === 'development' && <RuA11yOverlay />}
- *   </React.StrictMode>
+ *   </>
  * );
- * ```
  *
- * Компонент НЕ рендерится в production-сборке — проверка process.env.NODE_ENV
- * гарантирует это при бандлинге (tree-shaking).
+ * Guarding with NODE_ENV lets bundlers drop the overlay from production builds.
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
-  type A11yViolationNode,
-  type AxePreset,
   createDomObserver,
   runAxeScan,
+  type A11yViolationNode,
+  type AxePreset,
+  type AxeRunnerConfig,
   type ScanResult,
 } from './axeRunner';
-import { Panel } from './ui/Panel';
 import { HighlightLayer } from './ui/HighlightLayer';
-import { COLORS, panelStyles } from './ui/styles';
+import { Panel } from './ui/Panel';
+import { badgeBaseConfig, toggleConfig } from './ui/styles/panelConfig';
+import { COLORS } from './ui/styles/tokens';
 
 export interface RuA11yOverlayProps {
-  /**
-   * Дополнительный CSS-селектор для исключения из сканирования.
-   * По умолчанию исключается сам оверлей ([data-ru-a11y-overlay]).
-   */
+  /** Extra selector excluded from scanning. The overlay (`[data-ru-a11y-overlay]`) is always excluded. */
   excludeSelector?: string;
-
-  /**
-   * Пресет правил проверки. Соответствует пресетам eslint-preset:
-   * - 'recommended' (по умолчанию): WCAG 2.1 AA — базовые критические проверки
-   * - 'gost-aa': WCAG 2.1 AA + best-practice, ориентирован на ГОСТ/Постановление №102
-   * - 'strict': максимальный — включает AAA и экспериментальные правила
-   */
+  /** Rule preset, matching the ESLint plugin configs. Default: `recommended`. */
   preset?: AxePreset;
-
-  /**
-   * Задержка дебаунса в мс перед повторным сканированием после изменений DOM.
-   * По умолчанию: 1000 мс.
-   */
+  /** Debounce before re-scanning after DOM changes, ms. Default: 1000. */
   debounceMs?: number;
-
-  /**
-   * Автоматически запускать сканирование при изменениях DOM через MutationObserver.
-   * По умолчанию: true.
-   */
+  /** Re-scan automatically on DOM changes. Default: true. */
   autoScan?: boolean;
-
-  /**
-   * Запускать дополнительные DOM-проверки ru-a11y поверх axe-core.
-   * По умолчанию: true.
-   */
+  /** Run the ru-a11y DOM checks in addition to axe-core. Default: true. */
   customRules?: boolean;
-
-  /**
-   * Запускать стандартные проверки axe-core.
-   * Можно отключить для демонстрации только дополнительных ru-a11y runtime-правил.
-   * По умолчанию: true.
-   */
+  /** Run axe-core rules. Disable to see only the ru-a11y checks. Default: true. */
   axeRules?: boolean;
+  /** Log every scan to the browser console. Default: false. */
+  debug?: boolean;
 }
 
-/**
- * Главный компонент оверлея.
- *
- * Жизненный цикл:
- * 1. При монтировании — запускает первоначальное сканирование axe-core
- * 2. Если autoScan=true — подключает MutationObserver для реактивного ресканирования
- * 3. При размонтировании — отключает наблюдатель и отменяет ожидающие операции
- */
+const OVERLAY_SELECTOR = '[data-ru-a11y-overlay]';
+
+/** Gives React (including the StrictMode double mount) time to render before the first scan. */
+const INITIAL_SCAN_DELAY_MS = 800;
+
+function getToggleColor(result: ScanResult | null): string {
+  if (!result) return COLORS.btnPrimary;
+  if (result.counts.error > 0) return COLORS.badgeError;
+  if (result.counts.warning > 0) return COLORS.badgeWarning;
+  return COLORS.btnPrimary;
+}
+
+function getToggleLabel(isOpen: boolean, totalIssues: number): string {
+  if (isOpen) return 'Закрыть отчёт по доступности';
+  return totalIssues > 0
+    ? `Открыть отчёт по доступности: ${totalIssues} нарушений`
+    : 'Открыть отчёт по доступности: нарушений нет';
+}
+
 export function RuA11yOverlay({
   excludeSelector,
   preset = 'recommended',
@@ -86,78 +70,73 @@ export function RuA11yOverlay({
   autoScan = true,
   customRules = true,
   axeRules = true,
+  debug = false,
 }: RuA11yOverlayProps = {}) {
   const [isOpen, setIsOpen] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [result, setResult] = useState<ScanResult | null>(null);
   const [activeViolation, setActiveViolation] = useState<A11yViolationNode | null>(null);
-  const isMountedRef = useRef(true);
+  const isMountedRef = useRef(false);
 
-  const axeConfig = {
-    excludeSelector: excludeSelector ?? '[data-ru-a11y-overlay]',
-    preset,
-    debounceMs,
-    customRules,
-    axeRules,
-  };
+  const config = useMemo<AxeRunnerConfig>(
+    () => ({
+      excludeSelector: excludeSelector
+        ? `${OVERLAY_SELECTOR}, ${excludeSelector}`
+        : OVERLAY_SELECTOR,
+      preset,
+      debounceMs,
+      customRules,
+      axeRules,
+      debug,
+    }),
+    [excludeSelector, preset, debounceMs, customRules, axeRules, debug],
+  );
 
-  const handleScanResult = useCallback((scanResult: ScanResult) => {
+  const applyResult = useCallback((scanResult: ScanResult) => {
     if (!isMountedRef.current) return;
+
     setResult(scanResult);
     setIsScanning(false);
-    // Если активное нарушение исчезло — сбрасываем выделение
-    setActiveViolation((prev) => {
-      if (!prev) return null;
-      const stillExists = scanResult.violations.some((v) => v.key === prev.key);
-      return stillExists ? prev : null;
-    });
+    // Drop the selection when its violation has been fixed.
+    setActiveViolation((previous) =>
+      previous && scanResult.violations.some(({ key }) => key === previous.key) ? previous : null,
+    );
   }, []);
 
   const runScan = useCallback(async () => {
     if (!isMountedRef.current) return;
+
     setIsScanning(true);
-    const scanResult = await runAxeScan(axeConfig);
-    handleScanResult(scanResult);
-  }, [axeConfig, handleScanResult]);
+    const scanResult = await runAxeScan(config);
+    if (scanResult) {
+      applyResult(scanResult);
+    } else if (isMountedRef.current) {
+      setIsScanning(false);
+    }
+  }, [config, applyResult]);
 
-  // Первоначальное сканирование после монтирования компонента
   useEffect(() => {
-    // Сбрасываем флаг при каждом монтировании (важно для React StrictMode)
     isMountedRef.current = true;
-
-    // Задержка 800мс даёт React (включая StrictMode double-mount) и браузеру
-    // завершить рендер перед первым сканированием.
-    const timer = setTimeout(() => {
-      runScan();
-    }, 800);
+    const timer = setTimeout(runScan, INITIAL_SCAN_DELAY_MS);
 
     return () => {
       clearTimeout(timer);
       isMountedRef.current = false;
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [runScan]);
 
-  // Подключение MutationObserver для автоматического ресканирования
   useEffect(() => {
-    if (!autoScan) return;
+    if (!autoScan) return undefined;
+    return createDomObserver(applyResult, config);
+  }, [autoScan, config, applyResult]);
 
-    return createDomObserver(handleScanResult, axeConfig);
-  }, [autoScan]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const totalIssues = (result?.counts.error ?? 0) + (result?.counts.warning ?? 0);
-  const errorCount = result?.counts.error ?? 0;
-  const warningCount = result?.counts.warning ?? 0;
-
-  // Определяем цвет кнопки-переключателя на основе наличия ошибок
-  const toggleColor =
-    errorCount > 0 ? COLORS.badgeError : warningCount > 0 ? COLORS.badgeWarning : COLORS.btnPrimary;
+  const totalIssues = result ? result.counts.error + result.counts.warning : 0;
+  const toggleColor = getToggleColor(result);
 
   return createPortal(
     <>
-      {/* Слой подсветки */}
-      <HighlightLayer activeViolation={activeViolation} allViolations={result?.violations ?? []} />
+      <HighlightLayer activeViolation={activeViolation} />
 
-      {/* Панель с нарушениями */}
       {isOpen && (
         <Panel
           result={result}
@@ -169,18 +148,14 @@ export function RuA11yOverlay({
         />
       )}
 
-      {/* Кнопка-переключатель (FAB) */}
       <button
-        onClick={() => setIsOpen((v) => !v)}
+        type="button"
+        onClick={() => setIsOpen((open) => !open)}
         aria-expanded={isOpen}
-        aria-label={
-          isOpen
-            ? 'Закрыть отчёт по доступности'
-            : `Открыть отчёт по доступности${totalIssues > 0 ? `: ${totalIssues} нарушений` : ': нарушений нет'}`
-        }
+        aria-label={getToggleLabel(isOpen, totalIssues)}
         data-ru-a11y-overlay
         style={{
-          ...panelStyles.toggleButton,
+          ...toggleConfig,
           borderColor: totalIssues > 0 ? toggleColor : COLORS.panelBorder,
         }}
       >
@@ -190,18 +165,16 @@ export function RuA11yOverlay({
           <span aria-hidden="true" style={{ fontSize: '11px', opacity: 0.7 }}>
             ⟳
           </span>
-        ) : totalIssues > 0 ? (
-          <span
-            style={{
-              ...panelStyles.badge,
-              backgroundColor: toggleColor,
-              color: COLORS.badgeText,
-            }}
-            aria-hidden="true"
-          >
-            {totalIssues}
-          </span>
-        ) : null}
+        ) : (
+          totalIssues > 0 && (
+            <span
+              aria-hidden="true"
+              style={{ ...badgeBaseConfig, backgroundColor: toggleColor, color: COLORS.badgeText }}
+            >
+              {totalIssues}
+            </span>
+          )
+        )}
       </button>
     </>,
     document.body,

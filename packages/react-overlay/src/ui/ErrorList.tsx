@@ -1,7 +1,3 @@
-/**
- * ErrorList.tsx — список нарушений с группировкой по принципам WCAG
- */
-
 import { useMemo, useState } from 'react';
 import {
   emptyStateConfig,
@@ -15,7 +11,7 @@ import {
 } from './styles/errorConfig';
 import { COLORS } from './styles/tokens';
 import { ErrorItem } from './ErrorItem';
-import { WCAG_PRINCIPLES } from '../mapping/rulesMap';
+import { WCAG_PRINCIPLES } from 'ru-a11y-toolkit-core';
 import type { A11yViolationNode } from '../axeRunner';
 
 interface ErrorListProps {
@@ -33,6 +29,7 @@ const GROUP_LABELS: Record<GroupKey, string> = {
   other: 'Прочие нарушения',
 };
 
+/** Violations grouped by WCAG principle, each group collapsible. */
 export function ErrorList({ violations, activeViolation, onSelect }: ErrorListProps) {
   const [collapsedGroups, setCollapsedGroups] = useState<Set<GroupKey>>(new Set());
 
@@ -40,17 +37,15 @@ export function ErrorList({ violations, activeViolation, onSelect }: ErrorListPr
     const map = new Map<GroupKey, A11yViolationNode[]>();
     for (const group of GROUP_ORDER) map.set(group, []);
 
-    for (const v of violations) {
-      const principle = (v.meta.principle as GroupKey | undefined) ?? 'other';
-      const key: GroupKey = principle in GROUP_LABELS ? principle : 'other';
-      map.get(key)!.push(v);
+    for (const violation of violations) {
+      map.get(violation.meta.principle ?? 'other')?.push(violation);
     }
 
-    return GROUP_ORDER.filter((g) => (map.get(g)?.length ?? 0) > 0).map((g) => ({
-      key: g,
-      label: GROUP_LABELS[g],
-      items: map.get(g)!,
-    }));
+    return GROUP_ORDER.map((key) => ({
+      key,
+      label: GROUP_LABELS[key],
+      items: map.get(key) ?? [],
+    })).filter(({ items }) => items.length > 0);
   }, [violations]);
 
   if (violations.length === 0) {

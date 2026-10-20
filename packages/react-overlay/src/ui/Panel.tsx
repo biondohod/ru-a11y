@@ -1,8 +1,5 @@
-/**
- * Panel.tsx — основная панель оверлея с шапкой, списком ошибок и подвалом
- */
+/** Overlay panel: header with counters, the violation list and a footer. */
 
-import React, { useRef, useState, useCallback, useEffect } from 'react';
 import {
   panelConfig,
   panelHeaderConfig,
@@ -18,7 +15,8 @@ import {
 } from './styles/panelConfig';
 import { COLORS } from './styles/tokens';
 import { ErrorList } from './ErrorList';
-import type { ScanResult, A11yViolationNode } from '../axeRunner';
+import type { A11yViolationNode, ScanResult } from '../axeRunner';
+import { useDraggable } from './useDraggable';
 
 interface PanelProps {
   result: ScanResult | null;
@@ -27,47 +25,6 @@ interface PanelProps {
   activeViolation: A11yViolationNode | null;
   onSelectViolation: (v: A11yViolationNode | null) => void;
   onRescan: () => void;
-}
-
-/**
- * Хук для простого drag-and-drop панели.
- * Перетаскивание работает за шапку панели.
- */
-function useDraggable(initialOffset = { x: 0, y: 0 }) {
-  const [offset, setOffset] = useState(initialOffset);
-  const dragStart = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
-
-  const onMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      // Не начинаем drag при клике на кнопки внутри шапки
-      if ((e.target as HTMLElement).tagName === 'BUTTON') return;
-      e.preventDefault();
-      dragStart.current = { x: e.clientX, y: e.clientY, ox: offset.x, oy: offset.y };
-    },
-    [offset],
-  );
-
-  useEffect(() => {
-    const onMouseMove = (e: MouseEvent) => {
-      if (!dragStart.current) return;
-      const dx = e.clientX - dragStart.current.x;
-      const dy = e.clientY - dragStart.current.y;
-      setOffset({ x: dragStart.current.ox + dx, y: dragStart.current.oy + dy });
-    };
-
-    const onMouseUp = () => {
-      dragStart.current = null;
-    };
-
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
-    return () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
-    };
-  }, []);
-
-  return { offset, onMouseDown };
 }
 
 export function Panel({
@@ -113,6 +70,7 @@ export function Panel({
 
         <div style={panelHeaderActionsConfig}>
           <button
+            type="button"
             onClick={onRescan}
             disabled={isScanning}
             aria-label="Запустить проверку доступности заново"
@@ -122,6 +80,7 @@ export function Panel({
             {isScanning ? '⟳' : '↺'}
           </button>
           <button
+            type="button"
             onClick={onClose}
             aria-label="Закрыть панель проверки доступности"
             style={iconButtonConfig}

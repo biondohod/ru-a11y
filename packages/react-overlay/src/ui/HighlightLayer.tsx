@@ -1,6 +1,4 @@
-/**
- * HighlightLayer.tsx — подсветка проблемных элементов через CSS-анимацию
- */
+/** Scrolls to the selected violation and pulses an outline around the element. */
 
 import { useEffect, useRef } from 'react';
 import { COLORS } from './styles/tokens';
@@ -55,7 +53,7 @@ function findElement(violation: A11yViolationNode): Element | null {
       const el = document.querySelector(sel);
       if (el) return el;
     } catch {
-      // невалидный селектор — пропускаем
+      // invalid selector, try the next one
     }
   }
   return null;
@@ -92,7 +90,6 @@ export function scrollAndHighlight(violation: A11yViolationNode | null) {
 
 interface HighlightLayerProps {
   activeViolation: A11yViolationNode | null;
-  allViolations?: A11yViolationNode[];
 }
 
 export function HighlightLayer({ activeViolation }: HighlightLayerProps) {
