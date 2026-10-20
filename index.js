@@ -1,72 +1,42 @@
 'use strict';
 
 /**
- * ru-a11y-toolkit — umbrella-пакет
+ * ru-a11y-toolkit: umbrella package that re-exports every module of the toolkit.
  *
- * Реэкспортирует все готовые модули toolkit.
- *
- * Использование:
- *   const toolkit = require('ru-a11y-toolkit');
- *   // toolkit.eslint — ESLint-плагин
- *   // toolkit.overlay — React Overlay (только dev-режим)
+ * @example
+ * const { configs } = require('ru-a11y-toolkit');
+ * module.exports = [configs['gost-aa']];
  */
 
 const eslint = require('ru-a11y-toolkit-eslint');
 const core = require('ru-a11y-toolkit-core');
 
 /**
- * React Overlay — runtime-визуализатор нарушений доступности.
- * Загружается лениво: не падает при отсутствии React в окружении.
- * Для использования: import { RuA11yOverlay } from 'ru-a11y-toolkit-overlay'
+ * React modules are optional: they need React and a built `dist/`. A missing
+ * module resolves to an empty object, any other error is a real bug and is rethrown.
  */
-let overlay = {};
-try {
-  overlay = require('ru-a11y-toolkit-overlay');
-} catch {
-  // overlay недоступен (например, dist ещё не собран или нет React)
-}
-
-/**
- * Visually Impaired — режим повышенной читабельности для слабовидящих.
- * Загружается лениво: не падает при отсутствии React в окружении.
- * Для использования: import { useVisuallyImpaired } from 'ru-a11y-toolkit-visually-impaired'
- */
-let visuallyImpaired = {};
-try {
-  visuallyImpaired = require('ru-a11y-toolkit-visually-impaired');
-} catch {
-  // visuallyImpaired недоступен (например, dist ещё не собран или нет React)
+function requireOptional(moduleName) {
+  try {
+    return require(moduleName);
+  } catch (error) {
+    if (error && error.code === 'MODULE_NOT_FOUND') {
+      return {};
+    }
+    throw error;
+  }
 }
 
 module.exports = {
-  /** ESLint-плагин с правилами и конфигами */
+  /** ESLint plugin with rules and flat configs. */
   eslint,
-
-  /** Единый каталог правил, переводов и нормативных ссылок */
+  /** Shared rule catalog, Russian texts and normative references. */
   core,
-
-  /**
-   * React Overlay — runtime-визуализатор нарушений доступности.
-   * Используйте в dev-режиме: {process.env.NODE_ENV === 'development' && <toolkit.overlay.RuA11yOverlay />}
-   */
-  overlay,
-
-  /**
-   * Режим повышенной читабельности для слабовидящих.
-   * Используйте хук: const { toggle, isEnabled } = toolkit.visuallyImpaired.useVisuallyImpaired()
-   */
-  visuallyImpaired,
-
-  /**
-   * Конфиги для прямого использования в eslint.config.js (Flat Config):
-   *   const { configs } = require('ru-a11y-toolkit');
-   *   module.exports = [configs.recommended];
-   */
+  /** Development overlay: `<toolkit.overlay.RuA11yOverlay />`. */
+  overlay: requireOptional('ru-a11y-toolkit-overlay'),
+  /** Visually impaired mode: `toolkit.visuallyImpaired.useVisuallyImpaired()`. */
+  visuallyImpaired: requireOptional('ru-a11y-toolkit-visually-impaired'),
+  /** Shortcut to the ESLint flat configs. */
   configs: eslint.configs,
-
-  /**
-   * Все правила плагина:
-   *   const { rules } = require('ru-a11y-toolkit');
-   */
+  /** Shortcut to the ESLint rules. */
   rules: eslint.rules,
 };
