@@ -1,14 +1,7 @@
-# Зависимости
 node_modules/
-
-# Сборка
 dist/
 build/
-
-# Логи и отладка
+coverage/
+documents/
+package-lock.json
 *.log
-
-# Окружение
-.env
-.env.*
-

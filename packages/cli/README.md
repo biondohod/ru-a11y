@@ -115,23 +115,23 @@ ru-a11y-cli --version
 
 ### Опции CLI
 
-| Флаг | Тип | По умолчанию | Описание |
-| --- | --- | --- | --- |
-| `--urls-file <path>` | `string` | — | Файл со списком URL (по одному на строку). Пустые строки и строки, начинающиеся с `#`, игнорируются. |
-| `--standard <level>` | `gost-a \| gost-aa \| gost-aaa` | `gost-aa` | Уровень строгости и базовый набор WCAG-тегов для `axe-core`. |
-| `--wcag-tags <tags>` | `csv` | зависит от `--standard` | Явно задает теги `runOnly` для `axe-core` (например, `wcag2a,wcag2aa,wcag21aa`). |
-| `--format <type>` | `console \| json \| html` | `console` | Формат итогового отчета. |
-| `--output <dir>` | `string` | `ru-a11y-reports` | Директория сохранения файла отчета для `json`/`html`. |
-| `--max-issues <n>` | `number` | `Infinity` | Порог нарушений для завершения с кодом `1`. |
-| `--timeout <ms>` | `number` | `30000` | Таймаут проверки одной страницы. |
-| `--concurrency <n>` | `number` | `2` | Число одновременных проверок URL (минимум `1`). |
-| `--include <filters>` | `csv` | — | Оставляет только нарушения, где токен найден в `ruRuleCode`, `axeRuleId`, `principle` или `severity`. |
-| `--exclude <filters>` | `csv` | — | Исключает нарушения по тем же полям. |
-| `--disable-rules <ids>` | `csv` | — | Отключает указанные правила `axe-core` для runtime-проверки. |
-| `--with-eslint` | `boolean` | `false` | Добавляет статический аудит ESLint в общий отчет. |
-| `--eslint-targets <globs>` | `csv` | `src/**/*.{js,jsx,ts,tsx}` | Паттерны файлов для ESLint. |
-| `--eslint-config <path>` | `string` | — | Явный путь к конфигурации ESLint. |
-| `--project-root <path>` | `string` | текущая директория | Корень проекта для запуска ESLint. |
+| Флаг                       | Тип                             | По умолчанию               | Описание                                                                                              |
+| -------------------------- | ------------------------------- | -------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `--urls-file <path>`       | `string`                        | —                          | Файл со списком URL (по одному на строку). Пустые строки и строки, начинающиеся с `#`, игнорируются.  |
+| `--standard <level>`       | `gost-a \| gost-aa \| gost-aaa` | `gost-aa`                  | Уровень строгости и базовый набор WCAG-тегов для `axe-core`.                                          |
+| `--wcag-tags <tags>`       | `csv`                           | зависит от `--standard`    | Явно задает теги `runOnly` для `axe-core` (например, `wcag2a,wcag2aa,wcag21aa`).                      |
+| `--format <type>`          | `console \| json \| html`       | `console`                  | Формат итогового отчета.                                                                              |
+| `--output <dir>`           | `string`                        | `ru-a11y-reports`          | Директория сохранения файла отчета для `json`/`html`.                                                 |
+| `--max-issues <n>`         | `number`                        | `Infinity`                 | Порог нарушений для завершения с кодом `1`.                                                           |
+| `--timeout <ms>`           | `number`                        | `30000`                    | Таймаут проверки одной страницы.                                                                      |
+| `--concurrency <n>`        | `number`                        | `2`                        | Число одновременных проверок URL (минимум `1`).                                                       |
+| `--include <filters>`      | `csv`                           | —                          | Оставляет только нарушения, где токен найден в `ruRuleCode`, `axeRuleId`, `principle` или `severity`. |
+| `--exclude <filters>`      | `csv`                           | —                          | Исключает нарушения по тем же полям.                                                                  |
+| `--disable-rules <ids>`    | `csv`                           | —                          | Отключает указанные правила `axe-core` для runtime-проверки.                                          |
+| `--with-eslint`            | `boolean`                       | `false`                    | Добавляет статический аудит ESLint в общий отчет.                                                     |
+| `--eslint-targets <globs>` | `csv`                           | `src/**/*.{js,jsx,ts,tsx}` | Паттерны файлов для ESLint.                                                                           |
+| `--eslint-config <path>`   | `string`                        | —                          | Явный путь к конфигурации ESLint.                                                                     |
+| `--project-root <path>`    | `string`                        | текущая директория         | Корень проекта для запуска ESLint.                                                                    |
 
 ---
 
@@ -224,10 +224,10 @@ ru-a11y-cli https://example.com --with-eslint --project-root ../ru-a11y-playgrou
 
 ## Коды выхода
 
-| Код | Когда возвращается |
-| --- | --- |
-| `0` | Нарушений нет или их число не превышает `--max-issues`. |
-| `1` | Общее число нарушений больше порога `--max-issues`. |
+| Код | Когда возвращается                                                                                             |
+| --- | -------------------------------------------------------------------------------------------------------------- |
+| `0` | Нарушений нет или их число не превышает `--max-issues`.                                                        |
+| `1` | Общее число нарушений больше порога `--max-issues`.                                                            |
 | `2` | Ошибка CLI, ошибка парсинга аргументов или инфраструктурная ошибка проверки (например, страница не открылась). |
 
 ---
@@ -281,11 +281,11 @@ ru-a11y-cli --urls-file ./urls.txt --format json --output ./artifacts/a11y --max
 
 `ru-a11y-toolkit` эффективнее всего в связке трех инструментов:
 
-| Инструмент | Когда работает | Что покрывает |
-| --- | --- | --- |
-| [`ru-a11y-toolkit-eslint`](https://www.npmjs.com/package/ru-a11y-toolkit-eslint) | во время разработки | проблемы в JSX/TSX и статике кода |
-| [`ru-a11y-toolkit-overlay`](https://www.npmjs.com/package/ru-a11y-toolkit-overlay) | dev-режим в браузере | проблемы реального DOM и визуальные подсказки |
-| `ru-a11y-toolkit-cli` | CI/CD и регресс-аудит | готовые страницы и централизованный отчет |
+| Инструмент                                                                         | Когда работает        | Что покрывает                                 |
+| ---------------------------------------------------------------------------------- | --------------------- | --------------------------------------------- |
+| [`ru-a11y-toolkit-eslint`](https://www.npmjs.com/package/ru-a11y-toolkit-eslint)   | во время разработки   | проблемы в JSX/TSX и статике кода             |
+| [`ru-a11y-toolkit-overlay`](https://www.npmjs.com/package/ru-a11y-toolkit-overlay) | dev-режим в браузере  | проблемы реального DOM и визуальные подсказки |
+| `ru-a11y-toolkit-cli`                                                              | CI/CD и регресс-аудит | готовые страницы и централизованный отчет     |
 
 ---
 

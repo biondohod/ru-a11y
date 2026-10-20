@@ -1,4 +1,4 @@
-import axe from 'axe-core';
+import type axe from 'axe-core';
 import { getRuleMeta } from './mapping/rulesMap';
 import type { A11yViolationNode, AxePreset } from './axeRunner';
 
@@ -200,7 +200,13 @@ const customRules: CustomRule[] = [
     check: (context) =>
       context.document.documentElement.hasAttribute('lang') || !hasScannableContent(context)
         ? []
-        : [{ ruleId: 'html-has-lang', element: context.document.documentElement, impact: 'serious' }],
+        : [
+            {
+              ruleId: 'html-has-lang',
+              element: context.document.documentElement,
+              impact: 'serious',
+            },
+          ],
   },
   {
     id: 'html-lang-valid',
@@ -210,7 +216,13 @@ const customRules: CustomRule[] = [
       if (!lang) return [];
       return /^[a-z]{2,3}(-[a-zA-Z0-9]{2,8})*$/.test(lang)
         ? []
-        : [{ ruleId: 'html-lang-valid', element: context.document.documentElement, impact: 'serious' }];
+        : [
+            {
+              ruleId: 'html-lang-valid',
+              element: context.document.documentElement,
+              impact: 'serious',
+            },
+          ];
     },
   },
   {
@@ -231,7 +243,13 @@ const customRules: CustomRule[] = [
     check: (context) =>
       context.document.title.trim() || !hasScannableContent(context)
         ? []
-        : [{ ruleId: 'document-title', element: context.document.documentElement, impact: 'serious' }],
+        : [
+            {
+              ruleId: 'document-title',
+              element: context.document.documentElement,
+              impact: 'serious',
+            },
+          ],
   },
   {
     id: 'page-has-heading-one',
@@ -354,7 +372,8 @@ const customRules: CustomRule[] = [
       return queryAll(context, 'iframe[title], frame[title]').flatMap((frame) => {
         const title = frame.getAttribute('title')?.trim();
         if (!title) return [];
-        if (seen.has(title)) return [{ ruleId: 'frame-title-unique', element: frame, impact: 'moderate' }];
+        if (seen.has(title))
+          return [{ ruleId: 'frame-title-unique', element: frame, impact: 'moderate' }];
         seen.set(title, frame);
         return [];
       });
@@ -374,7 +393,11 @@ const customRules: CustomRule[] = [
     id: 'blink',
     presets: ALL_PRESETS,
     check: (context) =>
-      queryAll(context, 'blink').map((element) => ({ ruleId: 'blink', element, impact: 'serious' })),
+      queryAll(context, 'blink').map((element) => ({
+        ruleId: 'blink',
+        element,
+        impact: 'serious',
+      })),
   },
   {
     id: 'marquee',
@@ -453,7 +476,9 @@ const customRules: CustomRule[] = [
     check: (context) =>
       queryAll(context, 'input, textarea, select').flatMap((control) => {
         const id = control.getAttribute('id');
-        const hasLabel = id ? Boolean(context.document.querySelector(`label[for="${escapeIdent(id)}"]`)) : false;
+        const hasLabel = id
+          ? Boolean(context.document.querySelector(`label[for="${escapeIdent(id)}"]`))
+          : false;
         const wrapped = Boolean(control.closest('label'));
         return !hasLabel &&
           !wrapped &&
@@ -497,7 +522,10 @@ const customRules: CustomRule[] = [
     id: 'nested-interactive',
     presets: ALL_PRESETS,
     check: (context) =>
-      queryAll(context, 'a, button, input, select, textarea, [role="button"], [role="link"]').flatMap((element) =>
+      queryAll(
+        context,
+        'a, button, input, select, textarea, [role="button"], [role="link"]',
+      ).flatMap((element) =>
         Array.from(element.children).some((child) => isInteractive(child))
           ? [{ ruleId: 'nested-interactive', element, impact: 'serious' }]
           : [],
@@ -521,7 +549,13 @@ const customRules: CustomRule[] = [
       const mains = queryAll(context, 'main, [role="main"]');
       return mains.length === 1 || !hasScannableContent(context)
         ? []
-        : [{ ruleId: 'landmark-one-main', element: mains[1] ?? context.document.body, impact: 'moderate' }];
+        : [
+            {
+              ruleId: 'landmark-one-main',
+              element: mains[1] ?? context.document.body,
+              impact: 'moderate',
+            },
+          ];
     },
   },
   {
@@ -541,15 +575,17 @@ const customRules: CustomRule[] = [
     presets: STRICT_PRESETS,
     check: (context) => {
       const seen = new Set<string>();
-      return queryAll(context, 'nav, aside, section[aria-label], [role="navigation"], [role="complementary"]').flatMap(
-        (landmark) => {
-          const key = `${landmark.getAttribute('role') ?? getElementName(landmark)}:${getAccessibleName(landmark)}`;
-          if (!getAccessibleName(landmark)) return [];
-          if (seen.has(key)) return [{ ruleId: 'landmark-unique', element: landmark, impact: 'minor' }];
-          seen.add(key);
-          return [];
-        },
-      );
+      return queryAll(
+        context,
+        'nav, aside, section[aria-label], [role="navigation"], [role="complementary"]',
+      ).flatMap((landmark) => {
+        const key = `${landmark.getAttribute('role') ?? getElementName(landmark)}:${getAccessibleName(landmark)}`;
+        if (!getAccessibleName(landmark)) return [];
+        if (seen.has(key))
+          return [{ ruleId: 'landmark-unique', element: landmark, impact: 'minor' }];
+        seen.add(key);
+        return [];
+      });
     },
   },
   {
@@ -657,7 +693,8 @@ const customRules: CustomRule[] = [
     check: (context) =>
       queryAll(context, 'p').flatMap((paragraph) => {
         const style = paragraph.getAttribute('style') ?? '';
-        return /font-size\s*:\s*(2[4-9]|[3-9]\d)px/i.test(style) || /font-weight\s*:\s*(bold|[7-9]00)/i.test(style)
+        return /font-size\s*:\s*(2[4-9]|[3-9]\d)px/i.test(style) ||
+          /font-weight\s*:\s*(bold|[7-9]00)/i.test(style)
           ? [{ ruleId: 'p-as-heading', element: paragraph, impact: 'minor' }]
           : [];
       }),
@@ -666,7 +703,10 @@ const customRules: CustomRule[] = [
     id: 'target-size',
     presets: STRICT_PRESETS,
     check: (context) =>
-      queryAll(context, 'a[href], button, input, select, textarea, [role="button"], [role="link"]').flatMap((element) => {
+      queryAll(
+        context,
+        'a[href], button, input, select, textarea, [role="button"], [role="link"]',
+      ).flatMap((element) => {
         const rect = element.getBoundingClientRect();
         if (rect.width === 0 || rect.height === 0) return [];
         return rect.width < 24 || rect.height < 24

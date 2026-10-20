@@ -14,13 +14,13 @@
 
 ## Состав toolkit
 
-| Пакет | Кратко |
-| --- | --- |
-| [`ru-a11y-toolkit-eslint`](https://www.npmjs.com/package/ru-a11y-toolkit-eslint) | Статический lint-доступности с русскими сообщениями и пресетами ГОСТ/№102. |
-| [`ru-a11y-toolkit-core`](https://www.npmjs.com/package/ru-a11y-toolkit-core) | Единый каталог правил, переводов, алиасов axe/ESLint и нормативных ссылок. |
-| [`ru-a11y-toolkit-overlay`](https://www.npmjs.com/package/ru-a11y-toolkit-overlay) | Runtime-панель в браузере для визуализации нарушений в dev-режиме. |
-| [`ru-a11y-toolkit-cli`](https://www.npmjs.com/package/ru-a11y-toolkit-cli) | CLI-аудит готовых URL (Puppeteer + axe-core) с отчетами `console/json/html`. |
-| [`ru-a11y-toolkit-visually-impaired`](https://www.npmjs.com/package/ru-a11y-toolkit-visually-impaired) | Режим повышенной читабельности для конечных пользователей сайта. |
+| Пакет                                                                                                  | Кратко                                                                       |
+| ------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| [`ru-a11y-toolkit-eslint`](https://www.npmjs.com/package/ru-a11y-toolkit-eslint)                       | Статический lint-доступности с русскими сообщениями и пресетами ГОСТ/№102.   |
+| [`ru-a11y-toolkit-core`](https://www.npmjs.com/package/ru-a11y-toolkit-core)                           | Единый каталог правил, переводов, алиасов axe/ESLint и нормативных ссылок.   |
+| [`ru-a11y-toolkit-overlay`](https://www.npmjs.com/package/ru-a11y-toolkit-overlay)                     | Runtime-панель в браузере для визуализации нарушений в dev-режиме.           |
+| [`ru-a11y-toolkit-cli`](https://www.npmjs.com/package/ru-a11y-toolkit-cli)                             | CLI-аудит готовых URL (Puppeteer + axe-core) с отчетами `console/json/html`. |
+| [`ru-a11y-toolkit-visually-impaired`](https://www.npmjs.com/package/ru-a11y-toolkit-visually-impaired) | Режим повышенной читабельности для конечных пользователей сайта.             |
 
 ---
 
@@ -28,12 +28,12 @@
 
 В этой версии правила сведены в общий `ru-a11y-toolkit-core`, чтобы CLI, overlay и ESLint показывали одинаковые русские названия, рекомендации и ссылки на ГОСТ/Постановление №102.
 
-| Направление | Результат |
-| --- | --- |
-| Общий каталог правил | 115 правил и нормативных метаданных |
-| Собственные ESLint-правила | 10 правил: 7 базовых + `require-main-landmark`, `require-h1`, `no-autoplay-media` |
-| Overlay runtime-проверки | 44 дополнительные DOM-проверки поверх axe-core |
-| Уточнённые связки правил | Таблицы, заголовки, язык, skip-link, landmark, медиа, ARIA/focus, формы и масштабирование |
+| Направление                | Результат                                                                                 |
+| -------------------------- | ----------------------------------------------------------------------------------------- |
+| Общий каталог правил       | 115 правил и нормативных метаданных                                                       |
+| Собственные ESLint-правила | 10 правил: 7 базовых + `require-main-landmark`, `require-h1`, `no-autoplay-media`         |
+| Overlay runtime-проверки   | 44 дополнительные DOM-проверки поверх axe-core                                            |
+| Уточнённые связки правил   | Таблицы, заголовки, язык, skip-link, landmark, медиа, ARIA/focus, формы и масштабирование |
 
 Что важно для отчётности: часть проверок пересекается с WCAG/axe-core, но в ГОСТ Р 52872-2019 и Постановлении №102 требования часто формулируются прикладнее. Например, проверка заголовков разбита на `<title>`, наличие `<h1>`, порядок уровней и пустые заголовки; таблицы разделены на таблицы данных, `scope`/`caption` и запрет layout-таблиц; skip-link проверяется не только на наличие, но и на существующую DOM-цель.
 
@@ -92,7 +92,9 @@ React-overlay показывает runtime-нарушения прямо пов�
 ```tsx
 import { RuA11yOverlay } from 'ru-a11y-toolkit-overlay';
 
-{process.env.NODE_ENV === 'development' && <RuA11yOverlay />}
+{
+  process.env.NODE_ENV === 'development' && <RuA11yOverlay />;
+}
 ```
 
 Что ожидать:

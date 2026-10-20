@@ -1,20 +1,25 @@
+# Dependencies
 node_modules/
 .npm-cache/
 .npm-pack-cache-*/
-.idea/
-.vscode/
-**/build/
-**/dist/
 
-# Логи
+# Build output
+**/dist/
+**/build/
+coverage/
+
+# Reports produced by the CLI
+ru-a11y-reports/
+
+# Logs and debug artifacts
 *.log
 npm-debug.log*
-
-# Временные файлы тестов и отладки
 out*.txt
 jest-*.txt
 debug-*.js
 
-# OS
+# Editors and OS
+.idea/
+.vscode/
 .DS_Store
 Thumbs.db

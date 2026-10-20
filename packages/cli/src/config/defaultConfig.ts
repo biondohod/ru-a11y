@@ -15,4 +15,3 @@ export const STANDARD_TO_WCAG_TAGS: Record<string, string[]> = {
   'gost-aa': ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'],
   'gost-aaa': ['wcag2a', 'wcag2aa', 'wcag2aaa', 'wcag21a', 'wcag21aa', 'wcag21aaa'],
 };
-

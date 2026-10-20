@@ -21,7 +21,9 @@ function resolveProjectConfig() {
     'eslint.ru-a11y.config.cjs',
   ];
 
-  return candidates.map((candidate) => join(process.cwd(), candidate)).find((candidate) => existsSync(candidate));
+  return candidates
+    .map((candidate) => join(process.cwd(), candidate))
+    .find((candidate) => existsSync(candidate));
 }
 
 function resolveEslintBin() {
@@ -60,7 +62,9 @@ function main() {
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Не удалось найти eslint.';
     process.stderr.write(`Ошибка: ${message}\n`);
-    process.stderr.write('Убедитесь, что `eslint` установлен в проекте как dependency или devDependency.\n');
+    process.stderr.write(
+      'Убедитесь, что `eslint` установлен в проекте как dependency или devDependency.\n',
+    );
     process.exit(2);
     return;
   }

@@ -25,13 +25,17 @@ async function readSourceLines(filePath: string): Promise<string[]> {
   }
 }
 
-async function loadEslintConstructor(): Promise<new (options?: Record<string, unknown>) => {
-  lintFiles: (patterns: string[]) => Promise<EslintFileResult[]>;
-}> {
-  // Dynamic import keeps eslint optional for runtime-only mode.
-  const eslintModule = (await import('eslint')) as { ESLint: new (options?: Record<string, unknown>) => {
+async function loadEslintConstructor(): Promise<
+  new (options?: Record<string, unknown>) => {
     lintFiles: (patterns: string[]) => Promise<EslintFileResult[]>;
-  } };
+  }
+> {
+  // Dynamic import keeps eslint optional for runtime-only mode.
+  const eslintModule = (await import('eslint')) as {
+    ESLint: new (options?: Record<string, unknown>) => {
+      lintFiles: (patterns: string[]) => Promise<EslintFileResult[]>;
+    };
+  };
 
   return eslintModule.ESLint;
 }
@@ -46,7 +50,8 @@ export async function runEslintAudit(options: CliOptions): Promise<PageAuditResu
 
   const ESLint = await loadEslintConstructor();
   const cwd = resolve(options.projectRoot || process.cwd());
-  const patterns = options.eslintTargets.length > 0 ? options.eslintTargets : ['src/**/*.{js,jsx,ts,tsx}'];
+  const patterns =
+    options.eslintTargets.length > 0 ? options.eslintTargets : ['src/**/*.{js,jsx,ts,tsx}'];
 
   const eslint = new ESLint({
     cwd,
@@ -56,26 +61,28 @@ export async function runEslintAudit(options: CliOptions): Promise<PageAuditResu
 
   const lintResults = await eslint.lintFiles(patterns);
 
-  return Promise.all(lintResults.map(async (fileResult) => {
-    const sourceLines = await readSourceLines(fileResult.filePath);
-    const issues = fileResult.messages
-      .filter((message) => message.ruleId && message.severity > 0)
-      .map((message) =>
-        mapEslintResultToGost({
-          filePath: fileResult.filePath,
-          line: message.line,
-          column: message.column,
-          ruleId: message.ruleId as string,
-          message: message.message,
-          severity: message.severity === 2 ? 2 : 1,
-          snippet: sourceLines[message.line - 1],
-        }),
-      );
+  return Promise.all(
+    lintResults.map(async (fileResult) => {
+      const sourceLines = await readSourceLines(fileResult.filePath);
+      const issues = fileResult.messages
+        .filter((message) => message.ruleId && message.severity > 0)
+        .map((message) =>
+          mapEslintResultToGost({
+            filePath: fileResult.filePath,
+            line: message.line,
+            column: message.column,
+            ruleId: message.ruleId as string,
+            message: message.message,
+            severity: message.severity === 2 ? 2 : 1,
+            snippet: sourceLines[message.line - 1],
+          }),
+        );
 
-    return {
-      url: `eslint://${fileResult.filePath}`,
-      issues,
-      durationMs: 0,
-    };
-  }));
+      return {
+        url: `eslint://${fileResult.filePath}`,
+        issues,
+        durationMs: 0,
+      };
+    }),
+  );
 }

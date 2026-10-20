@@ -1,22 +1,8 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "target": "ES2019",
-    "lib": ["ES2019", "DOM"],
-    "jsx": "react-jsx",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "strict": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
     "outDir": "dist",
     "types": ["jest", "@testing-library/jest-dom"]
   },
-  "include": ["src", "src/scss.d.ts", "tests"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src", "tests"]
 }

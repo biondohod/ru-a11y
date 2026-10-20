@@ -34,4 +34,3 @@ export async function writeJsonReport(result: AuditRunResult, outputDir: string)
   await writeFile(reportPath, payload, 'utf-8');
   return reportPath;
 }
-

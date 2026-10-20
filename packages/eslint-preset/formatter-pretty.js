@@ -68,11 +68,14 @@ function formatLabel(label) {
 
 function highlightSnippet(snippet) {
   return snippet
-    .replace(/(&lt;|<)\/?([A-Za-z][\w:-]*)/g, (match, bracket) =>
-      `${tone(bracket, ANSI.gray)}${tone(match.slice(bracket.length), ANSI.bold, ANSI.magenta)}`
+    .replace(
+      /(&lt;|<)\/?([A-Za-z][\w:-]*)/g,
+      (match, bracket) =>
+        `${tone(bracket, ANSI.gray)}${tone(match.slice(bracket.length), ANSI.bold, ANSI.magenta)}`,
     )
-    .replace(/([A-Za-z_:-]+)=(".*?"|'.*?'|\{.*?\})/g, (_, attr, value) =>
-      `${tone(attr, ANSI.blue)}=${tone(value, ANSI.yellow)}`
+    .replace(
+      /([A-Za-z_:-]+)=(".*?"|'.*?'|\{.*?\})/g,
+      (_, attr, value) => `${tone(attr, ANSI.blue)}=${tone(value, ANSI.yellow)}`,
     );
 }
 
@@ -106,7 +109,7 @@ function extractNormativeRefs(text) {
           ...normalizedRefText
             .split(/\s*;\s*/)
             .map((item) => normalizeWhitespace(item))
-            .filter(Boolean)
+            .filter(Boolean),
         );
       }
 
@@ -178,7 +181,7 @@ function formatMessage(result, message, index) {
   const lines = [];
 
   lines.push(
-    `    ${tone(`Нарушение #${index}`, ANSI.bold, ANSI.magenta)} ${formatSeverity(message.severity)} ${tone(message.ruleId || 'unknown-rule', ANSI.bold, ANSI.blue)}`
+    `    ${tone(`Нарушение #${index}`, ANSI.bold, ANSI.magenta)} ${formatSeverity(message.severity)} ${tone(message.ruleId || 'unknown-rule', ANSI.bold, ANSI.blue)}`,
   );
   lines.push(`      ${formatLabel('Где')}: ${tone(location, ANSI.yellow)}`);
   lines.push(`      ${formatLabel('Текст ошибки')}:`);
@@ -204,7 +207,9 @@ function formatMessage(result, message, index) {
 function isRuA11yRule(ruleId) {
   return (
     typeof ruleId === 'string' &&
-    (ruleId.startsWith('@ru-a11y/') || ruleId.startsWith('ru-a11y/') || ruleId.startsWith('jsx-a11y/'))
+    (ruleId.startsWith('@ru-a11y/') ||
+      ruleId.startsWith('ru-a11y/') ||
+      ruleId.startsWith('jsx-a11y/'))
   );
 }
 
@@ -214,7 +219,8 @@ function getDisplayResults(results) {
   return results.map((result) => {
     const messages = Array.isArray(result.messages)
       ? result.messages.filter(
-          (message) => message && message.severity > 0 && (showAllRules || isRuA11yRule(message.ruleId)),
+          (message) =>
+            message && message.severity > 0 && (showAllRules || isRuA11yRule(message.ruleId)),
         )
       : [];
 
@@ -231,14 +237,22 @@ module.exports = function ruA11yFormatter(results) {
   const displayResults = getDisplayResults(results);
   const errorCount = displayResults.reduce((sum, result) => sum + (result.errorCount || 0), 0);
   const warningCount = displayResults.reduce((sum, result) => sum + (result.warningCount || 0), 0);
-  const relevantResults = displayResults.filter((result) => Array.isArray(result.messages) && result.messages.length > 0);
+  const relevantResults = displayResults.filter(
+    (result) => Array.isArray(result.messages) && result.messages.length > 0,
+  );
 
   const lines = [];
   lines.push(tone('ru-a11y ESLint report', ANSI.bold, ANSI.white));
   lines.push(tone('═'.repeat(72), ANSI.gray));
-  lines.push(`${formatLabel('Файлов с нарушениями')}: ${tone(String(relevantResults.length), ANSI.bold)}`);
-  lines.push(`${formatLabel('Ошибок')}: ${tone(String(errorCount), ANSI.bold, errorCount > 0 ? ANSI.red : ANSI.green)}`);
-  lines.push(`${formatLabel('Предупреждений')}: ${tone(String(warningCount), ANSI.bold, warningCount > 0 ? ANSI.yellow : ANSI.green)}`);
+  lines.push(
+    `${formatLabel('Файлов с нарушениями')}: ${tone(String(relevantResults.length), ANSI.bold)}`,
+  );
+  lines.push(
+    `${formatLabel('Ошибок')}: ${tone(String(errorCount), ANSI.bold, errorCount > 0 ? ANSI.red : ANSI.green)}`,
+  );
+  lines.push(
+    `${formatLabel('Предупреждений')}: ${tone(String(warningCount), ANSI.bold, warningCount > 0 ? ANSI.yellow : ANSI.green)}`,
+  );
   lines.push('');
 
   relevantResults.forEach((result) => {

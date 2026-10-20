@@ -2,7 +2,7 @@
 
 'use strict';
 
- const { runCli } = require('../dist/cli.js');
+const { runCli } = require('../dist/cli.js');
 
 runCli(process.argv.slice(2))
   .then((code) => {

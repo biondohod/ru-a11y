@@ -46,14 +46,12 @@
   font-size: calc(1rem * var(--ru-a11y-vi-font-scale)) !important;
 }
 
-:root[data-ru-a11y-vi-font-size]
-  h1:not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *) {
+:root[data-ru-a11y-vi-font-size] h1:not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *) {
   font-size: calc(2rem * var(--ru-a11y-vi-font-scale)) !important;
   font-weight: 700 !important;
 }
 
-:root[data-ru-a11y-vi-font-size]
-  h2:not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *) {
+:root[data-ru-a11y-vi-font-size] h2:not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *) {
   font-size: calc(1.65rem * var(--ru-a11y-vi-font-scale)) !important;
   font-weight: 700 !important;
 }
@@ -65,10 +63,23 @@
 }
 
 :root[data-ru-a11y-vi-line-height]
-  :where(p, span, li, td, th, label, caption, blockquote, dd, dt, input, textarea, select, button, a):not(
-    [data-ru-a11y-vi-overlay],
-    [data-ru-a11y-vi-overlay] *
-  ) {
+  :where(
+    p,
+    span,
+    li,
+    td,
+    th,
+    label,
+    caption,
+    blockquote,
+    dd,
+    dt,
+    input,
+    textarea,
+    select,
+    button,
+    a
+  ):not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *) {
   line-height: var(--ru-a11y-vi-line-height) !important;
 }
 
@@ -77,8 +88,7 @@
   letter-spacing: var(--ru-a11y-vi-letter-spacing) !important;
 }
 
-:root[data-ru-a11y-vi-color-scheme]
-  a:not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *) {
+:root[data-ru-a11y-vi-color-scheme] a:not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *) {
   color: var(--ru-a11y-vi-link) !important;
   font-weight: 700 !important;
 }
@@ -108,12 +118,12 @@
   padding: 0.5rem 0.75rem !important;
 }
 
-:root[data-ru-a11y-vi-image-mode='grayscale']
+:root[data-ru-a11y-vi-image-mode="grayscale"]
   img:not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *) {
   filter: grayscale(100%) contrast(125%) !important;
 }
 
-:root[data-ru-a11y-vi-image-mode='hidden']
+:root[data-ru-a11y-vi-image-mode="hidden"]
   img:not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *) {
   display: none !important;
 }

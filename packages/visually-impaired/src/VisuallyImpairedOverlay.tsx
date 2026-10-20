@@ -188,7 +188,14 @@ export function VisuallyImpairedOverlay({
       aria-label="Панель версии для слабовидящих"
       data-ru-a11y-vi-overlay
     >
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '8px',
+        }}
+      >
         <h2 style={titleStyle}>Версия для слабовидящих</h2>
         <button
           type="button"
@@ -253,7 +260,9 @@ export function VisuallyImpairedOverlay({
       <div style={sectionStyle}>
         <span style={sectionTitleStyle}>Цвет</span>
         <div style={rowStyle}>
-          {(['default', 'white-black', 'black-white', 'blue-yellow', 'beige-brown'] as ColorScheme[]).map((value) => (
+          {(
+            ['default', 'white-black', 'black-white', 'blue-yellow', 'beige-brown'] as ColorScheme[]
+          ).map((value) => (
             <OptionButton
               key={value}
               value={value}

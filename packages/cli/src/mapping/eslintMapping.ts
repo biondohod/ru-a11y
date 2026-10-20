@@ -47,14 +47,22 @@ export function mapEslintResultToGost(input: EslintIssueInput): GostIssue {
       : `RU_ESLINT_${input.ruleId.toUpperCase().replace(/[^A-Z0-9]+/g, '_')}`,
     axeRuleId: mappedAxeRuleId ?? input.ruleId,
     title: mappedRule ? mappedRule.title : `Нарушение ESLint: ${input.ruleId}`,
-    description: mappedRule ? mappedRule.description : 'Нарушение обнаружено статическим анализатором ESLint.',
-    recommendation: mappedRule ? mappedRule.recommendation : 'Исправьте проблему согласно сообщению ESLint и правилам ГОСТ/WCAG.',
+    description: mappedRule
+      ? mappedRule.description
+      : 'Нарушение обнаружено статическим анализатором ESLint.',
+    recommendation: mappedRule
+      ? mappedRule.recommendation
+      : 'Исправьте проблему согласно сообщению ESLint и правилам ГОСТ/WCAG.',
     severity: severityFromEslint(input.severity),
     principle: mappedRule ? mappedRule.principle : principleFromRuleId(input.ruleId),
-    gostRefs: mappedRule ? mappedRule.gostRefs : ['ГОСТ Р 52872-2019 (по правилу ESLint требуется уточнение)'],
+    gostRefs: mappedRule
+      ? mappedRule.gostRefs
+      : ['ГОСТ Р 52872-2019 (по правилу ESLint требуется уточнение)'],
     post102Refs: mappedRule
       ? mappedRule.post102Refs
-      : ['Постановление Правительства РФ №102 от 07.02.2026 (по правилу ESLint требуется уточнение)'],
+      : [
+          'Постановление Правительства РФ №102 от 07.02.2026 (по правилу ESLint требуется уточнение)',
+        ],
     wcagRefs: mappedRule ? mappedRule.wcagRefs : [],
     sourceMessage: input.message,
     issueType: 'lint',

@@ -1,15 +1,6 @@
-import {
-  RU_A11Y_RULES,
-  getCanonicalRuleId,
-  getRuleMeta,
-  type RuA11yRuleMeta,
-} from './rulesMap';
+import { RU_A11Y_RULES, getCanonicalRuleId, getRuleMeta, type RuA11yRuleMeta } from './rulesMap';
 
-export type GostPrinciple =
-  | 'воспринимаемость'
-  | 'управляемость'
-  | 'понятность'
-  | 'надежность';
+export type GostPrinciple = 'воспринимаемость' | 'управляемость' | 'понятность' | 'надежность';
 
 export type GostSeverity = 'критичное' | 'существенное' | 'незначительное';
 
@@ -39,8 +30,7 @@ export const FALLBACK_GOST_RULE: GostRuleDefinition = {
   code: 'RU_GOST_GENERIC',
   axeRuleIds: [],
   title: 'Обнаружено нарушение доступности',
-  description:
-    'Правило не сопоставлено с внутренним каталогом ru-a11y. Требуется ручная проверка.',
+  description: 'Правило не сопоставлено с внутренним каталогом ru-a11y. Требуется ручная проверка.',
   recommendation:
     'Проверьте элемент, указанный в отчете, и исправьте нарушение согласно рекомендациям axe-core, ГОСТ и Постановления №102.',
   principle: 'надежность',
@@ -89,10 +79,7 @@ function normalizePost102Ref(ref?: string): string[] {
   }
 
   return [
-    ref.replace(
-      /^Постановление №102,/,
-      'Постановление Правительства РФ №102 от 07.02.2026,',
-    ),
+    ref.replace(/^Постановление №102,/, 'Постановление Правительства РФ №102 от 07.02.2026,'),
   ];
 }
 
@@ -111,9 +98,8 @@ export function toGostRuleDefinition(meta: RuA11yRuleMeta): GostRuleDefinition {
   };
 }
 
-export const GOST_RULES: GostRuleDefinition[] = Object.values(RU_A11Y_RULES).map(
-  toGostRuleDefinition,
-);
+export const GOST_RULES: GostRuleDefinition[] =
+  Object.values(RU_A11Y_RULES).map(toGostRuleDefinition);
 
 export function findGostRuleByAxeId(axeRuleId: string): GostRuleDefinition {
   const canonicalRuleId = getCanonicalRuleId(axeRuleId);

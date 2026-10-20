@@ -35,10 +35,13 @@ function normalizeAxeConfig(options: CliOptions): Record<string, unknown> {
   }
 
   if (options.disabledRules.length > 0) {
-    const rules = options.disabledRules.reduce<Record<string, { enabled: boolean }>>((acc, ruleId) => {
-      acc[ruleId] = { enabled: false };
-      return acc;
-    }, {});
+    const rules = options.disabledRules.reduce<Record<string, { enabled: boolean }>>(
+      (acc, ruleId) => {
+        acc[ruleId] = { enabled: false };
+        return acc;
+      },
+      {},
+    );
 
     config.rules = rules;
   }
@@ -46,7 +49,11 @@ function normalizeAxeConfig(options: CliOptions): Record<string, unknown> {
   return config;
 }
 
-async function runSingleUrl(browser: Browser, url: string, options: CliOptions): Promise<PageAuditResult> {
+async function runSingleUrl(
+  browser: Browser,
+  url: string,
+  options: CliOptions,
+): Promise<PageAuditResult> {
   const startedAt = Date.now();
   const page = await browser.newPage();
 
@@ -58,14 +65,19 @@ async function runSingleUrl(browser: Browser, url: string, options: CliOptions):
 
     const axeConfig = normalizeAxeConfig(options);
     const result = await page.evaluate(async (config: Record<string, unknown>) => {
-      const axeApi = (window as unknown as { axe: { run: (context: Document, options?: unknown) => Promise<AxeRunResponse> } }).axe;
+      const axeApi = (
+        window as unknown as {
+          axe: { run: (context: Document, options?: unknown) => Promise<AxeRunResponse> };
+        }
+      ).axe;
       return axeApi.run(document, config);
     }, axeConfig);
 
-    const groups: Array<{ items: AxeRunResponse['violations']; type: 'violation' | 'incomplete' }> = [
-      { items: result.violations, type: 'violation' },
-      { items: result.incomplete, type: 'incomplete' },
-    ];
+    const groups: Array<{ items: AxeRunResponse['violations']; type: 'violation' | 'incomplete' }> =
+      [
+        { items: result.violations, type: 'violation' },
+        { items: result.incomplete, type: 'incomplete' },
+      ];
 
     const issues: GostIssue[] = groups.flatMap(({ items, type }) =>
       items.flatMap((violation: AxeRunResponse['violations'][number]) => {
@@ -102,7 +114,8 @@ async function runSingleUrl(browser: Browser, url: string, options: CliOptions):
       durationMs: Date.now() - startedAt,
     };
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Неизвестная ошибка запуска проверки страницы.';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Неизвестная ошибка запуска проверки страницы.';
 
     return {
       url,
@@ -148,7 +161,11 @@ export async function runPuppeteerAudit(options: CliOptions): Promise<AuditRunRe
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
 
-    const pages = await runWithConcurrency(options.urls, (url) => runSingleUrl(browser as Browser, url, options), options.concurrency);
+    const pages = await runWithConcurrency(
+      options.urls,
+      (url) => runSingleUrl(browser as Browser, url, options),
+      options.concurrency,
+    );
 
     return {
       startedAt: startedAt.toISOString(),
@@ -162,5 +179,3 @@ export async function runPuppeteerAudit(options: CliOptions): Promise<AuditRunRe
     }
   }
 }
-
-

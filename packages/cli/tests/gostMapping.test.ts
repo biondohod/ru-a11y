@@ -33,4 +33,3 @@ describe('mapAxeResultToGost', () => {
     expect(issue.ruleSource).toBe('fallback');
   });
 });
-

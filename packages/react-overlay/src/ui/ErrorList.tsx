@@ -2,7 +2,7 @@
  * ErrorList.tsx — список нарушений с группировкой по принципам WCAG
  */
 
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   emptyStateConfig,
   emptyIconConfig,

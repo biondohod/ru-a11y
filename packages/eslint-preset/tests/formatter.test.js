@@ -1,6 +1,7 @@
 'use strict';
 
 const formatter = require('../formatter-pretty');
+// eslint-disable-next-line no-control-regex -- stripping ANSI escape codes is intentional
 const ANSI_PATTERN = /\u001B\[[0-9;]*m/g;
 
 describe('ru-a11y formatter', () => {
@@ -10,11 +11,7 @@ describe('ru-a11y formatter', () => {
         filePath: 'src/App.jsx',
         errorCount: 1,
         warningCount: 0,
-        source: [
-          'export function App() {',
-          '  return <img src="/hero.png" />;',
-          '}',
-        ].join('\n'),
+        source: ['export function App() {', '  return <img src="/hero.png" />;', '}'].join('\n'),
         messages: [
           {
             ruleId: '@ru-a11y/gost-a11y/jsx-a11y/alt-text',
@@ -66,7 +63,9 @@ describe('ru-a11y formatter', () => {
     expect(plainOutput).toContain('Отсутствует атрибут lang на элементе <html>.');
     expect(plainOutput).toContain('ГОСТ Р 52872-2019 §5.2.4, уровень A');
     expect(plainOutput).toContain('Постановление №102 п. а)');
-    expect(plainOutput).not.toContain('Текст ошибки:\n        Отсутствует атрибут lang на элементе <html> (ГОСТ Р 52872-2019 §5.2.4, уровень A).');
+    expect(plainOutput).not.toContain(
+      'Текст ошибки:\n        Отсутствует атрибут lang на элементе <html> (ГОСТ Р 52872-2019 §5.2.4, уровень A).',
+    );
   });
 
   test('печатает успешный отчёт без нарушений', () => {

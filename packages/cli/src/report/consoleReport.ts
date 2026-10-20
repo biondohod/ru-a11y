@@ -154,21 +154,23 @@ function formatIssue(issue: GostIssue, index: number): string[] {
   const lines: string[] = [];
 
   lines.push(
-    `    ${tone(`Нарушение #${index}`, ANSI.bold, ANSI.magenta)} ${formatSeverity(issue.severity)} ${tone(issue.title, ANSI.bold)}`
+    `    ${tone(`Нарушение #${index}`, ANSI.bold, ANSI.magenta)} ${formatSeverity(issue.severity)} ${tone(issue.title, ANSI.bold)}`,
   );
   lines.push(`      ${formatLabel('Где')}: ${tone(formatIssueLocation(issue), ANSI.yellow)}`);
   lines.push(
-    `      ${formatLabel('Правило')}: ${tone(issue.ruRuleCode, ANSI.bold, ANSI.blue)} ${tone('/', ANSI.gray)} ${tone(issue.axeRuleId, ANSI.blue)}`
+    `      ${formatLabel('Правило')}: ${tone(issue.ruRuleCode, ANSI.bold, ANSI.blue)} ${tone('/', ANSI.gray)} ${tone(issue.axeRuleId, ANSI.blue)}`,
   );
   lines.push(
-    `      ${formatLabel('Источник')}: ${tone(issue.origin, ANSI.green)} ${tone('•', ANSI.gray)} ${tone(issue.ruleSource, ANSI.green)}`
+    `      ${formatLabel('Источник')}: ${tone(issue.origin, ANSI.green)} ${tone('•', ANSI.gray)} ${tone(issue.ruleSource, ANSI.green)}`,
   );
   lines.push(`      ${formatLabel('Описание')}:`);
   lines.push(...indentBlock(formatInlineCode(issue.description), '        '));
   lines.push(`      ${formatLabel('Текст ошибки')}:`);
   lines.push(...indentBlock(formatInlineCode(issue.sourceMessage), '        '));
   lines.push(...formatSourceSnippet(issue));
-  lines.push(...formatReferenceSection('Нормативные требования', collectNormativeReferences(issue)));
+  lines.push(
+    ...formatReferenceSection('Нормативные требования', collectNormativeReferences(issue)),
+  );
   lines.push(`      ${formatLabel('Рекомендация по исправлению')}:`);
   lines.push(...indentBlock(formatInlineCode(issue.recommendation), '        '));
 
@@ -188,8 +190,12 @@ export function buildConsoleReport(result: AuditRunResult): string {
 
   lines.push(tone('ru-a11y CLI report', ANSI.bold, ANSI.white));
   lines.push(tone('═'.repeat(72), ANSI.gray));
-  lines.push(`${formatLabel('Проверено страниц')}: ${tone(String(result.scannedPages), ANSI.bold)}`);
-  lines.push(`${formatLabel('Найдено нарушений')}: ${tone(String(totalIssues), ANSI.bold, totalIssues > 0 ? ANSI.red : ANSI.green)}`);
+  lines.push(
+    `${formatLabel('Проверено страниц')}: ${tone(String(result.scannedPages), ANSI.bold)}`,
+  );
+  lines.push(
+    `${formatLabel('Найдено нарушений')}: ${tone(String(totalIssues), ANSI.bold, totalIssues > 0 ? ANSI.red : ANSI.green)}`,
+  );
   lines.push('');
 
   for (const page of result.pages) {
@@ -218,7 +224,7 @@ export function buildConsoleReport(result: AuditRunResult): string {
 
       lines.push('');
       lines.push(
-        `  ${tone(PRINCIPLE_LABELS[principleKey], ANSI.bold, ANSI.magenta)} ${tone(`(${principleIssues.length})`, ANSI.gray)}`
+        `  ${tone(PRINCIPLE_LABELS[principleKey], ANSI.bold, ANSI.magenta)} ${tone(`(${principleIssues.length})`, ANSI.gray)}`,
       );
 
       principleIssues.forEach((issue, index) => {

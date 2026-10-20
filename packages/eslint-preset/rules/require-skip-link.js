@@ -22,49 +22,6 @@ const VALID_SKIP_HREFS = new Set([
   '#основной-контент',
 ]);
 
-/**
- * Проверяет, является ли узел ссылкой пропуска навигации
- * @param {import('@typescript-eslint/types').TSESTree.JSXOpeningElement} node
- * @returns {boolean}
- */
-function isSkipLink(node) {
-  if (node.name.name !== 'a') return false;
-
-  const hrefAttr = node.attributes.find(
-    (attr) => attr.type === 'JSXAttribute' && attr.name && attr.name.name === 'href',
-  );
-
-  if (!hrefAttr || !hrefAttr.value) return false;
-
-  const hrefValue =
-    hrefAttr.value.type === 'Literal'
-      ? hrefAttr.value.value
-      : hrefAttr.value.type === 'JSXExpressionContainer' &&
-          hrefAttr.value.expression.type === 'Literal'
-        ? hrefAttr.value.expression.value
-        : null;
-
-  return hrefValue && VALID_SKIP_HREFS.has(hrefValue);
-}
-
-/**
- * Рекурсивно проверяет наличие skip-link в дереве JSX
- * @param {import('@typescript-eslint/types').TSESTree.JSXElement} jsxElement
- * @returns {boolean}
- */
-function hasSkipLink(jsxElement) {
-  if (!jsxElement || !jsxElement.children) return false;
-
-  for (const child of jsxElement.children) {
-    if (child.type === 'JSXElement') {
-      if (isSkipLink(child.openingElement)) return true;
-      // Проверяем только первые 5 уровней вложенности
-      if (hasSkipLink(child)) return true;
-    }
-  }
-  return false;
-}
-
 module.exports = {
   meta: {
     type: 'problem',
@@ -99,12 +56,6 @@ module.exports = {
   create(context) {
     const options = context.options[0] || {};
     const allowedHrefs = new Set([...VALID_SKIP_HREFS, ...(options.allowedHrefs || [])]);
-
-    /**
-     * Отслеживаем, нашли ли мы skip-link в корневых JSX-элементах
-     * (body, main компоненты и т.п.)
-     */
-    let foundSkipLink = false;
 
     return {
       // Проверяем JSX-элементы, которые могут быть корнем документа
@@ -149,13 +100,7 @@ module.exports = {
           });
 
           if (!hasSkip) {
-            foundSkipLink = false;
-            context.report({
-              node,
-              messageId: 'missing',
-            });
-          } else {
-            foundSkipLink = true;
+            context.report({ node, messageId: 'missing' });
           }
         }
       },

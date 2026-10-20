@@ -26,9 +26,7 @@ describe('core rules registry', () => {
 
   it('keeps eslint to axe-compatible ids in core', () => {
     expect(ESLINT_RULE_TO_AXE_ID['@ru-a11y/gost-a11y/require-skip-link']).toBe('bypass');
-    expect(ESLINT_RULE_TO_AXE_ID['@ru-a11y/gost-a11y/no-table-layout']).toBe(
-      'no-table-layout',
-    );
+    expect(ESLINT_RULE_TO_AXE_ID['@ru-a11y/gost-a11y/no-table-layout']).toBe('no-table-layout');
   });
 
   it('builds GOST rule definitions from the same metadata', () => {
@@ -36,8 +34,6 @@ describe('core rules registry', () => {
 
     expect(rule.code).toBe('RU_GOST_TABLE_LAYOUT');
     expect(rule.gostRefs).toContain('ГОСТ Р 52872-2019, §5.1.5');
-    expect(rule.post102Refs).toContain(
-      'Постановление Правительства РФ №102 от 07.02.2026, п. а)',
-    );
+    expect(rule.post102Refs).toContain('Постановление Правительства РФ №102 от 07.02.2026, п. а)');
   });
 });

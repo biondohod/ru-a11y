@@ -131,7 +131,9 @@ export function buildHtmlReport(result: AuditRunResult): string {
     0,
   );
   const pagesWithErrors = result.pages.filter((page) => Boolean(page.error)).length;
-  const pagesWithIssues = result.pages.filter((page) => !page.error && page.issues.length > 0).length;
+  const pagesWithIssues = result.pages.filter(
+    (page) => !page.error && page.issues.length > 0,
+  ).length;
   const cleanPages = result.pages.filter((page) => !page.error && page.issues.length === 0).length;
 
   const navItems = result.pages

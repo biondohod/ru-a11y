@@ -52,12 +52,22 @@ describe('buildJunitReport', () => {
 
     expect(xml).toContain('<?xml version="1.0" encoding="UTF-8"?>');
     expect(xml).toContain('<testsuites name="ru-a11y CLI" tests="3" failures="1" errors="1"');
-    expect(xml).toContain('<testsuite name="https://example.com" tests="1" failures="1" errors="0"');
-    expect(xml).toContain('<failure message="Ссылка без доступного названия" type="RU_AXE_LINK_NAME">');
+    expect(xml).toContain(
+      '<testsuite name="https://example.com" tests="1" failures="1" errors="0"',
+    );
+    expect(xml).toContain(
+      '<failure message="Ссылка без доступного названия" type="RU_AXE_LINK_NAME">',
+    );
     expect(xml).toContain('Recommendation: Добавьте aria-label');
-    expect(xml).toContain('<testsuite name="https://example.com/clean" tests="1" failures="0" errors="0"');
+    expect(xml).toContain(
+      '<testsuite name="https://example.com/clean" tests="1" failures="0" errors="0"',
+    );
     expect(xml).toContain('No accessibility issues');
-    expect(xml).toContain('<testsuite name="https://example.com/broken" tests="1" failures="0" errors="1"');
-    expect(xml).toContain('<error message="Navigation timeout" type="audit-error">Navigation timeout</error>');
+    expect(xml).toContain(
+      '<testsuite name="https://example.com/broken" tests="1" failures="0" errors="1"',
+    );
+    expect(xml).toContain(
+      '<error message="Navigation timeout" type="audit-error">Navigation timeout</error>',
+    );
   });
 });

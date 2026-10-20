@@ -8,7 +8,14 @@ import { buildJsonReport, writeJsonReport } from './report/jsonReport';
 import { writeJunitReport } from './report/junitReport';
 import { runEslintAudit } from './runner/eslintRunner';
 import { runPuppeteerAudit } from './runner/puppeteerRunner';
-import type { AuditRunResult, CliOptions, CliOutputFormat, GostIssue, OutputFormat, StandardLevel } from './types';
+import type {
+  AuditRunResult,
+  CliOptions,
+  CliOutputFormat,
+  GostIssue,
+  OutputFormat,
+  StandardLevel,
+} from './types';
 
 const VERSION = '2.0.3';
 
@@ -93,7 +100,9 @@ function splitList(value: string | undefined): string[] {
 function parseInteger(value: string, flagName: string): number {
   const parsed = Number.parseInt(value, 10);
   if (Number.isNaN(parsed) || parsed < 0) {
-    throw new Error(`Некорректное значение для ${flagName}: ${value}. Ожидается неотрицательное целое число.`);
+    throw new Error(
+      `Некорректное значение для ${flagName}: ${value}. Ожидается неотрицательное целое число.`,
+    );
   }
 
   return parsed;
@@ -315,7 +324,9 @@ export async function parseCliArgs(argv: string[]): Promise<CliOptions> {
   options.urls = Array.from(new Set(options.urls));
 
   if (!options.help && !options.version && options.urls.length === 0 && !options.withEslint) {
-    throw new Error('Не указан ни один URL. Передайте URL аргументами или используйте --urls-file.');
+    throw new Error(
+      'Не указан ни один URL. Передайте URL аргументами или используйте --urls-file.',
+    );
   }
 
   if (options.urls.length > 0) {
@@ -339,7 +350,11 @@ function matchByToken(issue: GostIssue, token: string): boolean {
     .some((part) => part.includes(normalizedToken));
 }
 
-export function applyIssueFilters(result: AuditRunResult, include: string[], exclude: string[]): AuditRunResult {
+export function applyIssueFilters(
+  result: AuditRunResult,
+  include: string[],
+  exclude: string[],
+): AuditRunResult {
   const pages = result.pages.map((page) => {
     const withInclude = include.length
       ? page.issues.filter((issue) => include.some((token) => matchByToken(issue, token)))
@@ -390,7 +405,11 @@ function getFormats(format: CliOutputFormat): OutputFormat[] {
   return format === 'all' ? ALL_FORMATS : [format];
 }
 
-function getFormatOutputDir(outputDir: string, format: OutputFormat, isMultiFormat: boolean): string {
+function getFormatOutputDir(
+  outputDir: string,
+  format: OutputFormat,
+  isMultiFormat: boolean,
+): string {
   return isMultiFormat && format !== 'console' ? join(outputDir, format) : outputDir;
 }
 
@@ -410,14 +429,15 @@ export async function runCli(argv: string[]): Promise<number> {
     return 0;
   }
 
-  const runtimeAudit = options.urls.length > 0
-    ? await runPuppeteerAudit(options)
-    : {
-        startedAt: new Date().toISOString(),
-        finishedAt: new Date().toISOString(),
-        scannedPages: 0,
-        pages: [],
-      };
+  const runtimeAudit =
+    options.urls.length > 0
+      ? await runPuppeteerAudit(options)
+      : {
+          startedAt: new Date().toISOString(),
+          finishedAt: new Date().toISOString(),
+          scannedPages: 0,
+          pages: [],
+        };
 
   const eslintPages = await runEslintAudit(options);
 
@@ -436,17 +456,26 @@ export async function runCli(argv: string[]): Promise<number> {
     printReport(filtered, format);
 
     if (format === 'json') {
-      const filePath = await writeJsonReport(filtered, getFormatOutputDir(options.outputDir, format, isMultiFormat));
+      const filePath = await writeJsonReport(
+        filtered,
+        getFormatOutputDir(options.outputDir, format, isMultiFormat),
+      );
       process.stdout.write(`JSON-отчет сохранен: ${filePath}\n`);
     }
 
     if (format === 'html') {
-      const filePath = await writeHtmlReport(filtered, getFormatOutputDir(options.outputDir, format, isMultiFormat));
+      const filePath = await writeHtmlReport(
+        filtered,
+        getFormatOutputDir(options.outputDir, format, isMultiFormat),
+      );
       process.stdout.write(`HTML-отчет сохранен: ${filePath}\n`);
     }
 
     if (format === 'junit') {
-      const filePath = await writeJunitReport(filtered, getFormatOutputDir(options.outputDir, format, isMultiFormat));
+      const filePath = await writeJunitReport(
+        filtered,
+        getFormatOutputDir(options.outputDir, format, isMultiFormat),
+      );
       process.stdout.write(`JUnit XML-отчет сохранен: ${filePath}\n`);
     }
   }

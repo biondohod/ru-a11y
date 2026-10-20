@@ -1939,8 +1939,7 @@ export const RU_A11Y_CUSTOM_RULES: Record<string, RuA11yRuleMeta> = {
     description:
       'Неинтерактивный элемент получил обработчики мыши или клавиатуры, из-за чего его поведение ' +
       'не соответствует семантике и ожиданиям вспомогательных технологий.',
-    fix:
-      'Замените элемент на <button> или <a>, либо добавьте корректную роль и полную клавиатурную поддержку.',
+    fix: 'Замените элемент на <button> или <a>, либо добавьте корректную роль и полную клавиатурную поддержку.',
     wcag: 'WCAG 2.1, 4.1.2 Name, Role, Value',
     principle: 'robust',
     severity: 'warning',
@@ -2011,9 +2010,7 @@ export function getCanonicalRuleId(ruleId: string): string {
     return ruleId;
   }
 
-  const matchedRule = Object.values(RU_A11Y_RULES).find((rule) =>
-    rule.aliases?.includes(ruleId),
-  );
+  const matchedRule = Object.values(RU_A11Y_RULES).find((rule) => rule.aliases?.includes(ruleId));
 
   return matchedRule?.id ?? ruleId;
 }

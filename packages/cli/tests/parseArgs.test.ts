@@ -56,4 +56,3 @@ describe('parseCliArgs', () => {
     expect(options.format).toBe('junit');
   });
 });
-

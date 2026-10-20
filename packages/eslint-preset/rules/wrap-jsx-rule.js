@@ -63,7 +63,7 @@ function wrapJsxRule(originalRule, ruMessages) {
         },
       });
       return wrapped;
-    } catch (_) {
+    } catch {
       return context;
     }
   }

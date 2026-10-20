@@ -7,10 +7,7 @@ export {
   type RuA11yRuleMeta,
 } from './rulesMap';
 
-export {
-  ESLINT_RULE_TO_AXE_ID,
-  getAxeRuleIdForEslintRule,
-} from './eslintRuleMap';
+export { ESLINT_RULE_TO_AXE_ID, getAxeRuleIdForEslintRule } from './eslintRuleMap';
 
 export {
   FALLBACK_GOST_RULE,

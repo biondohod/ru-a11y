@@ -89,7 +89,13 @@ describe('RuA11yOverlay', () => {
       () =>
         new Promise((resolve) =>
           setTimeout(
-            () => resolve({ violations: [], passes: [], incomplete: [], inapplicable: [] } as any),
+            () =>
+              resolve({
+                violations: [],
+                passes: [],
+                incomplete: [],
+                inapplicable: [],
+              } as unknown as axe.AxeResults),
             2000,
           ),
         ),

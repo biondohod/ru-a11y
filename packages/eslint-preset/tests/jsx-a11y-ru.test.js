@@ -13,7 +13,6 @@
 const { RuleTester, Linter } = require('eslint');
 const plugin = require('../index.js');
 const wrapJsxRule = require('../rules/wrap-jsx-rule');
-const messages = require('../messages');
 
 // -----------------------------------------------------------------------
 // Вспомогательные данные

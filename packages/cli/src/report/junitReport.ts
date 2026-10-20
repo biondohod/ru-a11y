@@ -102,7 +102,9 @@ function buildPageSuite(page: PageAuditResult): { xml: string; stats: JunitSuite
     };
   }
 
-  const testcases = page.issues.map((issue, index) => buildTestCaseXml(page, issue, index)).join('\n');
+  const testcases = page.issues
+    .map((issue, index) => buildTestCaseXml(page, issue, index))
+    .join('\n');
 
   return {
     xml: `  <testsuite name="${escapeXml(suiteName)}" tests="${page.issues.length}" failures="${page.issues.length}" errors="0" time="${(

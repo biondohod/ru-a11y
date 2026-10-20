@@ -42,4 +42,3 @@ describe('buildJsonReport', () => {
     expect(report.pages[0].issues[0].axeRuleId).toBe('document-title');
   });
 });
-

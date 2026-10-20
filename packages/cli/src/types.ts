@@ -5,11 +5,7 @@ export type CliOutputFormat = OutputFormat | 'all';
 
 export type GostSeverity = 'критичное' | 'существенное' | 'незначительное';
 
-export type GostPrinciple =
-  | 'воспринимаемость'
-  | 'управляемость'
-  | 'понятность'
-  | 'надежность';
+export type GostPrinciple = 'воспринимаемость' | 'управляемость' | 'понятность' | 'надежность';
 
 export type AxeIssueType = 'violation' | 'incomplete' | 'inapplicable' | 'pass';
 
@@ -17,7 +13,12 @@ export type AuditIssueType = AxeIssueType | 'lint';
 
 export type IssueOrigin = 'runtime-axe' | 'static-eslint';
 
-export type RuleSource = 'core-rules-map' | 'cli-gost-map' | 'overlay-rules-map' | 'eslint-rules' | 'fallback';
+export type RuleSource =
+  | 'core-rules-map'
+  | 'cli-gost-map'
+  | 'overlay-rules-map'
+  | 'eslint-rules'
+  | 'fallback';
 
 export interface IssueSourceLocation {
   filePath?: string;

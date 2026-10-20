@@ -108,8 +108,9 @@ describe('buildHtmlReport', () => {
     const html = buildHtmlReport(report);
 
     expect(html).toContain('&lt;script&gt;alert(1)&lt;/script&gt;');
-    expect(html).toContain('&lt;script type=&quot;text/javascript&quot;&gt;alert(1)&lt;/script&gt;');
+    expect(html).toContain(
+      '&lt;script type=&quot;text/javascript&quot;&gt;alert(1)&lt;/script&gt;',
+    );
     expect(html).toContain('&lt;b&gt;raw message&lt;/b&gt;');
   });
 });
-

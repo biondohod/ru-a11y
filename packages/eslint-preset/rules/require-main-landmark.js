@@ -15,10 +15,7 @@ function getLiteralAttribute(node, name) {
 
   if (!attr || !attr.value) return null;
   if (attr.value.type === 'Literal') return String(attr.value.value);
-  if (
-    attr.value.type === 'JSXExpressionContainer' &&
-    attr.value.expression.type === 'Literal'
-  ) {
+  if (attr.value.type === 'JSXExpressionContainer' && attr.value.expression.type === 'Literal') {
     return String(attr.value.expression.value);
   }
 
@@ -27,8 +24,10 @@ function getLiteralAttribute(node, name) {
 
 function shouldCheckFile(context) {
   const filename = context.filename || (context.getFilename && context.getFilename()) || '';
-  return /(?:^|[\\/])(app|pages?|routes?|layouts?)(?:[\\/]|$)/i.test(filename) ||
-    /(?:app|page|layout|route|screen|view|index)\.[jt]sx?$/i.test(filename);
+  return (
+    /(?:^|[\\/])(app|pages?|routes?|layouts?)(?:[\\/]|$)/i.test(filename) ||
+    /(?:app|page|layout|route|screen|view|index)\.[jt]sx?$/i.test(filename)
+  );
 }
 
 module.exports = {

@@ -191,7 +191,10 @@ function normalizeSettings(value: unknown): VisuallyImpairedSettings {
   const input = value as Partial<VisuallyImpairedSettings>;
 
   return {
-    enabled: typeof input.enabled === 'boolean' ? input.enabled : DEFAULT_VISUALLY_IMPAIRED_SETTINGS.enabled,
+    enabled:
+      typeof input.enabled === 'boolean'
+        ? input.enabled
+        : DEFAULT_VISUALLY_IMPAIRED_SETTINGS.enabled,
     fontSize: isOneOf(input.fontSize, ['normal', 'large', 'xlarge'])
       ? input.fontSize
       : DEFAULT_VISUALLY_IMPAIRED_SETTINGS.fontSize,
@@ -201,7 +204,13 @@ function normalizeSettings(value: unknown): VisuallyImpairedSettings {
     letterSpacing: isOneOf(input.letterSpacing, ['normal', 'wide'])
       ? input.letterSpacing
       : DEFAULT_VISUALLY_IMPAIRED_SETTINGS.letterSpacing,
-    colorScheme: isOneOf(input.colorScheme, ['default', 'white-black', 'black-white', 'blue-yellow', 'beige-brown'])
+    colorScheme: isOneOf(input.colorScheme, [
+      'default',
+      'white-black',
+      'black-white',
+      'blue-yellow',
+      'beige-brown',
+    ])
       ? input.colorScheme
       : DEFAULT_VISUALLY_IMPAIRED_SETTINGS.colorScheme,
     underlineLinks:
@@ -288,7 +297,8 @@ function syncImageAltCaptions(): void {
       const altText = image.getAttribute('alt')?.trim();
       const nextSibling = image.nextElementSibling;
       const existingCaption =
-        nextSibling instanceof HTMLElement && nextSibling.classList.contains(IMAGE_ALT_CAPTION_CLASS)
+        nextSibling instanceof HTMLElement &&
+        nextSibling.classList.contains(IMAGE_ALT_CAPTION_CLASS)
           ? nextSibling
           : null;
 
@@ -367,10 +377,16 @@ function applySettings(next: VisuallyImpairedSettings): void {
   const effectiveLineHeight =
     next.enabled && next.lineHeight === 'normal' ? FULL_MODE_FALLBACKS.lineHeight : next.lineHeight;
   const effectiveColorScheme =
-    next.enabled && next.colorScheme === 'default' ? FULL_MODE_FALLBACKS.colorScheme : next.colorScheme;
-  const effectiveUnderlineLinks = next.enabled ? FULL_MODE_FALLBACKS.underlineLinks : next.underlineLinks;
+    next.enabled && next.colorScheme === 'default'
+      ? FULL_MODE_FALLBACKS.colorScheme
+      : next.colorScheme;
+  const effectiveUnderlineLinks = next.enabled
+    ? FULL_MODE_FALLBACKS.underlineLinks
+    : next.underlineLinks;
   const effectiveShowImageAlt = next.enabled ? FULL_MODE_FALLBACKS.showImageAlt : next.showImageAlt;
-  const effectiveReducedMotion = next.enabled ? FULL_MODE_FALLBACKS.reducedMotion : next.reducedMotion;
+  const effectiveReducedMotion = next.enabled
+    ? FULL_MODE_FALLBACKS.reducedMotion
+    : next.reducedMotion;
   const effectiveStrongFocus = next.enabled ? FULL_MODE_FALLBACKS.strongFocus : next.strongFocus;
 
   root.classList.toggle(VISUALLY_IMPAIRED_CLASS, next.enabled);
@@ -390,7 +406,10 @@ function applySettings(next: VisuallyImpairedSettings): void {
     'data-ru-a11y-vi-color-scheme',
     effectiveColorScheme === 'default' ? null : effectiveColorScheme,
   );
-  setRootAttribute('data-ru-a11y-vi-image-mode', next.imageMode === 'normal' ? null : next.imageMode);
+  setRootAttribute(
+    'data-ru-a11y-vi-image-mode',
+    next.imageMode === 'normal' ? null : next.imageMode,
+  );
   setRootAttribute('data-ru-a11y-vi-underline-links', effectiveUnderlineLinks);
   setRootAttribute('data-ru-a11y-vi-highlight-links', next.highlightLinks);
   setRootAttribute('data-ru-a11y-vi-reduced-motion', effectiveReducedMotion);
@@ -472,7 +491,10 @@ export function useVisuallyImpairedMode(): Pick<
 
   const enable = useCallback(() => setSettings({ enabled: true }), [setSettings]);
   const disable = useCallback(() => setSettings({ enabled: false }), [setSettings]);
-  const toggle = useCallback(() => setSettings({ enabled: !current.enabled }), [current.enabled, setSettings]);
+  const toggle = useCallback(
+    () => setSettings({ enabled: !current.enabled }),
+    [current.enabled, setSettings],
+  );
 
   return { isEnabled: current.enabled, enable, disable, toggle };
 }
@@ -481,7 +503,10 @@ export function useFontSize(): UseFontSizeReturn {
   const { settings: current, setSettings } = useVisuallyImpairedSettings();
   const levels: FontSizeLevel[] = ['normal', 'large', 'xlarge'];
 
-  const setFontSize = useCallback((fontSize: FontSizeLevel) => setSettings({ fontSize }), [setSettings]);
+  const setFontSize = useCallback(
+    (fontSize: FontSizeLevel) => setSettings({ fontSize }),
+    [setSettings],
+  );
   const increaseFontSize = useCallback(() => {
     const index = levels.indexOf(current.fontSize);
     setFontSize(levels[Math.min(index + 1, levels.length - 1)]);
@@ -496,7 +521,10 @@ export function useFontSize(): UseFontSizeReturn {
 
 export function useColorScheme(): UseColorSchemeReturn {
   const { settings: current, setSettings } = useVisuallyImpairedSettings();
-  const setColorScheme = useCallback((colorScheme: ColorScheme) => setSettings({ colorScheme }), [setSettings]);
+  const setColorScheme = useCallback(
+    (colorScheme: ColorScheme) => setSettings({ colorScheme }),
+    [setSettings],
+  );
 
   return { colorScheme: current.colorScheme, setColorScheme };
 }
@@ -532,8 +560,14 @@ export function useLinkSettings(): UseLinkSettingsReturn {
 
 export function useImageSettings(): UseImageSettingsReturn {
   const { settings: current, setSettings } = useVisuallyImpairedSettings();
-  const setImageMode = useCallback((imageMode: ImageMode) => setSettings({ imageMode }), [setSettings]);
-  const setShowImageAlt = useCallback((showImageAlt: boolean) => setSettings({ showImageAlt }), [setSettings]);
+  const setImageMode = useCallback(
+    (imageMode: ImageMode) => setSettings({ imageMode }),
+    [setSettings],
+  );
+  const setShowImageAlt = useCallback(
+    (showImageAlt: boolean) => setSettings({ showImageAlt }),
+    [setSettings],
+  );
   const toggleShowImageAlt = useCallback(
     () => setShowImageAlt(!current.showImageAlt),
     [current.showImageAlt, setShowImageAlt],
@@ -568,7 +602,10 @@ export function useMotionSettings(): UseMotionSettingsReturn {
 
 export function useFocusSettings(): UseFocusSettingsReturn {
   const { settings: current, setSettings } = useVisuallyImpairedSettings();
-  const setStrongFocus = useCallback((strongFocus: boolean) => setSettings({ strongFocus }), [setSettings]);
+  const setStrongFocus = useCallback(
+    (strongFocus: boolean) => setSettings({ strongFocus }),
+    [setSettings],
+  );
   const toggleStrongFocus = useCallback(
     () => setStrongFocus(!current.strongFocus),
     [current.strongFocus, setStrongFocus],
@@ -586,7 +623,10 @@ export function useVisuallyImpaired(): UseVisuallyImpairedReturn {
 
   const enable = useCallback(() => setSettings({ enabled: true }), [setSettings]);
   const disable = useCallback(() => setSettings({ enabled: false }), [setSettings]);
-  const toggle = useCallback(() => setSettings({ enabled: !current.enabled }), [current.enabled, setSettings]);
+  const toggle = useCallback(
+    () => setSettings({ enabled: !current.enabled }),
+    [current.enabled, setSettings],
+  );
 
   return {
     settings: current,
