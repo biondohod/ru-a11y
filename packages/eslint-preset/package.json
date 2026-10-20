@@ -72,6 +72,6 @@
     "url": "https://github.com/biondohod/ru-a11y/issues"
   },
   "engines": {
-    "node": ">=18.18"
+    "node": ">=22"
   }
 }

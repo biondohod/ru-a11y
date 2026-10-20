@@ -32,7 +32,7 @@ ru-a11y CLI report
 npm install --save-dev ru-a11y-toolkit-cli
 ```
 
-Node.js 20+. Puppeteer downloads Chromium on install; set `PUPPETEER_SKIP_DOWNLOAD=true` if
+Node.js 22+. Puppeteer downloads Chromium on install; set `PUPPETEER_SKIP_DOWNLOAD=true` if
 you provide your own browser.
 
 ## Usage

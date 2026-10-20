@@ -8,7 +8,7 @@ npm run build   # builds core first; other packages import its dist/
 npm run check   # format check, lint, typecheck and tests — the same steps CI runs
 ```
 
-Node.js 20+ is required. Set `PUPPETEER_SKIP_DOWNLOAD=true` before `npm install` if you do not
+Node.js 22+ is required. Set `PUPPETEER_SKIP_DOWNLOAD=true` before `npm install` if you do not
 need to run the CLI against real pages.
 
 ## Where things go

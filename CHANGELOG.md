@@ -44,4 +44,4 @@ independently; the format follows [Keep a Changelog](https://keepachangelog.com/
 ### Tooling
 
 - ESLint (typescript-eslint, react-hooks) and a shared `tsconfig.base.json` for the monorepo.
-- GitHub Actions: format, lint, build, typecheck and tests on Node 20, 22 and 24.
+- GitHub Actions: format, lint, build, typecheck and tests on Node 22 and 24.

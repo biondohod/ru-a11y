@@ -85,7 +85,7 @@ import 'ru-a11y-toolkit-visually-impaired/styles/visually-impaired.css';
 
 ## Разработка
 
-Нужен Node.js 20+.
+Нужен Node.js 22+.
 
 ```bash
 git clone https://github.com/biondohod/ru-a11y.git

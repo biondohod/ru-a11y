@@ -120,7 +120,7 @@ reader behaviour still need manual testing.
 
 ## Development
 
-Requires Node.js 20+.
+Requires Node.js 22+.
 
 ```bash
 git clone https://github.com/biondohod/ru-a11y.git
