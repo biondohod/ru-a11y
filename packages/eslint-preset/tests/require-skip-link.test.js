@@ -146,5 +146,3 @@ ruleTester.run('require-skip-link', rule, {
     },
   ],
 });
-
-console.log('✅ Тесты require-skip-link прошли успешно');

@@ -26,7 +26,7 @@ export const collapsedStyle: CSSProperties = {
   ...panelStyle,
   width: 'auto',
   padding: 0,
-  overflow: 'visible',
+  overflowY: 'visible',
 };
 
 export const titleStyle: CSSProperties = {

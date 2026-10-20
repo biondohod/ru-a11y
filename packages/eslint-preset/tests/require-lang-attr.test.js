@@ -69,5 +69,3 @@ ruleTester.run('require-lang-attr', rule, {
     },
   ],
 });
-
-console.log('✅ Тесты require-lang-attr прошли успешно');

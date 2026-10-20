@@ -201,5 +201,3 @@ ruleTester.run('table-requires-th', rule, {
     },
   ],
 });
-
-console.log('✅ Тесты table-requires-th прошли успешно');

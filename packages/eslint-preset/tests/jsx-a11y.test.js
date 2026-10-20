@@ -309,5 +309,3 @@ ruleTester.run('@ru-a11y/gost-a11y/jsx-a11y/aria-role', plugin.rules['jsx-a11y/a
   valid: [{ code: `function C(){return <div role="button">OK</div>;}` }],
   invalid: [{ code: `function C(){return <div role="superman">Bad</div>;}`, errors: 1 }],
 });
-
-console.log('✅ Тесты jsx-a11y-ru прошли успешно');
