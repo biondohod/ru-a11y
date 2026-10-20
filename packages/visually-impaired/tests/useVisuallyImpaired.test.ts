@@ -7,7 +7,7 @@ import {
   useFontSize,
   useLinkSettings,
   useVisuallyImpaired,
-} from '../src/useVisuallyImpaired';
+} from '../src';
 
 describe('useVisuallyImpaired', () => {
   beforeEach(() => {
