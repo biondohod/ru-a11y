@@ -1,6 +1,6 @@
 {
   "name": "ru-a11y-toolkit-eslint",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "description": "ESLint plugin for web accessibility aligned with GOST R 52872-2019 and Russian Government Decree No. 102, with Russian messages. Part of ru-a11y-toolkit.",
   "main": "index.js",
   "bin": {
@@ -37,7 +37,7 @@
   "license": "MIT",
   "dependencies": {
     "eslint-plugin-jsx-a11y": "^6.0.0",
-    "ru-a11y-toolkit-core": "1.4.0"
+    "ru-a11y-toolkit-core": "1.5.0"
   },
   "peerDependencies": {
     "eslint": "^8.57.0 || ^9.0.0 || ^10.0.0"

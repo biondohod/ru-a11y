@@ -1,6 +1,6 @@
 {
   "name": "ru-a11y-toolkit-core",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Shared rule catalog of ru-a11y-toolkit: Russian texts and GOST R 52872-2019 / Decree No. 102 / WCAG references for every accessibility rule.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",

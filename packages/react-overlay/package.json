@@ -1,6 +1,6 @@
 {
   "name": "ru-a11y-toolkit-overlay",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "React development overlay that shows accessibility violations in the browser, with Russian descriptions and GOST / Decree No. 102 references. Part of ru-a11y-toolkit.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -56,7 +56,7 @@
   },
   "dependencies": {
     "axe-core": "^4.10.0",
-    "ru-a11y-toolkit-core": "1.4.0"
+    "ru-a11y-toolkit-core": "1.5.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.4.0",

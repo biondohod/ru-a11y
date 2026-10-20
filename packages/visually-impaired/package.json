@@ -1,6 +1,6 @@
 {
   "name": "ru-a11y-toolkit-visually-impaired",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Visually impaired mode for React sites: font size, contrast schemes, spacing, link and focus settings. Part of ru-a11y-toolkit.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
