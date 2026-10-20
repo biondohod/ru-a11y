@@ -1,4 +1,8 @@
-export const ESLINT_RULE_TO_AXE_ID: Record<string, string> = {
+/**
+ * ESLint rule id -> axe-core rule id. Lets the CLI merge static (ESLint) and
+ * runtime (axe) findings under the same rule metadata.
+ */
+export const ESLINT_RULE_TO_AXE_ID: Readonly<Record<string, string>> = {
   'no-table-layout': 'no-table-layout',
   'table-requires-th': 'table-requires-th',
   'click-events-have-key-events': 'click-events-have-key-events',
@@ -55,8 +59,16 @@ export const ESLINT_RULE_TO_AXE_ID: Record<string, string> = {
   '@ru-a11y/gost-a11y/jsx-a11y/autocomplete-valid': 'autocomplete-valid',
 };
 
-export function getAxeRuleIdForEslintRule(ruleId: string): string | undefined {
-  const legacyRuleId = ruleId.replace(/^ru-a11y\//, '@ru-a11y/gost-a11y/');
+const FLAT_CONFIG_PREFIX = /^ru-a11y\//;
+const PLUGIN_PREFIX = '@ru-a11y/gost-a11y/';
 
-  return ESLINT_RULE_TO_AXE_ID[ruleId] ?? ESLINT_RULE_TO_AXE_ID[legacyRuleId];
+/**
+ * Accepts both the legacy `@ru-a11y/gost-a11y/*` ids and the short `ru-a11y/*`
+ * ids used by flat config.
+ */
+export function getAxeRuleIdForEslintRule(ruleId: string): string | undefined {
+  return (
+    ESLINT_RULE_TO_AXE_ID[ruleId] ??
+    ESLINT_RULE_TO_AXE_ID[ruleId.replace(FLAT_CONFIG_PREFIX, PLUGIN_PREFIX)]
+  );
 }

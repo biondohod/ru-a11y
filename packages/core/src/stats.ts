@@ -1,3 +1,7 @@
+/**
+ * Coverage numbers shown in the documentation. Each package has a test that
+ * fails when its real rule count drifts from these values.
+ */
 export const RU_A11Y_TOOLKIT_STATS = {
   canonicalRules: 115,
   runtimeAndLintChecks: 184,

@@ -1,11 +1,16 @@
+export type { RuA11yRuleMeta, RuleSeverity, WcagPrinciple } from './types';
+
 export {
   RU_A11Y_CUSTOM_RULES,
   RU_A11Y_RULES,
   WCAG_PRINCIPLES,
   getCanonicalRuleId,
   getRuleMeta,
-  type RuA11yRuleMeta,
-} from './rulesMap';
+  isKnownRule,
+  type AxeRuleId,
+  type CustomRuleId,
+  type RuleId,
+} from './registry';
 
 export { ESLINT_RULE_TO_AXE_ID, getAxeRuleIdForEslintRule } from './eslintRuleMap';
 
@@ -17,6 +22,7 @@ export {
   toGostPrinciple,
   toGostRuleDefinition,
   toGostSeverity,
+  toRuleCode,
   type GostPrinciple,
   type GostRuleDefinition,
   type GostSeverity,

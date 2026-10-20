@@ -1,9 +1,13 @@
-import { RU_A11Y_RULES, getCanonicalRuleId, getRuleMeta, type RuA11yRuleMeta } from './rulesMap';
+import { RU_A11Y_RULES, getRuleMeta, isKnownRule, getCanonicalRuleId } from './registry';
+import type { RuA11yRuleMeta, RuleSeverity, WcagPrinciple } from './types';
 
+/** WCAG principle names as GOST R 52872-2019 spells them. */
 export type GostPrinciple = 'воспринимаемость' | 'управляемость' | 'понятность' | 'надежность';
 
+/** Severity scale used in reports for Russian regulators. */
 export type GostSeverity = 'критичное' | 'существенное' | 'незначительное';
 
+/** Rule shape consumed by reports: everything needed to describe a violation. */
 export interface GostRuleDefinition {
   code: string;
   axeRuleIds: string[];
@@ -17,7 +21,20 @@ export interface GostRuleDefinition {
   wcagRefs: string[];
 }
 
-const LEGACY_CODE_BY_RULE_ID: Record<string, string> = {
+const GOST_PRINCIPLE_BY_WCAG: Readonly<Record<WcagPrinciple, GostPrinciple>> = {
+  perceivable: 'воспринимаемость',
+  operable: 'управляемость',
+  understandable: 'понятность',
+  robust: 'надежность',
+};
+
+const GOST_SEVERITY_BY_RULE_SEVERITY: Readonly<Record<RuleSeverity, GostSeverity>> = {
+  error: 'существенное',
+  warning: 'незначительное',
+};
+
+/** Stable report codes kept for rules that existed before codes were generated. */
+const LEGACY_CODE_BY_RULE_ID: Readonly<Record<string, string>> = {
   bypass: 'RU_GOST_NAV_SKIP_LINK',
   'color-contrast': 'RU_GOST_TEXT_CONTRAST',
   'color-contrast-enhanced': 'RU_GOST_TEXT_CONTRAST',
@@ -25,6 +42,8 @@ const LEGACY_CODE_BY_RULE_ID: Record<string, string> = {
   'no-table-layout': 'RU_GOST_TABLE_LAYOUT',
   'table-requires-th': 'RU_GOST_TABLE_HEADERS',
 };
+
+const POST_102_FULL_TITLE = 'Постановление Правительства РФ №102 от 07.02.2026';
 
 export const FALLBACK_GOST_RULE: GostRuleDefinition = {
   code: 'RU_GOST_GENERIC',
@@ -36,51 +55,36 @@ export const FALLBACK_GOST_RULE: GostRuleDefinition = {
   principle: 'надежность',
   defaultSeverity: 'незначительное',
   gostRefs: ['ГОСТ Р 52872-2019 (требуется ручная классификация)'],
-  post102Refs: ['Постановление №102 от 07.02.2026 (требуется ручная классификация)'],
+  post102Refs: [`${POST_102_FULL_TITLE} (требуется ручная классификация)`],
   wcagRefs: [],
 };
 
+/** Turns any rule id into an upper snake case report code, e.g. `image-alt` -> `RU_AXE_IMAGE_ALT`. */
+export function toRuleCode(prefix: string, ruleId: string): string {
+  return `${prefix}_${ruleId.toUpperCase().replace(/[^A-Z0-9]+/g, '_')}`;
+}
+
 export function normalizeRuleCode(ruleId: string): string {
-  const legacyCode = LEGACY_CODE_BY_RULE_ID[ruleId];
-  if (legacyCode) {
-    return legacyCode;
-  }
-
-  return `RU_AXE_${ruleId.toUpperCase().replace(/[^A-Z0-9]+/g, '_')}`;
+  return LEGACY_CODE_BY_RULE_ID[ruleId] ?? toRuleCode('RU_AXE', ruleId);
 }
 
-export function toGostPrinciple(principle?: RuA11yRuleMeta['principle']): GostPrinciple {
-  if (principle === 'perceivable') {
-    return 'воспринимаемость';
-  }
-
-  if (principle === 'operable') {
-    return 'управляемость';
-  }
-
-  if (principle === 'understandable') {
-    return 'понятность';
-  }
-
-  return 'надежность';
+export function toGostPrinciple(principle?: WcagPrinciple): GostPrinciple {
+  return principle ? GOST_PRINCIPLE_BY_WCAG[principle] : 'надежность';
 }
 
-export function toGostSeverity(level?: RuA11yRuleMeta['severity']): GostSeverity {
-  return level === 'error' ? 'существенное' : 'незначительное';
+export function toGostSeverity(severity?: RuleSeverity): GostSeverity {
+  return severity ? GOST_SEVERITY_BY_RULE_SEVERITY[severity] : 'незначительное';
 }
 
 function toRefs(ref?: string): string[] {
   return ref ? [ref] : [];
 }
 
-function normalizePost102Ref(ref?: string): string[] {
-  if (!ref) {
-    return [];
-  }
-
-  return [
-    ref.replace(/^Постановление №102,/, 'Постановление Правительства РФ №102 от 07.02.2026,'),
-  ];
+/** Expands the short "Постановление №102," prefix used in the catalog to the full title. */
+function toPost102Refs(ref?: string): string[] {
+  return toRefs(ref).map((value) =>
+    value.replace(/^Постановление №102,/, `${POST_102_FULL_TITLE},`),
+  );
 }
 
 export function toGostRuleDefinition(meta: RuA11yRuleMeta): GostRuleDefinition {
@@ -93,20 +97,19 @@ export function toGostRuleDefinition(meta: RuA11yRuleMeta): GostRuleDefinition {
     principle: toGostPrinciple(meta.principle),
     defaultSeverity: toGostSeverity(meta.severity),
     gostRefs: toRefs(meta.gost),
-    post102Refs: normalizePost102Ref(meta.post102),
+    post102Refs: toPost102Refs(meta.post102),
     wcagRefs: toRefs(meta.wcag),
   };
 }
 
-export const GOST_RULES: GostRuleDefinition[] =
+export const GOST_RULES: readonly GostRuleDefinition[] =
   Object.values(RU_A11Y_RULES).map(toGostRuleDefinition);
 
+/** Looks a rule up by axe id or alias; unknown rules resolve to {@link FALLBACK_GOST_RULE}. */
 export function findGostRuleByAxeId(axeRuleId: string): GostRuleDefinition {
   const canonicalRuleId = getCanonicalRuleId(axeRuleId);
 
-  if (!(canonicalRuleId in RU_A11Y_RULES)) {
-    return FALLBACK_GOST_RULE;
-  }
-
-  return toGostRuleDefinition(getRuleMeta(canonicalRuleId));
+  return isKnownRule(canonicalRuleId)
+    ? toGostRuleDefinition(getRuleMeta(canonicalRuleId))
+    : FALLBACK_GOST_RULE;
 }

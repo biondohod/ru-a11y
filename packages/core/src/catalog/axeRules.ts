@@ -1,59 +1,14 @@
-/**
- * Маппинг правил axe-core на русскоязычные описания с привязкой к нормативным документам:
- *   - ГОСТ Р 52872-2019 «Интернет-ресурсы и другая информация, представленная в электронно-цифровой форме»
- *   - Постановление Правительства РФ №102 от 07.02.2026
- *   - WCAG 2.1 (Web Content Accessibility Guidelines)
- *
- * Данный файл является общим источником истины для всего ru-a11y-toolkit:
- * - ru-a11y-toolkit-overlay: использует для отображения в runtime UI
- * - ru-a11y-toolkit-eslint: использует как reference для сообщений об ошибках
- */
-
-export interface RuA11yRuleMeta {
-  /** axe-core ruleId или внутренний идентификатор */
-  id: string;
-  /** Краткое название нарушения (RU) */
-  title: string;
-  /** Развернутое объяснение — что не так и почему это проблема (RU) */
-  description: string;
-  /** Пример исправления — 1-2 строки кода или совета (RU) */
-  fix: string;
-  /** Ссылка на пункт ГОСТ Р 52872-2019 */
-  gost?: string;
-  /** Ссылка на пункт Постановления №102 */
-  post102?: string;
-  /** Ссылка на Success Criterion WCAG */
-  wcag?: string;
-  /** Принцип WCAG для группировки: Воспринимаемость / Управляемость / Понятность / Надёжность */
-  principle?: 'perceivable' | 'operable' | 'understandable' | 'robust';
-  /** Степень серьёзности нарушения */
-  severity: 'error' | 'warning';
-  /** Дополнительные идентификаторы правила в eslint/axe-совместимых интеграциях */
-  aliases?: string[];
-}
+import type { RuA11yRuleMeta } from '../types';
 
 /**
- * Сопоставление axe-core ruleId → метаданные нарушения на русском языке.
- *
- * Покрытие:
- * - Нетекстовый контент (WCAG 1.1)
- * - Медиа (WCAG 1.2)
- * - Адаптируемость (WCAG 1.3)
- * - Навигация с клавиатуры (WCAG 2.1, 2.4)
- * - Заголовки и метки (WCAG 2.4)
- * - Языковые атрибуты (WCAG 3.1)
- * - Совместимость (WCAG 4.1)
+ * Russian metadata for axe-core rules, linked to GOST R 52872-2019,
+ * Government Decree No. 102 and WCAG 2.1 success criteria.
  */
-const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
+export const AXE_RULES = {
   // -------------------------------------------------------------------------
-  // ПРИНЦИП: Воспринимаемость (Perceivable)
+  // Principle: Perceivable
   // -------------------------------------------------------------------------
 
-  /**
-   * WCAG 1.1.1 Нетекстовый контент
-   * ГОСТ Р 52872-2019 §5.1.1 — Текстовые альтернативы нетекстовому контенту
-   * Постановление №102 п. г) — нетекстовый контент должен иметь текстовую альтернативу
-   */
   'image-alt': {
     id: 'image-alt',
     title: 'Изображение без альтернативного текста',
@@ -68,10 +23,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 1.1.1 — избыточный alt
-   * ГОСТ Р 52872-2019 §5.1.1
-   */
   'image-redundant-alt': {
     id: 'image-redundant-alt',
     title: 'Атрибут alt содержит избыточные слова',
@@ -86,10 +37,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * WCAG 1.2.2 Субтитры (предварительно записанные)
-   * Постановление №102 п. г) — аудиовизуальная информация должна иметь текстовую альтернативу
-   */
   'video-caption': {
     id: 'video-caption',
     title: 'Видео без субтитров',
@@ -104,11 +51,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 1.3.1 Информация и отношения
-   * ГОСТ Р 52872-2019 §5.1.5 — Таблицы
-   * Постановление №102 п. а) — структура должна определяться программой
-   */
   'td-headers-attr': {
     id: 'td-headers-attr',
     title: 'Ячейка таблицы ссылается на несуществующий заголовок',
@@ -123,10 +65,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 1.3.1 — таблица данных без заголовков
-   * ГОСТ Р 52872-2019 §5.1.5
-   */
   'th-has-data-cells': {
     id: 'th-has-data-cells',
     title: 'Заголовок таблицы не связан с ячейками данных',
@@ -141,10 +79,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * WCAG 1.4.3 Контраст (минимальный)
-   * Постановление №102 п. в) — достаточный контраст текста
-   */
   'color-contrast': {
     id: 'color-contrast',
     title: 'Недостаточный контраст текста',
@@ -163,9 +97,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 1.4.6 Контраст (расширенный) — уровень AAA
-   */
   'color-contrast-enhanced': {
     id: 'color-contrast-enhanced',
     title: 'Недостаточный контраст текста (расширенный AAA)',
@@ -184,10 +115,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 1.4.4 Изменение размера текста
-   * Постановление №102 п. б) — масштабирование до 200%
-   */
   'meta-viewport': {
     id: 'meta-viewport',
     title: 'Масштабирование страницы отключено',
@@ -206,13 +133,9 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
   },
 
   // -------------------------------------------------------------------------
-  // ПРИНЦИП: Управляемость (Operable)
+  // Principle: Operable
   // -------------------------------------------------------------------------
 
-  /**
-   * WCAG 2.1.1 Клавиатура
-   * Постановление №102 п. а) — беспрепятственный доступ с клавиатуры
-   */
   'scrollable-region-focusable': {
     id: 'scrollable-region-focusable',
     title: 'Прокручиваемая область недоступна с клавиатуры',
@@ -226,11 +149,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 2.4.1 Блоки в обход
-   * ГОСТ Р 52872-2019 §5.2.3.1 — Ссылка пропуска навигации
-   * Постановление №102 п. а)
-   */
   bypass: {
     id: 'bypass',
     title: 'Отсутствует ссылка пропуска навигации',
@@ -247,11 +165,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     aliases: ['@ru-a11y/gost-a11y/require-skip-link', 'require-skip-link'],
   },
 
-  /**
-   * WCAG 2.4.2 Заголовок страницы
-   * ГОСТ Р 52872-2019 §5.2.3
-   * Постановление №102 п. е)
-   */
   'document-title': {
     id: 'document-title',
     title: 'Отсутствует или пустой заголовок страницы',
@@ -268,10 +181,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     aliases: ['@ru-a11y/gost-a11y/require-title-semantic', 'require-title-semantic'],
   },
 
-  /**
-   * WCAG 2.4.6 Заголовки и метки
-   * ГОСТ Р 52872-2019 §5.2.3
-   */
   'heading-order': {
     id: 'heading-order',
     title: 'Нарушена иерархия заголовков',
@@ -286,10 +195,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * WCAG 2.4.3 Последовательность фокуса
-   * Постановление №102 п. а)
-   */
   tabindex: {
     id: 'tabindex',
     title: 'Некорректное значение tabIndex',
@@ -305,10 +210,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * WCAG 2.4.7 Видимость фокуса
-   * Постановление №102 п. а)
-   */
   'focus-trap': {
     id: 'focus-trap',
     title: 'Фокус клавиатуры заблокирован',
@@ -323,14 +224,9 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
   },
 
   // -------------------------------------------------------------------------
-  // ПРИНЦИП: Понятность (Understandable)
+  // Principle: Understandable
   // -------------------------------------------------------------------------
 
-  /**
-   * WCAG 3.1.1 Язык страницы
-   * ГОСТ Р 52872-2019 §5.2.4
-   * Постановление №102 п. а) и п. д)
-   */
   'html-has-lang': {
     id: 'html-has-lang',
     title: 'Отсутствует атрибут lang на элементе <html>',
@@ -346,10 +242,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     aliases: ['@ru-a11y/gost-a11y/require-lang-attr', 'require-lang-attr'],
   },
 
-  /**
-   * WCAG 3.1.1 — некорректный код языка
-   * ГОСТ Р 52872-2019 §5.2.4
-   */
   'html-lang-valid': {
     id: 'html-lang-valid',
     title: 'Некорректный код языка',
@@ -363,11 +255,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 3.3.2 Метки или инструкции
-   * ГОСТ Р 52872-2019 §5.1.3
-   * Постановление №102 п. м)
-   */
   label: {
     id: 'label',
     title: 'Поле формы без метки',
@@ -385,14 +272,9 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
   },
 
   // -------------------------------------------------------------------------
-  // ПРИНЦИП: Надёжность (Robust)
+  // Principle: Robust
   // -------------------------------------------------------------------------
 
-  /**
-   * WCAG 4.1.2 Имя, роль, значение
-   * ГОСТ Р 52872-2019 §5.1.1
-   * Постановление №102 п. а)
-   */
   'button-name': {
     id: 'button-name',
     title: 'Кнопка без доступного названия',
@@ -410,11 +292,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     aliases: ['@ru-a11y/gost-a11y/no-frame-structure', 'no-frame-structure'],
   },
 
-  /**
-   * WCAG 4.1.2 — ссылка без имени
-   * ГОСТ Р 52872-2019 §5.2.4
-   * Постановление №102 п. ж)
-   */
   'link-name': {
     id: 'link-name',
     title: 'Ссылка без доступного названия',
@@ -429,9 +306,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 4.1.2 — недопустимый ARIA-атрибут
-   */
   'aria-valid-attr': {
     id: 'aria-valid-attr',
     title: 'Недопустимый ARIA-атрибут',
@@ -444,9 +318,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 4.1.2 — неверное значение ARIA-атрибута
-   */
   'aria-valid-attr-value': {
     id: 'aria-valid-attr-value',
     title: 'Неверное значение ARIA-атрибута',
@@ -459,9 +330,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 4.1.2 — роль обязывает к наличию ARIA-атрибутов
-   */
   'aria-required-attr': {
     id: 'aria-required-attr',
     title: 'Отсутствует обязательный ARIA-атрибут',
@@ -474,9 +342,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 4.1.2 — недопустимая ARIA-роль
-   */
   'aria-roles': {
     id: 'aria-roles',
     title: 'Недопустимая ARIA-роль',
@@ -489,11 +354,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 1.1.1 — <iframe> без title
-   * ГОСТ Р 52872-2019 §5.1.1
-   * Постановление №102 п. а)
-   */
   'frame-title': {
     id: 'frame-title',
     title: 'Фрейм без атрибута title',
@@ -509,12 +369,9 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
   },
 
   // -------------------------------------------------------------------------
-  // ДОПОЛНИТЕЛЬНЫЕ ПРАВИЛА AXE-CORE
+  // Additional axe-core rules
   // -------------------------------------------------------------------------
 
-  /**
-   * WCAG 1.4.12 — межбуквенные/межстрочные интервалы через inline-стили
-   */
   'avoid-inline-spacing': {
     id: 'avoid-inline-spacing',
     title: 'Жёстко заданные интервалы текста через style-атрибут',
@@ -530,9 +387,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * WCAG 1.4.1 — ссылки в тексте различаются только цветом
-   */
   'link-in-text-block': {
     id: 'link-in-text-block',
     title: 'Ссылка в тексте различается только цветом',
@@ -548,9 +402,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 1.3.4 — ориентация отображения заблокирована
-   */
   'css-orientation-lock': {
     id: 'css-orientation-lock',
     title: 'Ориентация экрана заблокирована в CSS',
@@ -566,9 +417,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * WCAG 1.3.5 — атрибут autocomplete
-   */
   'autocomplete-valid': {
     id: 'autocomplete-valid',
     title: 'Некорректный атрибут autocomplete',
@@ -584,9 +432,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 2.2.2 — мигающий элемент <blink>
-   */
   blink: {
     id: 'blink',
     title: 'Используется устаревший элемент <blink>',
@@ -602,9 +447,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 2.2.2 — мигающий элемент <marquee>
-   */
   marquee: {
     id: 'marquee',
     title: 'Используется устаревший элемент <marquee>',
@@ -620,9 +462,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 2.2.1 — мета-обновление страницы
-   */
   'meta-refresh': {
     id: 'meta-refresh',
     title: 'Автоматическое обновление/перенаправление страницы',
@@ -637,9 +476,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 2.2.4 / 3.2.5 — мета-обновление без исключений (AAA)
-   */
   'meta-refresh-no-exceptions': {
     id: 'meta-refresh-no-exceptions',
     title: 'Отложенное обновление страницы недопустимо (AAA)',
@@ -653,9 +489,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * WCAG 2.1.1 — автовоспроизведение звука
-   */
   'no-autoplay-audio': {
     id: 'no-autoplay-audio',
     title: 'Автовоспроизведение звука без управления',
@@ -672,9 +505,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     aliases: ['@ru-a11y/gost-a11y/no-autoplay-media', 'no-autoplay-media'],
   },
 
-  /**
-   * WCAG 2.1.1 — серверная карта изображений
-   */
   'server-side-image-map': {
     id: 'server-side-image-map',
     title: 'Использована серверная карта изображений',
@@ -687,9 +517,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 2.1.1 — фрейм с фокусируемым контентом недоступен с клавиатуры
-   */
   'frame-focusable-content': {
     id: 'frame-focusable-content',
     title: 'Фрейм с фокусируемым контентом имеет tabindex="-1"',
@@ -702,9 +529,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 4.1.2 — уникальный title фрейма
-   */
   'frame-title-unique': {
     id: 'frame-title-unique',
     title: 'Фреймы имеют одинаковый атрибут title',
@@ -719,9 +543,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * WCAG 2.4.7 / best-practice — порядок фокуса
-   */
   'focus-order-semantics': {
     id: 'focus-order-semantics',
     title: 'Элемент в порядке фокуса не является интерактивным',
@@ -737,9 +558,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * WCAG 2.4.9 / AAA — одинаковые ссылки с разным назначением
-   */
   'identical-links-same-purpose': {
     id: 'identical-links-same-purpose',
     title: 'Ссылки с одинаковым текстом ведут в разные места',
@@ -754,9 +572,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * WCAG 2.4.2 / best-practice — страница должна иметь h1
-   */
   'page-has-heading-one': {
     id: 'page-has-heading-one',
     title: 'На странице отсутствует заголовок первого уровня',
@@ -770,9 +585,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     aliases: ['@ru-a11y/gost-a11y/require-h1', 'require-h1'],
   },
 
-  /**
-   * WCAG 2.4.1 — ссылка пропуска должна иметь цель
-   */
   'skip-link': {
     id: 'skip-link',
     title: 'Ссылка пропуска указывает на несуществующий элемент',
@@ -788,9 +600,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * WCAG 1.3.1 — структура списка нарушена
-   */
   list: {
     id: 'list',
     title: 'Неправильная структура списка',
@@ -805,9 +614,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 1.3.1 — элемент <li> вне списка
-   */
   listitem: {
     id: 'listitem',
     title: 'Элемент <li> не является потомком списка',
@@ -820,9 +626,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 1.3.1 — некорректная структура <dl>
-   */
   'definition-list': {
     id: 'definition-list',
     title: 'Неправильная структура списка определений',
@@ -837,9 +640,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 1.3.1 — элементы <dt>/<dd> вне <dl>
-   */
   dlitem: {
     id: 'dlitem',
     title: 'Элемент <dt> или <dd> не является потомком <dl>',
@@ -852,9 +652,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 4.1.2 — дублирующийся id в ARIA/label
-   */
   'duplicate-id-aria': {
     id: 'duplicate-id-aria',
     title: 'Дублирующийся id используется в ARIA или label',
@@ -872,9 +669,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 4.1.1 — дублирующийся id у активных элементов (устарело)
-   */
   'duplicate-id-active': {
     id: 'duplicate-id-active',
     title: 'Дублирующийся id у активного (интерактивного) элемента',
@@ -887,9 +681,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 4.1.1 — дублирующийся id (общее правило, устарело)
-   */
   'duplicate-id': {
     id: 'duplicate-id',
     title: 'Дублирующийся атрибут id',
@@ -903,9 +694,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * best-practice — заголовок без текста
-   */
   'empty-heading': {
     id: 'empty-heading',
     title: 'Пустой заголовок',
@@ -919,9 +707,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * best-practice — заголовок таблицы без текста
-   */
   'empty-table-header': {
     id: 'empty-table-header',
     title: 'Пустой заголовок таблицы',
@@ -935,9 +720,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * WCAG 3.3.2 — поле формы с несколькими метками
-   */
   'form-field-multiple-labels': {
     id: 'form-field-multiple-labels',
     title: 'Поле формы имеет несколько элементов <label>',
@@ -955,9 +737,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * WCAG 3.1.2 — атрибут lang с некорректным значением
-   */
   'valid-lang': {
     id: 'valid-lang',
     title: 'Некорректный код языка в атрибуте lang',
@@ -972,9 +751,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 3.1.1 — несоответствие lang и xml:lang
-   */
   'html-xml-lang-mismatch': {
     id: 'html-xml-lang-mismatch',
     title: 'Атрибуты lang и xml:lang указывают разные языки',
@@ -987,9 +763,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 4.1.2 — кнопка-input без доступного имени
-   */
   'input-button-name': {
     id: 'input-button-name',
     title: 'Кнопка <input type="button/submit/reset"> без доступного имени',
@@ -1004,9 +777,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 1.1.1 — изображение-кнопка без alt
-   */
   'input-image-alt': {
     id: 'input-image-alt',
     title: '<input type="image"> без альтернативного текста',
@@ -1019,9 +789,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 2.5.3 — видимый текст не совпадает с доступным именем
-   */
   'label-content-name-mismatch': {
     id: 'label-content-name-mismatch',
     title: 'Видимый текст элемента не входит в его доступное имя',
@@ -1037,9 +804,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * best-practice — поле формы только с title или aria-describedby в качестве метки
-   */
   'label-title-only': {
     id: 'label-title-only',
     title: 'Поле формы размечено только через title или aria-describedby',
@@ -1052,9 +816,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * WCAG 4.1.2 — элемент <select> без доступного имени
-   */
   'select-name': {
     id: 'select-name',
     title: 'Выпадающий список <select> без доступного имени',
@@ -1069,9 +830,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 4.1.2 — <summary> без доступного имени
-   */
   'summary-name': {
     id: 'summary-name',
     title: 'Элемент <summary> без доступного названия',
@@ -1084,9 +842,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 1.1.1 — <object> без альтернативного текста
-   */
   'object-alt': {
     id: 'object-alt',
     title: 'Элемент <object> без альтернативного текста',
@@ -1101,9 +856,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 1.1.1 — аудио без субтитров
-   */
   'audio-caption': {
     id: 'audio-caption',
     title: 'Аудио без текстовой альтернативы',
@@ -1118,9 +870,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 1.1.1 — SVG-изображение без альтернативного текста
-   */
   'svg-img-alt': {
     id: 'svg-img-alt',
     title: 'SVG-изображение без альтернативного текста',
@@ -1135,9 +884,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 1.1.1 — элемент с role="img" без alt-текста
-   */
   'role-img-alt': {
     id: 'role-img-alt',
     title: 'Элемент с role="img" без альтернативного текста',
@@ -1150,9 +896,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 1.3.1 — параграф оформлен как заголовок
-   */
   'p-as-heading': {
     id: 'p-as-heading',
     title: 'Параграф оформлен как заголовок через стили',
@@ -1167,9 +910,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * WCAG 4.1.2 — вложенные интерактивные элементы
-   */
   'nested-interactive': {
     id: 'nested-interactive',
     title: 'Интерактивные элементы вложены друг в друга',
@@ -1184,9 +924,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * best-practice — ориентиры (landmarks) должны охватывать весь контент
-   */
   region: {
     id: 'region',
     title: 'Контент страницы не обёрнут в landmark-регион',
@@ -1201,9 +938,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * best-practice — landmark banner на верхнем уровне
-   */
   'landmark-banner-is-top-level': {
     id: 'landmark-banner-is-top-level',
     title: '<header> (banner) вложен в другой landmark',
@@ -1215,9 +949,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * best-practice — landmark complementary на верхнем уровне
-   */
   'landmark-complementary-is-top-level': {
     id: 'landmark-complementary-is-top-level',
     title: '<aside> (complementary) вложен в основной контент',
@@ -1229,9 +960,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * best-practice — landmark contentinfo на верхнем уровне
-   */
   'landmark-contentinfo-is-top-level': {
     id: 'landmark-contentinfo-is-top-level',
     title: '<footer> (contentinfo) вложен в другой landmark',
@@ -1243,9 +971,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * best-practice — landmark main на верхнем уровне
-   */
   'landmark-main-is-top-level': {
     id: 'landmark-main-is-top-level',
     title: '<main> вложен в другой landmark',
@@ -1257,9 +982,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * best-practice — не более одного banner
-   */
   'landmark-no-duplicate-banner': {
     id: 'landmark-no-duplicate-banner',
     title: 'На странице несколько элементов <header> (banner)',
@@ -1273,9 +995,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * best-practice — не более одного contentinfo
-   */
   'landmark-no-duplicate-contentinfo': {
     id: 'landmark-no-duplicate-contentinfo',
     title: 'На странице несколько элементов <footer> (contentinfo)',
@@ -1289,9 +1008,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * best-practice — не более одного main
-   */
   'landmark-no-duplicate-main': {
     id: 'landmark-no-duplicate-main',
     title: 'На странице несколько элементов <main>',
@@ -1303,9 +1019,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * best-practice — страница должна иметь main
-   */
   'landmark-one-main': {
     id: 'landmark-one-main',
     title: 'На странице отсутствует элемент <main>',
@@ -1318,9 +1031,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     aliases: ['@ru-a11y/gost-a11y/require-main-landmark', 'require-main-landmark'],
   },
 
-  /**
-   * best-practice — ориентиры должны быть уникальными
-   */
   'landmark-unique': {
     id: 'landmark-unique',
     title: 'Несколько одинаковых landmark-регионов без различия',
@@ -1335,9 +1045,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * WCAG 1.3.1 — атрибут scope таблицы
-   */
   'scope-attr-valid': {
     id: 'scope-attr-valid',
     title: 'Некорректное использование атрибута scope в таблице',
@@ -1353,9 +1060,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * WCAG 1.3.1 — ячейка таблицы без заголовка (experimental)
-   */
   'td-has-header': {
     id: 'td-has-header',
     title: 'Ячейка данных в большой таблице без заголовка',
@@ -1372,9 +1076,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * best-practice — заголовок и подпись таблицы совпадают
-   */
   'table-duplicate-name': {
     id: 'table-duplicate-name',
     title: 'Заголовок и подпись таблицы совпадают',
@@ -1388,9 +1089,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * WCAG 1.3.1 — поддельная подпись таблицы
-   */
   'table-fake-caption': {
     id: 'table-fake-caption',
     title: 'Подпись таблицы реализована ячейкой данных, а не <caption>',
@@ -1404,9 +1102,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * WCAG 2.5.8 — минимальный размер касания (WCAG 2.2 AA)
-   */
   'target-size': {
     id: 'target-size',
     title: 'Цель касания слишком мала',
@@ -1422,9 +1117,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * best-practice — масштабирование до 500%
-   */
   'meta-viewport-large': {
     id: 'meta-viewport-large',
     title: 'Страница не поддерживает масштабирование до 500%',
@@ -1438,9 +1130,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * WCAG 4.1.2 / best-practice — aria-roledescription без роли
-   */
   'aria-roledescription': {
     id: 'aria-roledescription',
     title: 'aria-roledescription на элементе без семантической роли',
@@ -1456,9 +1145,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * best-practice — role="text" с фокусируемыми потомками
-   */
   'aria-text': {
     id: 'aria-text',
     title: 'role="text" содержит фокусируемые элементы',
@@ -1473,9 +1159,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * WCAG 4.1.2 — ARIA переключаемое поле без доступного имени
-   */
   'aria-toggle-field-name': {
     id: 'aria-toggle-field-name',
     title: 'ARIA-переключатель без доступного имени',
@@ -1488,9 +1171,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 4.1.2 — ARIA-подсказка без доступного имени
-   */
   'aria-tooltip-name': {
     id: 'aria-tooltip-name',
     title: 'ARIA-подсказка (tooltip) без доступного имени',
@@ -1503,9 +1183,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * best-practice — ARIA-элемент дерева без доступного имени
-   */
   'aria-treeitem-name': {
     id: 'aria-treeitem-name',
     title: 'Элемент дерева (treeitem) без доступного имени',
@@ -1517,9 +1194,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * best-practice — скрытый контент на странице
-   */
   'hidden-content': {
     id: 'hidden-content',
     title: 'На странице есть скрытый контент',
@@ -1534,9 +1208,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * best-practice — frame-tested
-   */
   'frame-tested': {
     id: 'frame-tested',
     title: 'Фрейм не проверен инструментом axe-core',
@@ -1548,9 +1219,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * best-practice — уникальность accesskey
-   */
   accesskeys: {
     id: 'accesskeys',
     title: 'Дублирующееся значение атрибута accesskey',
@@ -1565,9 +1233,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * WCAG 2.4.4 / 4.1.2 — <area> без альтернативного текста
-   */
   'area-alt': {
     id: 'area-alt',
     title: 'Активная область карты изображений без альтернативного текста',
@@ -1582,9 +1247,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 4.1.2 — ARIA-атрибут не допустим для данной роли
-   */
   'aria-allowed-attr': {
     id: 'aria-allowed-attr',
     title: 'ARIA-атрибут не поддерживается для данной роли',
@@ -1599,9 +1261,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * best-practice — ARIA-роль не подходит для элемента
-   */
   'aria-allowed-role': {
     id: 'aria-allowed-role',
     title: 'ARIA-роль не подходит для данного элемента',
@@ -1617,9 +1276,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * WCAG 4.1.2 — атрибуты aria-braillelabel/aria-brailleroledescription без текстового эквивалента
-   */
   'aria-braille-equivalent': {
     id: 'aria-braille-equivalent',
     title: 'Брайль-атрибут без текстового эквивалента',
@@ -1635,9 +1291,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 4.1.2 — ARIA-команда (button/link/menuitem) без доступного имени
-   */
   'aria-command-name': {
     id: 'aria-command-name',
     title: 'ARIA-команда без доступного имени',
@@ -1650,9 +1303,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 4.1.2 — ARIA-атрибут используется не в соответствии со спецификацией роли
-   */
   'aria-conditional-attr': {
     id: 'aria-conditional-attr',
     title: 'ARIA-атрибут применён вне допустимого контекста роли',
@@ -1668,9 +1318,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 4.1.2 — устаревшая ARIA-роль
-   */
   'aria-deprecated-role': {
     id: 'aria-deprecated-role',
     title: 'Используется устаревшая ARIA-роль',
@@ -1685,9 +1332,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * best-practice — ARIA-диалог без доступного имени
-   */
   'aria-dialog-name': {
     id: 'aria-dialog-name',
     title: 'ARIA-диалог без доступного имени',
@@ -1701,9 +1345,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'warning',
   },
 
-  /**
-   * WCAG 1.3.1 / 4.1.2 — aria-hidden="true" на <body>
-   */
   'aria-hidden-body': {
     id: 'aria-hidden-body',
     title: 'Атрибут aria-hidden="true" на элементе <body>',
@@ -1718,9 +1359,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 4.1.2 — aria-hidden элемент фокусируем или содержит фокусируемых потомков
-   */
   'aria-hidden-focus': {
     id: 'aria-hidden-focus',
     title: 'Фокусируемый элемент скрыт через aria-hidden',
@@ -1737,9 +1375,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 4.1.2 — ARIA поле ввода без доступного имени
-   */
   'aria-input-field-name': {
     id: 'aria-input-field-name',
     title: 'ARIA-поле ввода без доступного имени',
@@ -1754,9 +1389,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 1.1.1 — ARIA-индикатор без доступного имени
-   */
   'aria-meter-name': {
     id: 'aria-meter-name',
     title: 'ARIA-индикатор (meter) без доступного имени',
@@ -1771,9 +1403,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 1.1.1 — ARIA-прогрессбар без доступного имени
-   */
   'aria-progressbar-name': {
     id: 'aria-progressbar-name',
     title: 'Индикатор прогресса без доступного имени',
@@ -1788,9 +1417,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 4.1.2 — ARIA-атрибут запрещён для данной роли
-   */
   'aria-prohibited-attr': {
     id: 'aria-prohibited-attr',
     title: 'Запрещённый ARIA-атрибут для данной роли',
@@ -1806,9 +1432,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 1.3.1 — ARIA-роль требует наличия дочерних ролей
-   */
   'aria-required-children': {
     id: 'aria-required-children',
     title: 'Отсутствуют обязательные дочерние ARIA-роли',
@@ -1824,9 +1447,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * WCAG 1.3.1 — ARIA-роль требует наличия родительской роли
-   */
   'aria-required-parent': {
     id: 'aria-required-parent',
     title: 'Элемент с ARIA-ролью находится вне обязательного родителя',
@@ -1842,9 +1462,6 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     severity: 'error',
   },
 
-  /**
-   * best-practice — конфликт presentation роли
-   */
   'presentation-role-conflict': {
     id: 'presentation-role-conflict',
     title: 'Конфликт role="presentation" с ARIA-атрибутами или tabindex',
@@ -1857,194 +1474,4 @@ const RU_A11Y_AXE_RULES: Record<string, RuA11yRuleMeta> = {
     principle: 'robust',
     severity: 'warning',
   },
-};
-
-export const RU_A11Y_CUSTOM_RULES: Record<string, RuA11yRuleMeta> = {
-  'no-table-layout': {
-    id: 'no-table-layout',
-    title: 'Таблицы используются для вёрстки',
-    description:
-      'Таблица используется не для табличных данных, а для оформления страницы. ' +
-      'Это нарушает семантику и мешает вспомогательным технологиям корректно считывать структуру контента.',
-    fix: 'Используйте CSS Grid или Flexbox для вёрстки. Таблицы оставляйте только для табличных данных.',
-    gost: 'ГОСТ Р 52872-2019, §5.1.5',
-    post102: 'Постановление №102, п. а)',
-    wcag: 'WCAG 2.1, 1.3.1 Info and Relationships',
-    principle: 'perceivable',
-    severity: 'error',
-    aliases: ['@ru-a11y/gost-a11y/no-table-layout'],
-  },
-
-  'table-requires-th': {
-    id: 'table-requires-th',
-    title: 'Таблица данных не содержит корректных заголовков',
-    description:
-      'Таблица данных не содержит ячеек <th>, scope или caption, необходимых для корректного ' +
-      'восприятия структуры таблицы вспомогательными технологиями.',
-    fix: 'Добавьте <th> с корректным scope для строк и столбцов, а также <caption> для описания таблицы.',
-    gost: 'ГОСТ Р 52872-2019, §5.1.5',
-    post102: 'Постановление №102, п. а)',
-    wcag: 'WCAG 2.1, 1.3.1 Info and Relationships',
-    principle: 'perceivable',
-    severity: 'error',
-    aliases: ['@ru-a11y/gost-a11y/table-requires-th'],
-  },
-
-  'click-events-have-key-events': {
-    id: 'click-events-have-key-events',
-    title: 'Обработчик click не дублируется клавиатурным управлением',
-    description:
-      'Элемент реагирует на мышь, но не поддерживает эквивалентное управление с клавиатуры. ' +
-      'Пользователи без мыши не смогут активировать этот интерфейсный элемент.',
-    fix: 'Добавьте onKeyDown/onKeyUp или используйте нативный интерактивный элемент, например <button>.',
-    post102: 'Постановление №102, п. а)',
-    wcag: 'WCAG 2.1, 2.1.1 Keyboard',
-    principle: 'operable',
-    severity: 'error',
-    aliases: ['@ru-a11y/gost-a11y/jsx-a11y/click-events-have-key-events'],
-  },
-
-  'heading-has-content': {
-    id: 'heading-has-content',
-    title: 'Заголовок не содержит текстового содержимого',
-    description:
-      'Элемент заголовка пуст или не имеет доступной текстовой альтернативы. ' +
-      'Это нарушает структуру страницы и делает навигацию по заголовкам бесполезной.',
-    fix: 'Добавьте информативный текст в заголовок или пересмотрите его семантическое использование.',
-    gost: 'ГОСТ Р 52872-2019, §5.2.3',
-    post102: 'Постановление №102, п. е)',
-    wcag: 'WCAG 2.1, 2.4.6 Headings and Labels',
-    principle: 'understandable',
-    severity: 'error',
-    aliases: ['@ru-a11y/gost-a11y/jsx-a11y/heading-has-content'],
-  },
-
-  'aria-activedescendant-has-tabindex': {
-    id: 'aria-activedescendant-has-tabindex',
-    title: 'Элемент с aria-activedescendant не может получать фокус',
-    description:
-      'Составной виджет использует aria-activedescendant, но сам элемент не является фокусируемым. ' +
-      'Это ломает клавиатурную навигацию внутри компонента.',
-    fix: 'Добавьте tabIndex={0} или используйте нативный фокусируемый контейнер для виджета.',
-    post102: 'Постановление №102, п. а)',
-    wcag: 'WCAG 2.1, 4.1.2 Name, Role, Value',
-    principle: 'operable',
-    severity: 'error',
-    aliases: ['@ru-a11y/gost-a11y/jsx-a11y/aria-activedescendant-has-tabindex'],
-  },
-
-  'no-noninteractive-element-interactions': {
-    id: 'no-noninteractive-element-interactions',
-    title: 'Неинтерактивный элемент используется как интерактивный',
-    description:
-      'Неинтерактивный элемент получил обработчики мыши или клавиатуры, из-за чего его поведение ' +
-      'не соответствует семантике и ожиданиям вспомогательных технологий.',
-    fix: 'Замените элемент на <button> или <a>, либо добавьте корректную роль и полную клавиатурную поддержку.',
-    wcag: 'WCAG 2.1, 4.1.2 Name, Role, Value',
-    principle: 'robust',
-    severity: 'warning',
-    aliases: ['@ru-a11y/gost-a11y/jsx-a11y/no-noninteractive-element-interactions'],
-  },
-
-  'no-noninteractive-tabindex': {
-    id: 'no-noninteractive-tabindex',
-    title: 'Неинтерактивный элемент включён в порядок фокуса',
-    description:
-      'Неинтерактивный элемент получил tabIndex и попадает в последовательность клавиатурного фокуса. ' +
-      'Это делает навигацию непредсказуемой.',
-    fix: 'Уберите tabIndex с неинтерактивного элемента или замените его на семантически подходящий интерактивный элемент.',
-    post102: 'Постановление №102, п. а)',
-    wcag: 'WCAG 2.1, 2.4.3 Focus Order',
-    principle: 'operable',
-    severity: 'warning',
-    aliases: ['@ru-a11y/gost-a11y/jsx-a11y/no-noninteractive-tabindex'],
-  },
-
-  'no-redundant-roles': {
-    id: 'no-redundant-roles',
-    title: 'Указана избыточная ARIA-роль',
-    description:
-      'Элемент уже имеет неявную нативную роль, поэтому явное дублирование role не даёт пользы ' +
-      'и может усложнить поддержку интерфейса.',
-    fix: 'Удалите избыточный атрибут role и сохраните нативную семантику HTML-элемента.',
-    wcag: 'WCAG 2.1, 4.1.2 Name, Role, Value',
-    principle: 'robust',
-    severity: 'warning',
-    aliases: ['@ru-a11y/gost-a11y/jsx-a11y/no-redundant-roles'],
-  },
-
-  'no-static-element-interactions': {
-    id: 'no-static-element-interactions',
-    title: 'Статический элемент содержит интерактивное поведение',
-    description:
-      'На статический элемент добавлены интерактивные обработчики без корректной семантики. ' +
-      'Это сбивает пользователей скринридеров и клавиатуры.',
-    fix: 'Используйте нативный интерактивный элемент или добавьте корректную роль вместе с клавиатурной поддержкой.',
-    wcag: 'WCAG 2.1, 4.1.2 Name, Role, Value',
-    principle: 'robust',
-    severity: 'warning',
-    aliases: ['@ru-a11y/gost-a11y/jsx-a11y/no-static-element-interactions'],
-  },
-
-  'no-interactive-element-to-noninteractive-role': {
-    id: 'no-interactive-element-to-noninteractive-role',
-    title: 'Интерактивному элементу назначена неинтерактивная роль',
-    description:
-      'Нативный интерактивный элемент получил неинтерактивную роль и потерял корректную семантику ' +
-      'для вспомогательных технологий.',
-    fix: 'Удалите конфликтующую role или замените элемент на действительно подходящий по смыслу.',
-    wcag: 'WCAG 2.1, 4.1.2 Name, Role, Value',
-    principle: 'robust',
-    severity: 'warning',
-    aliases: ['@ru-a11y/gost-a11y/jsx-a11y/no-interactive-element-to-noninteractive-role'],
-  },
-};
-
-export const RU_A11Y_RULES: Record<string, RuA11yRuleMeta> = {
-  ...RU_A11Y_AXE_RULES,
-  ...RU_A11Y_CUSTOM_RULES,
-};
-
-export function getCanonicalRuleId(ruleId: string): string {
-  if (ruleId in RU_A11Y_RULES) {
-    return ruleId;
-  }
-
-  const matchedRule = Object.values(RU_A11Y_RULES).find((rule) => rule.aliases?.includes(ruleId));
-
-  return matchedRule?.id ?? ruleId;
-}
-
-/**
- * Список принципов WCAG с русскоязычными названиями для группировки в UI
- */
-export const WCAG_PRINCIPLES: Record<NonNullable<RuA11yRuleMeta['principle']>, string> = {
-  perceivable: 'Воспринимаемость',
-  operable: 'Управляемость',
-  understandable: 'Понятность',
-  robust: 'Надёжность',
-};
-
-/**
- * Возвращает метаданные правила по его ID.
- * Если правило не найдено в маппинге, возвращает fallback-описание на русском.
- */
-export function getRuleMeta(ruleId: string): RuA11yRuleMeta {
-  const canonicalRuleId = getCanonicalRuleId(ruleId);
-
-  if (canonicalRuleId in RU_A11Y_RULES) {
-    return RU_A11Y_RULES[canonicalRuleId];
-  }
-
-  // Fallback для правил, не покрытых нашим маппингом
-  return {
-    id: ruleId,
-    title: `Нарушение доступности: ${ruleId}`,
-    description:
-      'Обнаружено нарушение требований доступности. ' +
-      'Подробная информация доступна в документации axe-core.',
-    fix: `Изучите правило "${ruleId}" в документации axe-core: https://dequeuniversity.com/rules/axe/`,
-    wcag: 'WCAG 2.1',
-    severity: 'warning',
-  };
-}
+} satisfies Record<string, RuA11yRuleMeta>;
