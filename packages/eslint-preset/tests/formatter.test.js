@@ -5,7 +5,7 @@ const formatter = require('../formatter-pretty');
 const ANSI_PATTERN = /\u001B\[[0-9;]*m/g;
 
 describe('ru-a11y formatter', () => {
-  test('разделяет сообщение на секции и показывает подсвеченный сниппет', () => {
+  test('splits the message into sections and shows a highlighted snippet', () => {
     const output = formatter([
       {
         filePath: 'src/App.jsx',
@@ -38,7 +38,7 @@ describe('ru-a11y formatter', () => {
     expect(plainOutput).toContain('WCAG 1.1.1');
   });
 
-  test('выносит нормативные ссылки из текста ошибки в отдельный блок', () => {
+  test('moves normative references into a separate block', () => {
     const output = formatter([
       {
         filePath: 'src/App.jsx',
@@ -68,7 +68,7 @@ describe('ru-a11y formatter', () => {
     );
   });
 
-  test('печатает успешный отчёт без нарушений', () => {
+  test('prints a clean report', () => {
     const output = formatter([
       {
         filePath: 'src/App.jsx',

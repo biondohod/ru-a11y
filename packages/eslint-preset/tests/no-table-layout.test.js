@@ -1,6 +1,6 @@
 /**
- * Тесты для правила: no-table-layout
- * Стандарт: ГОСТ Р 52872-2019 §5.1.5; Постановление №102 п. а)
+ * Tests for the rule: no-table-layout
+ * GOST R 52872-2019 §5.1.5; Decree No. 102, item a)
  */
 
 'use strict';
@@ -19,7 +19,7 @@ const ruleTester = new RuleTester({
 ruleTester.run('no-table-layout', rule, {
   valid: [
     {
-      name: 'семантическая таблица данных с th и caption',
+      name: 'data table with th and caption',
       code: `
         function DataTable() {
           return (
@@ -43,7 +43,7 @@ ruleTester.run('no-table-layout', rule, {
       `,
     },
     {
-      name: 'таблица с role="presentation" разрешена',
+      name: 'role="presentation" table is allowed',
       code: `
         function LayoutTable() {
           return (
@@ -60,7 +60,7 @@ ruleTester.run('no-table-layout', rule, {
       `,
     },
     {
-      name: 'таблица с role="none" разрешена',
+      name: 'role="none" table is allowed',
       code: `
         function LayoutTable() {
           return (
@@ -76,7 +76,7 @@ ruleTester.run('no-table-layout', rule, {
       `,
     },
     {
-      name: 'таблица с summary (признак семантики)',
+      name: 'table with summary',
       code: `
         function DataTable() {
           return (
@@ -96,7 +96,7 @@ ruleTester.run('no-table-layout', rule, {
 
   invalid: [
     {
-      name: 'таблица для вёрстки с border="0" без role',
+      name: 'layout table with border="0" and no role',
       code: `
         function LayoutTable() {
           return (
@@ -118,7 +118,7 @@ ruleTester.run('no-table-layout', rule, {
       ],
     },
     {
-      name: 'таблица с cellpadding без семантики',
+      name: 'table with cellpadding and no semantics',
       code: `
         function LayoutTable() {
           return (

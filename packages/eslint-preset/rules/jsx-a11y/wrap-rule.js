@@ -1,80 +1,55 @@
-/**
- * wrap-jsx-rule.js
- *
- * Оборачивает правило eslint-plugin-jsx-a11y, подменяя англоязычные message
- * на русские при вызове context.report().
- *
- * ESLint 9 делает context.report non-configurable/non-writable, поэтому мы
- * создаём объект-обёртку поверх context (через Object.create + defineProperty
- * только для 'report'), и передаём его в originalRule.create.
- *
- * @param {Object} originalRule  - оригинальное правило из eslint-plugin-jsx-a11y
- * @param {Array}  ruMessages    - [{ match: RegExp|string, replace: string }, ...]
- */
-
 'use strict';
 
 /**
- * @param {Object} originalRule  - оригинальное правило из eslint-plugin-jsx-a11y
- * @param {Array}  ruMessages    - [{ match: RegExp|string, replace: string }, ...]
- * @returns {Object} обёрнутое ESLint-правило
+ * Wraps an eslint-plugin-jsx-a11y rule and translates its English report messages.
+ *
+ * ESLint 9 freezes `context.report`, so instead of patching it we hand the original
+ * rule a context that inherits everything from the real one and overrides `report`.
  */
-function wrapJsxRule(originalRule, ruMessages) {
-  if (!originalRule || !originalRule.create) return originalRule;
 
-  const mappings = Array.isArray(ruMessages) ? ruMessages : [];
+/**
+ * @typedef {{ match: string | RegExp, replace: string }} MessageMapping
+ */
 
-  /**
-   * Подменяет английское сообщение на русское, если найдено совпадение.
-   */
-  function translateMessage(message) {
-    if (!message || !mappings.length) return message;
-    for (const { match, replace } of mappings) {
-      if (typeof match === 'string') {
-        if (message.includes(match)) return replace;
-      } else if (match instanceof RegExp) {
-        if (match.test(message)) return replace;
+/** Returns the Russian message for the first matching mapping, or the original one. */
+function translate(message, mappings) {
+  const mapping = mappings.find(({ match }) =>
+    typeof match === 'string' ? message.includes(match) : match.test(message),
+  );
+
+  return mapping ? mapping.replace : message;
+}
+
+function createTranslatingContext(context, mappings) {
+  const translatingContext = Object.create(context);
+
+  Object.defineProperty(translatingContext, 'report', {
+    configurable: true,
+    writable: true,
+    value(descriptor) {
+      if (descriptor && typeof descriptor.message === 'string') {
+        return context.report({ ...descriptor, message: translate(descriptor.message, mappings) });
       }
-    }
-    return message;
-  }
+      return context.report(descriptor);
+    },
+  });
 
-  /**
-   * Создаёт объект-обёртку над context, переопределяя только метод report.
-   */
-  function makeWrappedContext(context) {
-    // Создаём объект наследующий context, но с переопределённым report
-    const wrapped = Object.create(context);
-    try {
-      Object.defineProperty(wrapped, 'report', {
-        configurable: true,
-        writable: true,
-        value: function (descriptor) {
-          if (descriptor && typeof descriptor.message === 'string') {
-            const translated = translateMessage(descriptor.message);
-            if (translated !== descriptor.message) {
-              return context.report.call(
-                context,
-                Object.assign({}, descriptor, { message: translated }),
-              );
-            }
-          }
-          return context.report.call(context, descriptor);
-        },
-      });
-      return wrapped;
-    } catch {
-      return context;
-    }
-  }
+  return translatingContext;
+}
+
+/**
+ * @param {import('eslint').Rule.RuleModule} originalRule
+ * @param {MessageMapping[]} [mappings]
+ * @returns {import('eslint').Rule.RuleModule}
+ */
+function wrapJsxRule(originalRule, mappings = []) {
+  if (!originalRule || !originalRule.create) return originalRule;
+  if (mappings.length === 0) return originalRule;
 
   return {
-    meta: originalRule.meta
-      ? Object.assign({}, originalRule.meta)
-      : { type: 'suggestion', schema: [] },
-
+    meta: originalRule.meta ? { ...originalRule.meta } : { type: 'suggestion', schema: [] },
     create(context) {
-      return originalRule.create(makeWrappedContext(context));
+      return originalRule.create(createTranslatingContext(context, mappings));
     },
   };
 }

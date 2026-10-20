@@ -1,10 +1,7 @@
 /**
- * Русскоязычные сообщения об ошибках доступности
- * Все сообщения содержат ссылки на:
- *   - ГОСТ Р 52872-2019 «Интернет-ресурсы и другая информация, представленная в
- *     электронно-цифровой форме. Приложения для стационарных и мобильных устройств,
- *     иные пользовательские интерфейсы. Требования доступности»
- *   - Постановление Правительства РФ №102 от 07.02.2026
+ * Russian report messages of the plugin. Every message references:
+ *   - GOST R 52872-2019 (accessibility requirements for web resources and apps);
+ *   - Government Decree of the Russian Federation No. 102 of 07.02.2026
  *     http://publication.pravo.gov.ru/document/0001202602100010?index=1
  */
 
@@ -152,11 +149,9 @@ const messages = {
   },
 
   // -----------------------------------------------------------------------
-  // Русские переводы сообщений eslint-plugin-jsx-a11y
-  // Формат: массив { match: string|RegExp, replace: string }
-  // match — подстрока оригинального английского сообщения
-  // replace — полный русский текст
-  // Ссылки: ГОСТ Р 52872-2019, Постановление №102, WCAG 2.1
+  // Translations of eslint-plugin-jsx-a11y messages: { match, replace }[] where
+  // `match` is a substring (or RegExp) of the original English message and
+  // `replace` is the full Russian text.
   // -----------------------------------------------------------------------
 
   jsxA11y: {
@@ -164,7 +159,7 @@ const messages = {
     // "img elements must have an alt prop..."
     // "Input elements must have alt prop..."
     // "area elements must have alt prop..."
-    // ГОСТ Р 52872-2019 §5.1.1; Постановление №102 п. г)
+    // GOST R 52872-2019 §5.1.1; Decree 102 item г)
     altText: [
       {
         match: 'must have an alt prop',
@@ -177,7 +172,7 @@ const messages = {
 
     // --- anchor-has-content ---
     // "Anchors must have content and the content must be accessible by a screen reader."
-    // ГОСТ Р 52872-2019 §5.2.4; Постановление №102 п. ж)
+    // GOST R 52872-2019 §5.2.4; Decree 102 item ж)
     anchorHasContent: [
       {
         match: 'Anchors must have content',
@@ -191,7 +186,7 @@ const messages = {
     // --- anchor-is-valid ---
     // "The href attribute is required for an anchor to be keyboard accessible..."
     // "Anchor used as a button..."
-    // Постановление №102 п. ж)
+    // Decree 102 item ж)
     anchorIsValid: [
       {
         match: 'href attribute is required for an anchor',
@@ -231,7 +226,7 @@ const messages = {
 
     // --- aria-proptypes ---
     // "The value for aria-X must be a boolean."
-    // "The value for aria-X must be a string."  и т.д.
+    // "The value for aria-X must be a string." etc.
     // WCAG 4.1.2
     ariaProptypes: [
       {
@@ -271,7 +266,7 @@ const messages = {
 
     // --- click-events-have-key-events ---
     // "Visible, non-interactive elements with click handlers must have at least one keyboard listener."
-    // Постановление №102 п. а); WCAG 2.1.1
+    // Decree 102 item а); WCAG 2.1.1
     clickEventsHaveKeyEvents: [
       {
         match: 'click handlers must have at least one keyboard listener',
@@ -284,7 +279,7 @@ const messages = {
 
     // --- heading-has-content ---
     // "Headings must have content and the content must be accessible by a screen reader."
-    // ГОСТ Р 52872-2019 §5.2.3; Постановление №102 п. е)
+    // GOST R 52872-2019 §5.2.3; Decree 102 item е)
     headingHasContent: [
       {
         match: 'Headings must have content',
@@ -297,7 +292,7 @@ const messages = {
 
     // --- html-has-lang ---
     // "<html> elements must have the lang prop."
-    // ГОСТ Р 52872-2019 §5.2.4; Постановление №102 п. а)
+    // GOST R 52872-2019 §5.2.4; Decree 102 item а)
     htmlHasLang: [
       {
         match: 'elements must have the lang prop',
@@ -310,7 +305,7 @@ const messages = {
 
     // --- iframe-has-title ---
     // "<iframe> elements must have a unique title property."
-    // ГОСТ Р 52872-2019 §5.1.1; Постановление №102 п. а)
+    // GOST R 52872-2019 §5.1.1; Decree 102 item а)
     iframeHasTitle: [
       {
         match: 'must have a unique title property',
@@ -323,7 +318,7 @@ const messages = {
 
     // --- img-redundant-alt ---
     // "Redundant alt attribute. Screen-readers already announce `img` tags as an image..."
-    // ГОСТ Р 52872-2019 §5.1.1; Постановление №102 п. г)
+    // GOST R 52872-2019 §5.1.1; Decree 102 item г)
     imgRedundantAlt: [
       {
         match: 'Redundant alt attribute',
@@ -336,7 +331,7 @@ const messages = {
 
     // --- interactive-supports-focus ---
     // "Elements with the 'X' interactive role must be focusable."
-    // Постановление №102 п. а); WCAG 2.1.1
+    // Decree 102 item а); WCAG 2.1.1
     interactiveSupportsFocus: [
       {
         match: 'interactive role must be focusable',
@@ -349,7 +344,7 @@ const messages = {
 
     // --- label-has-associated-control ---
     // "A form label must be associated with a control."
-    // ГОСТ Р 52872-2019 §5.1.3; Постановление №102 п. м)
+    // GOST R 52872-2019 §5.1.3; Decree 102 item м)
     labelHasAssociatedControl: [
       {
         match: 'form label must have accessible text',
@@ -367,7 +362,7 @@ const messages = {
 
     // --- media-has-caption ---
     // "Media elements such as <audio> and <video> must have a <track> for captions."
-    // Постановление №102 п. г); WCAG 1.2.2
+    // Decree 102 item г); WCAG 1.2.2
     mediaHasCaption: [
       {
         match: 'must have a <track> for captions',
@@ -381,7 +376,7 @@ const messages = {
     // --- mouse-events-have-key-events ---
     // "onMouseOver must be accompanied by onFocus for accessibility."
     // "onMouseOut must be accompanied by onBlur for accessibility."
-    // Постановление №102 п. а); WCAG 2.1.1
+    // Decree 102 item а); WCAG 2.1.1
     mouseEventsHaveKeyEvents: [
       {
         match: 'onMouseOver must be accompanied by onFocus',
@@ -399,9 +394,9 @@ const messages = {
       },
     ],
 
-    // --- tabindex-no-positive (в jsx-a11y правило называется tabindex-no-positive) ---
+    // --- tabindex-no-positive (the jsx-a11y name, not no-positive-tabindex) ---
     // "Avoid positive integer values for tabIndex."
-    // Постановление №102 п. а); WCAG 2.4.3
+    // Decree 102 item а); WCAG 2.4.3
     tabindexNoPositive: [
       {
         match: 'Avoid positive integer values for tabIndex',
@@ -492,7 +487,7 @@ const messages = {
 
     // --- scope ---
     // "The scope prop can only be used on <th> elements."
-    // ГОСТ Р 52872-2019 §5.1.5
+    // GOST R 52872-2019 §5.1.5
     scope: [
       {
         match: 'The scope prop can only be used on',
@@ -517,7 +512,7 @@ const messages = {
 
     // --- aria-activedescendant-has-tabindex ---
     // "An element that manages focus with `aria-activedescendant` must have a tabindex"
-    // WCAG 4.1.2; Постановление №102 п. а)
+    // WCAG 4.1.2; Decree 102 item а)
     ariaActivedescendantHasTabindex: [
       {
         match: 'manages focus with `aria-activedescendant` must have a tabindex',

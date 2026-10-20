@@ -1,21 +1,20 @@
 /**
- * Тесты для jsx-a11y-ru.js и wrap-jsx-rule.js
+ * Tests for rules/jsx-a11y (translated jsx-a11y rules) and wrap-rule.js:
  *
- * Проверяет:
- * 1. Все 26 обёрнутых правил jsx-a11y регистрируются в плагине
- * 2. Русские сообщения подставляются при нарушении (перехват context.report)
- * 3. Оригинальная логика правил не нарушается (valid/invalid примеры)
- * 4. Утилита wrap-jsx-rule работает корректно изолированно
+ * 1. all 26 wrapped jsx-a11y rules are registered in the plugin;
+ * 2. reports get Russian messages (context.report is intercepted);
+ * 3. the original rule logic still works (valid/invalid cases);
+ * 4. the wrapper itself works in isolation.
  */
 
 'use strict';
 
 const { RuleTester, Linter } = require('eslint');
 const plugin = require('../index.js');
-const wrapJsxRule = require('../rules/wrap-jsx-rule');
+const wrapJsxRule = require('../rules/jsx-a11y/wrap-rule');
 
 // -----------------------------------------------------------------------
-// Вспомогательные данные
+// Fixtures
 // -----------------------------------------------------------------------
 
 const EXPECTED_JSX_A11Y_RULES = [
@@ -53,11 +52,11 @@ const LANG_OPTS = {
   parserOptions: { ecmaFeatures: { jsx: true } },
 };
 
-/** Запускает правило через Linter и возвращает первое сообщение об ошибке */
+/** Runs a single rule through Linter and returns the first message. */
 function lint(ruleName, code) {
   const linter = new Linter({ configType: 'flat' });
-  // Регистрируем плагин под коротким именем чтобы обойти ESLint 9
-  // парсинг @scope/pkg/rulename как pluginName=@scope/pkg, rule=rulename
+  // Short plugin name: ESLint 9 would parse `@scope/pkg/rule` as
+  // plugin `@scope/pkg` and rule `rule`.
   const config = [
     {
       files: ['**/*.jsx', '**/*.js'],
@@ -71,22 +70,22 @@ function lint(ruleName, code) {
 }
 
 // -----------------------------------------------------------------------
-// 1. Регистрация правил в плагине
+// 1. Registration
 // -----------------------------------------------------------------------
 
-describe('jsx-a11y-ru: регистрация правил', () => {
-  test('плагин содержит все 26 обёрнутых правил jsx-a11y', () => {
+describe('jsx-a11y wrappers: registration', () => {
+  test('the plugin exposes all 26 wrapped jsx-a11y rules', () => {
     const pluginRuleNames = Object.keys(plugin.rules);
     for (const name of EXPECTED_JSX_A11Y_RULES) {
       expect(pluginRuleNames).toContain(`jsx-a11y/${name}`);
     }
   });
 
-  test('итоговое количество правил плагина: 10 кастомных + 26 jsx-a11y = 36', () => {
+  test('the plugin has 36 rules: 10 custom + 26 jsx-a11y', () => {
     expect(Object.keys(plugin.rules)).toHaveLength(36);
   });
 
-  test('каждое обёрнутое правило имеет meta и create', () => {
+  test('every wrapped rule has meta and create', () => {
     for (const name of EXPECTED_JSX_A11Y_RULES) {
       const rule = plugin.rules[`jsx-a11y/${name}`];
       expect(rule).toHaveProperty('meta');
@@ -97,11 +96,11 @@ describe('jsx-a11y-ru: регистрация правил', () => {
 });
 
 // -----------------------------------------------------------------------
-// 2. Подстановка русских сообщений через перехват context.report
+// 2. Russian messages via intercepted context.report
 // -----------------------------------------------------------------------
 
-describe('jsx-a11y-ru: русские сообщения при нарушении', () => {
-  test('anchor-has-content: пустая ссылка — русское сообщение', () => {
+describe('jsx-a11y wrappers: Russian messages', () => {
+  test('anchor-has-content: empty link', () => {
     const msg = lint('anchor-has-content', `function C(){return <a href="/p"></a>;}`);
     expect(msg).not.toBeNull();
     expect(msg.message).toMatch(/Элемент <a>/);
@@ -109,21 +108,21 @@ describe('jsx-a11y-ru: русские сообщения при нарушени
     expect(msg.message).toMatch(/Постановление №102/);
   });
 
-  test('html-hас-lang: html без lang — русское сообщение', () => {
+  test('html-has-lang: html without lang', () => {
     const msg = lint('html-has-lang', `function C(){return <html><body/></html>;}`);
     expect(msg).not.toBeNull();
     expect(msg.message).toMatch(/атрибут lang/);
     expect(msg.message).toMatch(/ГОСТ Р 52872-2019/);
   });
 
-  test('iframe-has-title: iframe без title — русское сообщение', () => {
+  test('iframe-has-title: iframe without title', () => {
     const msg = lint('iframe-has-title', `function C(){return <iframe src="x.html"/>;}`);
     expect(msg).not.toBeNull();
     expect(msg.message).toMatch(/title/);
     expect(msg.message).toMatch(/ГОСТ Р 52872-2019/);
   });
 
-  test('tabindex-no-positive: tabIndex={2} — русское сообщение', () => {
+  test('tabindex-no-positive: tabIndex={2}', () => {
     const msg = lint('tabindex-no-positive', `function C(){return <div tabIndex={2}>x</div>;}`);
     expect(msg).not.toBeNull();
     expect(msg.message).toMatch(/tabIndex/);
@@ -131,14 +130,14 @@ describe('jsx-a11y-ru: русские сообщения при нарушени
     expect(msg.message).toMatch(/WCAG 2\.4\.3/);
   });
 
-  test('aria-role: невалидная роль — русское сообщение', () => {
+  test('aria-role: invalid role', () => {
     const msg = lint('aria-role', `function C(){return <div role="superman">x</div>;}`);
     expect(msg).not.toBeNull();
     expect(msg.message).toMatch(/role/);
     expect(msg.message).toMatch(/WCAG 4\.1\.2/);
   });
 
-  test('click-events-have-key-events: onClick без клавиатуры — русское сообщение', () => {
+  test('click-events-have-key-events: onClick without a keyboard handler', () => {
     const msg = lint(
       'click-events-have-key-events',
       `function C(){return <div onClick={()=>{}}>x</div>;}`,
@@ -148,21 +147,21 @@ describe('jsx-a11y-ru: русские сообщения при нарушени
     expect(msg.message).toMatch(/Постановление №102/);
   });
 
-  test('alt-text: img без alt — русское сообщение', () => {
+  test('alt-text: img without alt', () => {
     const msg = lint('alt-text', `function C(){return <img src="x.png"/>;}`);
     expect(msg).not.toBeNull();
     expect(msg.message).toMatch(/alt/);
     expect(msg.message).toMatch(/ГОСТ Р 52872-2019/);
   });
 
-  test('scope: scope на td — русское сообщение', () => {
+  test('scope: scope on td', () => {
     const msg = lint('scope', `function C(){return <td scope="col">x</td>;}`);
     expect(msg).not.toBeNull();
     expect(msg.message).toMatch(/scope/);
     expect(msg.message).toMatch(/ГОСТ Р 52872-2019/);
   });
 
-  test('все сообщения содержат кириллицу', () => {
+  test('every message is in Russian', () => {
     const cyrillicRe = /[а-яёА-ЯЁ]/;
     const testCases = {
       'anchor-has-content': `function C(){return <a href="/p"></a>;}`,
@@ -181,17 +180,17 @@ describe('jsx-a11y-ru: русские сообщения при нарушени
 });
 
 // -----------------------------------------------------------------------
-// 3. wrap-jsx-rule: изолированное тестирование утилиты
+// 3. wrap-rule in isolation
 // -----------------------------------------------------------------------
 
-describe('wrap-jsx-rule: утилита подмены сообщений', () => {
+describe('wrapJsxRule', () => {
   /**
-   * Создаём минимальный fake-context с патчируемым report
-   * и запускаем listener напрямую, без ESLint runtime.
+   * Minimal fake context with a patchable report; listeners are called
+   * directly, without the ESLint runtime.
    */
   function runWithFakeContext(rule, mappings, triggerFn) {
     let reported = null;
-    // Простой объект — report можно переопределить через Object.create
+    // A plain object, so report can be overridden via Object.create
     const fakeContext = Object.create({
       report(descriptor) {
         reported = descriptor;
@@ -214,7 +213,7 @@ describe('wrap-jsx-rule: утилита подмены сообщений', () =
     },
   };
 
-  test('подменяет message по точному совпадению строки', () => {
+  test('replaces a message matched by substring', () => {
     const result = runWithFakeContext(
       fakeRule,
       [{ match: 'Original English error message', replace: 'Русское сообщение' }],
@@ -223,7 +222,7 @@ describe('wrap-jsx-rule: утилита подмены сообщений', () =
     expect(result.message).toBe('Русское сообщение');
   });
 
-  test('не подменяет если match не найден', () => {
+  test('keeps the message when nothing matches', () => {
     const result = runWithFakeContext(
       fakeRule,
       [{ match: 'something else', replace: 'Не должно появиться' }],
@@ -232,7 +231,7 @@ describe('wrap-jsx-rule: утилита подмены сообщений', () =
     expect(result.message).toBe('Original English error message');
   });
 
-  test('match по RegExp работает', () => {
+  test('supports RegExp matchers', () => {
     const result = runWithFakeContext(
       fakeRule,
       [{ match: /English (error)/, replace: 'Через RegExp' }],
@@ -241,23 +240,23 @@ describe('wrap-jsx-rule: утилита подмены сообщений', () =
     expect(result.message).toBe('Через RegExp');
   });
 
-  test('при null — возвращает null', () => {
+  test('returns null for null', () => {
     expect(wrapJsxRule(null, [])).toBeNull();
   });
 
-  test('при отсутствии create — возвращает оригинал', () => {
+  test('returns the original rule when it has no create', () => {
     const noCreate = { meta: {} };
     expect(wrapJsxRule(noCreate, [])).toBe(noCreate);
   });
 
-  test('meta сохраняется', () => {
+  test('keeps meta', () => {
     const wrapped = wrapJsxRule(fakeRule, []);
     expect(wrapped.meta.type).toBe('problem');
   });
 });
 
 // -----------------------------------------------------------------------
-// 4. Функциональные тесты (RuleTester — на верхнем уровне)
+// 4. RuleTester cases (must run at the top level)
 // -----------------------------------------------------------------------
 
 const ruleTester = new RuleTester({

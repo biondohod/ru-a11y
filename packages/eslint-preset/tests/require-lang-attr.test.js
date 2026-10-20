@@ -1,6 +1,6 @@
 /**
- * Тесты для правила: require-lang-attr
- * Стандарт: ГОСТ Р 52872-2019 §5.2.4; Постановление №102 п. а), п. д)
+ * Tests for the rule: require-lang-attr
+ * GOST R 52872-2019 §5.2.4; Decree No. 102, items a), d)
  */
 
 'use strict';
@@ -19,27 +19,27 @@ const ruleTester = new RuleTester({
 ruleTester.run('require-lang-attr', rule, {
   valid: [
     {
-      name: 'html с lang="ru"',
+      name: 'html lang="ru"',
       code: `function App() { return <html lang="ru"><body></body></html>; }`,
     },
     {
-      name: 'html с lang="ru-RU"',
+      name: 'html lang="ru-RU"',
       code: `function App() { return <html lang="ru-RU"><body></body></html>; }`,
     },
     {
-      name: 'html с lang="en"',
+      name: 'html lang="en"',
       code: `function App() { return <html lang="en"><body></body></html>; }`,
     },
     {
-      name: 'html с lang="zh-Hans"',
+      name: 'html lang="zh-Hans"',
       code: `function App() { return <html lang="zh-Hans"><body></body></html>; }`,
     },
     {
-      name: 'не-html элементы не проверяются',
+      name: 'elements other than html are ignored',
       code: `function App() { return <div><p>Текст</p></div>; }`,
     },
     {
-      name: 'enforceRussian: true — lang="ru" принимается',
+      name: 'enforceRussian accepts lang="ru"',
       code: `function App() { return <html lang="ru"><body></body></html>; }`,
       options: [{ enforceRussian: true }],
     },
@@ -47,22 +47,22 @@ ruleTester.run('require-lang-attr', rule, {
 
   invalid: [
     {
-      name: 'html без атрибута lang',
+      name: 'html without lang',
       code: `function App() { return <html><body></body></html>; }`,
       errors: [{ messageId: 'missing' }],
     },
     {
-      name: 'html с невалидным lang (цифры)',
+      name: 'invalid lang (digits)',
       code: `function App() { return <html lang="123"><body></body></html>; }`,
       errors: [{ messageId: 'invalidValue' }],
     },
     {
-      name: 'html с невалидным lang (пустая строка)',
+      name: 'invalid lang (empty string)',
       code: `function App() { return <html lang=""><body></body></html>; }`,
       errors: [{ messageId: 'invalidValue' }],
     },
     {
-      name: 'enforceRussian: true — lang="en" выдаёт предупреждение',
+      name: 'enforceRussian reports lang="en"',
       code: `function App() { return <html lang="en"><body></body></html>; }`,
       options: [{ enforceRussian: true }],
       errors: [{ messageId: 'notRussian' }],

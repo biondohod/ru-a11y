@@ -1,6 +1,6 @@
 /**
- * Тесты для правила: table-requires-th
- * Стандарт: ГОСТ Р 52872-2019 §5.1.5; Постановление №102 п. а)
+ * Tests for the rule: table-requires-th
+ * GOST R 52872-2019 §5.1.5; Decree No. 102, item a)
  */
 
 'use strict';
@@ -19,7 +19,7 @@ const ruleTester = new RuleTester({
 ruleTester.run('table-requires-th', rule, {
   valid: [
     {
-      name: 'таблица данных с th и scope="col"',
+      name: 'data table with th scope="col"',
       code: `
         function DataTable() {
           return (
@@ -42,7 +42,7 @@ ruleTester.run('table-requires-th', rule, {
       `,
     },
     {
-      name: 'таблица с th scope="row"',
+      name: 'table with th scope="row"',
       code: `
         function DataTable() {
           return (
@@ -59,7 +59,7 @@ ruleTester.run('table-requires-th', rule, {
       `,
     },
     {
-      name: 'таблица с role="presentation" — исключение',
+      name: 'role="presentation" table is skipped',
       code: `
         function LayoutTable() {
           return (
@@ -75,7 +75,7 @@ ruleTester.run('table-requires-th', rule, {
       `,
     },
     {
-      name: 'таблица с aria-hidden="true" — исключение',
+      name: 'aria-hidden="true" table is skipped',
       code: `
         function HiddenTable() {
           return (
@@ -91,7 +91,7 @@ ruleTester.run('table-requires-th', rule, {
       `,
     },
     {
-      name: 'таблица с динамическим scope',
+      name: 'dynamic scope',
       code: `
         function DataTable({ scopeValue }) {
           return (
@@ -107,7 +107,7 @@ ruleTester.run('table-requires-th', rule, {
       `,
     },
     {
-      name: 'requireCaption: true — таблица с caption',
+      name: 'requireCaption: table with caption',
       code: `
         function DataTable() {
           return (
@@ -129,7 +129,7 @@ ruleTester.run('table-requires-th', rule, {
 
   invalid: [
     {
-      name: 'таблица без <th>',
+      name: 'table without <th>',
       code: `
         function BadTable() {
           return (
@@ -147,7 +147,7 @@ ruleTester.run('table-requires-th', rule, {
       errors: [{ messageId: 'missingTh' }],
     },
     {
-      name: 'таблица с <th> без атрибута scope',
+      name: '<th> without scope',
       code: `
         function BadTable() {
           return (
@@ -165,7 +165,7 @@ ruleTester.run('table-requires-th', rule, {
       errors: [{ messageId: 'missingScope' }, { messageId: 'missingScope' }],
     },
     {
-      name: 'таблица с <th> и невалидным scope',
+      name: '<th> with an invalid scope',
       code: `
         function BadTable() {
           return (
@@ -182,7 +182,7 @@ ruleTester.run('table-requires-th', rule, {
       errors: [{ messageId: 'invalidScope' }],
     },
     {
-      name: 'requireCaption: true — таблица без caption',
+      name: 'requireCaption: table without caption',
       code: `
         function BadTable() {
           return (

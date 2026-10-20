@@ -1,6 +1,6 @@
 /**
- * Тесты для правила: require-skip-link
- * Стандарт: ГОСТ Р 52872-2019 §5.2.3.1; Постановление №102 п. а)
+ * Tests for the rule: require-skip-link
+ * GOST R 52872-2019 §5.2.3.1; Decree No. 102, item a)
  */
 
 'use strict';
@@ -17,10 +17,10 @@ const ruleTester = new RuleTester({
 });
 
 ruleTester.run('require-skip-link', rule, {
-  // Корректные случаи: skip-link присутствует
+  // Valid: a skip link is present
   valid: [
     {
-      name: 'body содержит skip-link с href="#main" первым элементом',
+      name: 'body starts with a skip link to #main',
       code: `
         function App() {
           return (
@@ -34,7 +34,7 @@ ruleTester.run('require-skip-link', rule, {
       `,
     },
     {
-      name: 'body содержит skip-link с href="#content"',
+      name: 'skip link to #content',
       code: `
         function App() {
           return (
@@ -48,7 +48,7 @@ ruleTester.run('require-skip-link', rule, {
       `,
     },
     {
-      name: 'body содержит skip-link с href="#maincontent"',
+      name: 'skip link to #maincontent',
       code: `
         function App() {
           return (
@@ -61,7 +61,7 @@ ruleTester.run('require-skip-link', rule, {
       `,
     },
     {
-      name: 'не-body элементы не проверяются',
+      name: 'elements other than body are ignored',
       code: `
         function Header() {
           return (
@@ -73,7 +73,7 @@ ruleTester.run('require-skip-link', rule, {
       `,
     },
     {
-      name: 'компонент без body не проверяется',
+      name: 'components without body are ignored',
       code: `
         function Page() {
           return (
@@ -87,10 +87,10 @@ ruleTester.run('require-skip-link', rule, {
     },
   ],
 
-  // Некорректные случаи: skip-link отсутствует
+  // Invalid: no skip link
   invalid: [
     {
-      name: 'body без skip-link',
+      name: 'body without a skip link',
       code: `
         function App() {
           return (
@@ -109,7 +109,7 @@ ruleTester.run('require-skip-link', rule, {
       ],
     },
     {
-      name: 'body с ссылкой, но не skip-link (обычная ссылка)',
+      name: 'body with a regular link only',
       code: `
         function App() {
           return (
@@ -128,7 +128,7 @@ ruleTester.run('require-skip-link', rule, {
       ],
     },
     {
-      name: 'body только с пустым содержимым',
+      name: 'body with empty content only',
       code: `
         function App() {
           return (

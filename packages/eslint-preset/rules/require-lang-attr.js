@@ -1,56 +1,30 @@
-/**
- * Правило: require-lang-attr
- * Описание: Обязательный атрибут lang на элементе <html>
- * Стандарт: ГОСТ Р 52872-2019 §5.2.4, уровень A
- * Постановление №102: п. а) — информация должна быть доступна вспомогательным технологиям
- *
- * Атрибут lang помогает скринридерам выбрать правильный голосовой профиль
- * и корректно произносить текст на нужном языке.
- *
- * Для русскоязычных сайтов рекомендуется lang="ru" или lang="ru-RU".
- */
-
 'use strict';
 
+/**
+ * require-lang-attr
+ * `<html>` must declare a valid BCP 47 `lang`, so screen readers pick the right voice.
+ * Optionally enforces Russian (Government Decree No. 102, item d)).
+ * GOST R 52872-2019, §5.2.4.
+ */
+
 const messages = require('../messages');
+const { createRule, getOptions } = require('./utils/create-rule');
+const { findAttribute, getElementName, getStaticValue } = require('./utils/jsx');
 
-/**
- * Список допустимых кодов языка BCP-47 (не исчерпывающий)
- * Поддерживаемые форматы:
- *   - Просто язык: ru, en, zh
- *   - Язык + скрипт (4 буквы): zh-Hans, zh-Hant
- *   - Язык + регион (2-3 буквы/цифры): ru-RU, en-US, zh-CN
- *   - Язык + скрипт + регион: zh-Hans-CN
- */
-const LANG_PATTERN = /^[a-zA-Z]{2,3}(-[a-zA-Z]{4})?(-[a-zA-Z]{2,3})?(-[a-zA-Z0-9]+)*$/;
+/** language[-Script][-REGION][-variant...], e.g. `ru`, `ru-RU`, `zh-Hans-CN`. */
+const BCP47_PATTERN = /^[a-zA-Z]{2,3}(-[a-zA-Z]{4})?(-[a-zA-Z]{2,3})?(-[a-zA-Z0-9]+)*$/;
 
-/**
- * Получает значение атрибута из JSX
- * @param {import('@typescript-eslint/types').TSESTree.JSXAttribute} attr
- * @returns {string|null}
- */
-function getAttrStringValue(attr) {
-  if (!attr || !attr.value) return null;
-  if (attr.value.type === 'Literal') return String(attr.value.value);
-  if (
-    attr.value.type === 'JSXExpressionContainer' &&
-    attr.value.expression &&
-    attr.value.expression.type === 'Literal'
-  ) {
-    return String(attr.value.expression.value);
-  }
-  return null;
+function isRussian(lang) {
+  return lang === 'ru' || lang.startsWith('ru-');
 }
 
-module.exports = {
+module.exports = createRule({
+  name: 'require-lang-attr',
   meta: {
     type: 'problem',
     docs: {
       description:
         'Требует корректного атрибута lang на элементе <html> (ГОСТ Р 52872-2019 §5.2.4)',
-      category: 'Доступность',
-      recommended: true,
-      url: 'https://github.com/ru-a11y/ru-a11y/blob/main/docs/rules/require-lang-attr.md',
     },
     messages: {
       missing: messages.requireLangAttr.missing,
@@ -61,7 +35,6 @@ module.exports = {
       {
         type: 'object',
         properties: {
-          // Если true — предупреждает, когда язык не русский (для гос. сайтов)
           enforceRussian: {
             type: 'boolean',
             default: false,
@@ -74,56 +47,30 @@ module.exports = {
   },
 
   create(context) {
-    const options = context.options[0] || {};
-    const enforceRussian = options.enforceRussian === true;
+    const { enforceRussian = false } = getOptions(context);
 
     return {
       JSXOpeningElement(node) {
-        const tagName = node.name && node.name.type === 'JSXIdentifier' ? node.name.name : null;
+        if (getElementName(node) !== 'html') return;
 
-        // Проверяем только элемент <html>
-        if (tagName !== 'html') return;
-
-        const langAttr = node.attributes.find(
-          (attr) => attr.type === 'JSXAttribute' && attr.name && attr.name.name === 'lang',
-        );
-
-        // Атрибут lang отсутствует
-        if (!langAttr) {
-          context.report({
-            node,
-            messageId: 'missing',
-          });
+        const langAttribute = findAttribute(node, 'lang');
+        if (!langAttribute) {
+          context.report({ node, messageId: 'missing' });
           return;
         }
 
-        const langValue = getAttrStringValue(langAttr);
+        const lang = getStaticValue(langAttribute);
+        if (lang === null) return; // dynamic value, cannot be validated statically
 
-        // Не удалось определить значение (динамическое выражение) — пропускаем
-        if (langValue === null) return;
-
-        // Проверяем формат кода языка BCP-47
-        if (!LANG_PATTERN.test(langValue)) {
-          context.report({
-            node: langAttr,
-            messageId: 'invalidValue',
-            data: { value: langValue },
-          });
+        if (!BCP47_PATTERN.test(lang)) {
+          context.report({ node: langAttribute, messageId: 'invalidValue', data: { value: lang } });
           return;
         }
 
-        // Если enforceRussian — предупреждаем о не-русском языке
-        if (enforceRussian) {
-          const isRussian = langValue === 'ru' || langValue.startsWith('ru-');
-          if (!isRussian) {
-            context.report({
-              node: langAttr,
-              messageId: 'notRussian',
-              data: { value: langValue },
-            });
-          }
+        if (enforceRussian && !isRussian(lang)) {
+          context.report({ node: langAttribute, messageId: 'notRussian', data: { value: lang } });
         }
       },
     };
   },
-};
+});

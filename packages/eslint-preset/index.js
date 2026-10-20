@@ -1,154 +1,72 @@
-/**
- * @ru-a11y/eslint-preset
- *
- * ESLint-пресет для проверки веб-доступности согласно:
- * - ГОСТ Р 52872-2012 «Интернет-ресурсы и другая информация, представленная
- *   в электронно-цифровой форме. Приложения для стационарных и мобильных
- *   устройств, иные пользовательские интерфейсы. Требования доступности»
- * - Постановление Правительства РФ №102 от 07.02.2026
- *
- * === Flat Config (ESLint 9+, eslint.config.js) ===
- *
- * import ruA11y from '@ru-a11y/eslint-preset';
- * export default [ruA11y.configs['recommended/flat']];
- *
- * Или с jsx-a11y:
- * import ruA11y from '@ru-a11y/eslint-preset';
- * import jsxA11y from 'eslint-plugin-jsx-a11y';
- * export default [
- *   { plugins: { 'jsx-a11y': jsxA11y } },
- *   ruA11y.configs['gost-aa/flat'],
- * ];
- *
- * === Legacy Config (ESLint 8, .eslintrc.js) ===
- *
- * module.exports = {
- *   extends: ['@ru-a11y/gost-aa']
- * }
- *
- * Или для более точного контроля:
- * module.exports = {
- *   plugins: ['@ru-a11y/gost-a11y'],
- *   rules: {
- *     '@ru-a11y/gost-a11y/require-lang-attr': 'error',
- *     // ... другие правила
- *   }
- * }
- */
-
 'use strict';
 
-// Импорт всех кастомных правил
-const requireSkipLink = require('./rules/require-skip-link');
-const noTableLayout = require('./rules/no-table-layout');
-const requireLangAttr = require('./rules/require-lang-attr');
-const requireTitleSemantic = require('./rules/require-title-semantic');
-const zoom200Warning = require('./rules/zoom-200-warning');
-const noFrameStructure = require('./rules/no-frame-structure');
-const tableRequiresTh = require('./rules/table-requires-th');
-const requireMainLandmark = require('./rules/require-main-landmark');
-const requireH1 = require('./rules/require-h1');
-const noAutoplayMedia = require('./rules/no-autoplay-media');
-const ruA11yCore = require('ru-a11y-toolkit-core');
-
-// Обёрнутые правила eslint-plugin-jsx-a11y с русскоязычными сообщениями
-const jsxA11yRu = require('./rules/jsx-a11y-ru');
-
-// Импорт конфигураций
-const recommended = require('./configs/recommended');
-const gostAA = require('./configs/gost-aa');
-const strict = require('./configs/strict');
-
 /**
- * Плагин @ru-a11y/gost-a11y
- * Экспортирует все кастомные правила и готовые конфигурации
+ * ru-a11y-toolkit-eslint
+ *
+ * Accessibility rules for JSX aligned with GOST R 52872-2019 and Government
+ * Decree No. 102, with Russian messages.
+ *
+ * @example eslint.config.js
+ * const ruA11y = require('ru-a11y-toolkit-eslint');
+ * module.exports = [ruA11y.configs['gost-aa']];
  */
-const plugin = {
-  meta: {
-    name: '@ru-a11y/gost-a11y',
-    version: '1.0.0-alpha.1',
-  },
 
-  rulesMeta: ruA11yCore.RU_A11Y_RULES,
-  customRulesMeta: ruA11yCore.RU_A11Y_CUSTOM_RULES,
-  getRuleMeta: ruA11yCore.getRuleMeta,
-  eslintRuleToAxeId: ruA11yCore.ESLINT_RULE_TO_AXE_ID,
-
-  // Все кастомные правила
-  rules: {
-    'require-skip-link': requireSkipLink,
-    'no-table-layout': noTableLayout,
-    'require-lang-attr': requireLangAttr,
-    'require-title-semantic': requireTitleSemantic,
-    'zoom-200-warning': zoom200Warning,
-    'no-frame-structure': noFrameStructure,
-    'table-requires-th': tableRequiresTh,
-    'require-main-landmark': requireMainLandmark,
-    'require-h1': requireH1,
-    'no-autoplay-media': noAutoplayMedia,
-    // Обёрнутые правила jsx-a11y с русскими сообщениями
-    // Доступны как @ru-a11y/gost-a11y/jsx-a11y/alt-text и т.д.
-    ...Object.fromEntries(
-      Object.entries(jsxA11yRu).map(([name, rule]) => [`jsx-a11y/${name}`, rule]),
-    ),
-  },
+const core = require('ru-a11y-toolkit-core');
+const { version } = require('./package.json');
+const { rules } = require('./rules');
+const levels = {
+  recommended: require('./configs/levels/recommended'),
+  'gost-aa': require('./configs/levels/gost-aa'),
+  strict: require('./configs/levels/strict'),
 };
 
-function toFlatRuleId(ruleId) {
-  return ruleId.replace(/^@ru-a11y\/gost-a11y\//, 'ru-a11y/');
-}
+/** Namespace the plugin is registered under in flat config: rules are `ru-a11y/<rule>`. */
+const NAMESPACE = 'ru-a11y';
 
-function toFlatRules(rules) {
+const plugin = {
+  meta: { name: 'ru-a11y-toolkit-eslint', version },
+  rules,
+
+  // Shared rule catalog, handy for custom tooling built on top of the plugin.
+  rulesMeta: core.RU_A11Y_RULES,
+  customRulesMeta: core.RU_A11Y_CUSTOM_RULES,
+  getRuleMeta: core.getRuleMeta,
+  eslintRuleToAxeId: core.ESLINT_RULE_TO_AXE_ID,
+};
+
+function withNamespace(ruleLevels) {
   return Object.fromEntries(
-    Object.entries(rules).map(([ruleId, ruleConfig]) => [toFlatRuleId(ruleId), ruleConfig]),
+    Object.entries(ruleLevels).map(([ruleId, level]) => [`${NAMESPACE}/${ruleId}`, level]),
   );
 }
 
-// Flat Config-объекты строятся после plugin, чтобы избежать циклических зависимостей.
-// В flat config ESLint разбирает scoped rule id по слешам, поэтому rule id вида
-// @ru-a11y/gost-a11y/jsx-a11y/alt-text воспринимается как отдельный плагин.
-// Короткий namespace ru-a11y позволяет оставить rule name jsx-a11y/alt-text.
-const flatPlugins = { 'ru-a11y': plugin };
+function createFlatConfig(level, extra = {}) {
+  return {
+    name: `${NAMESPACE}/${level}`,
+    plugins: { [NAMESPACE]: plugin },
+    languageOptions: {
+      parserOptions: { ecmaFeatures: { jsx: true } },
+    },
+    rules: withNamespace(levels[level]),
+    ...extra,
+  };
+}
+
+const recommended = createFlatConfig('recommended');
+const gostAA = createFlatConfig('gost-aa');
+const strict = createFlatConfig('strict', {
+  linterOptions: { reportUnusedDisableDirectives: 'error' },
+});
 
 plugin.configs = {
-  // === Legacy Config (ESLint 8, .eslintrc.js) ===
-
-  // Базовый уровень — ГОСТ А (критические нарушения)
   recommended,
-
-  // Полный уровень — ГОСТ AA + Постановление №102
   'gost-aa': gostAA,
-
-  // Максимальный уровень — ГОСТ AAA + дополнительные RU-паттерны
   strict,
 
-  // === Flat Config (ESLint 9+, eslint.config.js) ===
-
-  // Базовый уровень — ГОСТ А
-  'recommended/flat': {
-    name: '@ru-a11y/gost-a11y/recommended',
-    plugins: flatPlugins,
-    rules: toFlatRules(recommended.rules),
-  },
-
-  // Полный уровень — ГОСТ AA + Постановление №102
-  // Примечание: jsx-a11y нужно передать отдельно:
-  // { plugins: { 'jsx-a11y': jsxA11y } }
-  'gost-aa/flat': {
-    name: '@ru-a11y/gost-a11y/gost-aa',
-    plugins: flatPlugins,
-    rules: toFlatRules(gostAA.rules),
-  },
-
-  // Максимальный уровень — ГОСТ AAA
-  'strict/flat': {
-    name: '@ru-a11y/gost-a11y/strict',
-    plugins: flatPlugins,
-    linterOptions: {
-      reportUnusedDisableDirectives: 'error',
-    },
-    rules: toFlatRules(strict.rules),
-  },
+  // Aliases kept for projects that used the explicit `/flat` names.
+  'recommended/flat': recommended,
+  'gost-aa/flat': gostAA,
+  'strict/flat': strict,
 };
 
 module.exports = plugin;

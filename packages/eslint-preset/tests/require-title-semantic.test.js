@@ -1,6 +1,6 @@
 /**
- * Тесты для правила: require-title-semantic
- * Стандарт: ГОСТ Р 52872-2019 §5.2.3; Постановление №102 п. е)
+ * Tests for the rule: require-title-semantic
+ * GOST R 52872-2019 §5.2.3; Decree No. 102, item e)
  */
 
 'use strict';
@@ -19,7 +19,7 @@ const ruleTester = new RuleTester({
 ruleTester.run('require-title-semantic', rule, {
   valid: [
     {
-      name: 'информативный title',
+      name: 'meaningful title',
       code: `
         function Head() {
           return <title>Личный кабинет — Портал Госуслуг</title>;
@@ -27,7 +27,7 @@ ruleTester.run('require-title-semantic', rule, {
       `,
     },
     {
-      name: 'информативный title с указанием ведомства',
+      name: 'meaningful title with an agency name',
       code: `
         function Head() {
           return <title>Запись к врачу — Министерство здравоохранения РФ</title>;
@@ -35,7 +35,7 @@ ruleTester.run('require-title-semantic', rule, {
       `,
     },
     {
-      name: 'корректная структура заголовков h1→h2→h3',
+      name: 'valid heading order h1 -> h2 -> h3',
       code: `
         function Page() {
           return (
@@ -49,7 +49,7 @@ ruleTester.run('require-title-semantic', rule, {
       `,
     },
     {
-      name: 'корректная структура с несколькими h2 подряд',
+      name: 'several h2 in a row',
       code: `
         function Page() {
           return (
@@ -63,7 +63,7 @@ ruleTester.run('require-title-semantic', rule, {
       `,
     },
     {
-      name: 'заголовок с вложенным элементом (иконка)',
+      name: 'heading with a nested element (icon)',
       code: `
         function Page() {
           return (
@@ -76,7 +76,7 @@ ruleTester.run('require-title-semantic', rule, {
 
   invalid: [
     {
-      name: 'пустой title',
+      name: 'empty title',
       code: `
         function Head() {
           return <title>   </title>;
@@ -85,7 +85,7 @@ ruleTester.run('require-title-semantic', rule, {
       errors: [{ messageId: 'emptyTitle' }],
     },
     {
-      name: 'шаблонный title "страница"',
+      name: 'placeholder title "страница"',
       code: `
         function Head() {
           return <title>страница</title>;
@@ -94,7 +94,7 @@ ruleTester.run('require-title-semantic', rule, {
       errors: [{ messageId: 'genericTitle' }],
     },
     {
-      name: 'пустой заголовок h1',
+      name: 'empty h1',
       code: `
         function Page() {
           return <h1>   </h1>;
@@ -103,7 +103,7 @@ ruleTester.run('require-title-semantic', rule, {
       errors: [{ messageId: 'emptyHeading' }],
     },
     {
-      name: 'пропуск уровня заголовка: h1 → h3',
+      name: 'skipped heading level: h1 -> h3',
       code: `
         function Page() {
           return (
@@ -117,7 +117,7 @@ ruleTester.run('require-title-semantic', rule, {
       errors: [{ messageId: 'headingSkipped' }],
     },
     {
-      name: 'пропуск уровня заголовка: h2 → h4',
+      name: 'skipped heading level: h2 -> h4',
       code: `
         function Page() {
           return (

@@ -1,6 +1,6 @@
 /**
- * Тесты для правила: zoom-200-warning
- * Стандарт: Постановление Правительства РФ №102 п. б)
+ * Tests for the rule: zoom-200-warning
+ * Government Decree No. 102, item b)
  */
 
 'use strict';
@@ -19,7 +19,7 @@ const ruleTester = new RuleTester({
 ruleTester.run('zoom-200-warning', rule, {
   valid: [
     {
-      name: 'viewport без ограничений масштабирования',
+      name: 'viewport without zoom restrictions',
       code: `
         function Head() {
           return <meta name="viewport" content="width=device-width, initial-scale=1.0" />;
@@ -27,7 +27,7 @@ ruleTester.run('zoom-200-warning', rule, {
       `,
     },
     {
-      name: 'viewport с maximum-scale=2.0',
+      name: 'viewport with maximum-scale=2.0',
       code: `
         function Head() {
           return <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0" />;
@@ -35,7 +35,7 @@ ruleTester.run('zoom-200-warning', rule, {
       `,
     },
     {
-      name: 'viewport с maximum-scale=5.0',
+      name: 'viewport with maximum-scale=5.0',
       code: `
         function Head() {
           return <meta name="viewport" content="width=device-width, maximum-scale=5.0" />;
@@ -43,7 +43,7 @@ ruleTester.run('zoom-200-warning', rule, {
       `,
     },
     {
-      name: 'нормальный размер шрифта 16px',
+      name: 'font size 16px',
       code: `
         function Component() {
           return <p style={{ fontSize: '16px' }}>Текст</p>;
@@ -51,7 +51,7 @@ ruleTester.run('zoom-200-warning', rule, {
       `,
     },
     {
-      name: 'нормальный размер шрифта 1rem',
+      name: 'font size 1rem',
       code: `
         function Component() {
           return <p style={{ fontSize: '1rem' }}>Текст</p>;
@@ -59,7 +59,7 @@ ruleTester.run('zoom-200-warning', rule, {
       `,
     },
     {
-      name: 'нормальный размер шрифта 1.2rem',
+      name: 'font size 1.2rem',
       code: `
         function Component() {
           return <p style={{ fontSize: '1.2rem' }}>Текст</p>;
@@ -67,7 +67,7 @@ ruleTester.run('zoom-200-warning', rule, {
       `,
     },
     {
-      name: 'мета-тег без name="viewport"',
+      name: 'meta tag other than viewport',
       code: `
         function Head() {
           return <meta name="description" content="Описание страницы" />;
@@ -78,7 +78,7 @@ ruleTester.run('zoom-200-warning', rule, {
 
   invalid: [
     {
-      name: 'viewport с user-scalable=no',
+      name: 'viewport with user-scalable=no',
       code: `
         function Head() {
           return <meta name="viewport" content="width=device-width, user-scalable=no" />;
@@ -87,7 +87,7 @@ ruleTester.run('zoom-200-warning', rule, {
       errors: [{ messageId: 'userScalableNo' }],
     },
     {
-      name: 'viewport с maximum-scale=1.0',
+      name: 'viewport with maximum-scale=1.0',
       code: `
         function Head() {
           return <meta name="viewport" content="width=device-width, maximum-scale=1.0" />;
@@ -96,7 +96,7 @@ ruleTester.run('zoom-200-warning', rule, {
       errors: [{ messageId: 'maxScaleLow' }],
     },
     {
-      name: 'viewport с maximum-scale=1.5',
+      name: 'viewport with maximum-scale=1.5',
       code: `
         function Head() {
           return <meta name="viewport" content="width=device-width, maximum-scale=1.5" />;
@@ -105,7 +105,7 @@ ruleTester.run('zoom-200-warning', rule, {
       errors: [{ messageId: 'maxScaleLow' }],
     },
     {
-      name: 'слишком маленький шрифт 12px',
+      name: 'font size 12px is too small',
       code: `
         function Component() {
           return <small style={{ fontSize: '12px' }}>Сноска</small>;
@@ -114,7 +114,7 @@ ruleTester.run('zoom-200-warning', rule, {
       errors: [{ messageId: 'smallFontSize' }],
     },
     {
-      name: 'слишком маленький шрифт 0.7rem',
+      name: 'font size 0.7rem is too small',
       code: `
         function Component() {
           return <span style={{ fontSize: '0.7rem' }}>Текст</span>;
@@ -123,7 +123,7 @@ ruleTester.run('zoom-200-warning', rule, {
       errors: [{ messageId: 'smallFontSize' }],
     },
     {
-      name: 'фиксированная ширина 800px',
+      name: 'fixed width 800px',
       code: `
         function Component() {
           return <div style={{ width: '800px' }}>Контент</div>;

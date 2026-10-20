@@ -1,36 +1,34 @@
-/**
- * Правило: require-skip-link
- * Описание: Обязательное наличие ссылки «пропустить навигацию» в начале страницы
- * Стандарт: ГОСТ Р 52872-2019 §5.2.3.1, уровень A
- * Постановление №102: п. а) — беспрепятственный доступ с клавиатуры и скринридеров
- *
- * Это правило проверяет наличие skip-navigation ссылки в JSX-разметке.
- * Ссылка должна быть одним из первых интерактивных элементов на странице
- * и вести на основной контент (href="#main", "#content", "#maincontent").
- */
-
 'use strict';
 
-const messages = require('../messages');
+/**
+ * require-skip-link
+ * `<body>` must start with a "skip to content" link pointing at the main content,
+ * so keyboard and screen reader users can bypass repeated navigation.
+ * GOST R 52872-2019, §5.2.3.1; Government Decree No. 102, item a).
+ */
 
-/** Допустимые значения href для ссылки пропуска */
-const VALID_SKIP_HREFS = new Set([
+const messages = require('../messages');
+const { createRule, getOptions } = require('./utils/create-rule');
+const { getChildElements, getElementName, getStaticAttribute } = require('./utils/jsx');
+
+const DEFAULT_SKIP_HREFS = [
   '#main',
   '#content',
   '#maincontent',
   '#main-content',
   '#основной-контент',
-]);
+];
 
-module.exports = {
+/** The skip link has to be among the first focusable things on the page. */
+const MAX_SKIP_LINK_POSITION = 3;
+
+module.exports = createRule({
+  name: 'require-skip-link',
   meta: {
     type: 'problem',
     docs: {
       description:
         'Требует наличия ссылки пропуска навигации в начале страницы (ГОСТ Р 52872-2019 §5.2.3.1)',
-      category: 'Доступность',
-      recommended: true,
-      url: 'https://github.com/ru-a11y/ru-a11y/blob/main/docs/rules/require-skip-link.md',
     },
     messages: {
       missing: messages.requireSkipLink.missing,
@@ -41,7 +39,6 @@ module.exports = {
       {
         type: 'object',
         properties: {
-          // Дополнительные допустимые значения href
           allowedHrefs: {
             type: 'array',
             items: { type: 'string' },
@@ -54,56 +51,24 @@ module.exports = {
   },
 
   create(context) {
-    const options = context.options[0] || {};
-    const allowedHrefs = new Set([...VALID_SKIP_HREFS, ...(options.allowedHrefs || [])]);
+    const { allowedHrefs = [] } = getOptions(context);
+    const skipHrefs = new Set([...DEFAULT_SKIP_HREFS, ...allowedHrefs]);
+
+    const isSkipLink = (element) =>
+      getElementName(element.openingElement) === 'a' &&
+      skipHrefs.has(getStaticAttribute(element.openingElement, 'href'));
 
     return {
-      // Проверяем JSX-элементы, которые могут быть корнем документа
       JSXElement(node) {
-        const openingEl = node.openingElement;
-        const tagName =
-          openingEl.name && openingEl.name.type === 'JSXIdentifier' ? openingEl.name.name : null;
+        if (getElementName(node.openingElement) !== 'body') return;
 
-        // Проверяем только элементы body (для серверного рендеринга) или обёрточные компоненты
-        if (tagName === 'body') {
-          // Ищем skip-link среди первых дочерних элементов
-          const children = node.children.filter((c) => c.type === 'JSXElement');
+        const children = getChildElements(node);
+        if (children.length === 0) return;
 
-          if (children.length === 0) return;
-
-          // Проверяем первые 3 дочерних элемента
-          const firstChildren = children.slice(0, 3);
-          const hasSkip = firstChildren.some((child) => {
-            const childTag =
-              child.openingElement.name && child.openingElement.name.type === 'JSXIdentifier'
-                ? child.openingElement.name.name
-                : null;
-
-            if (childTag === 'a') {
-              const hrefAttr = child.openingElement.attributes.find(
-                (attr) => attr.type === 'JSXAttribute' && attr.name && attr.name.name === 'href',
-              );
-
-              if (!hrefAttr || !hrefAttr.value) return false;
-
-              const hrefValue =
-                hrefAttr.value.type === 'Literal'
-                  ? hrefAttr.value.value
-                  : hrefAttr.value.type === 'JSXExpressionContainer' &&
-                      hrefAttr.value.expression.type === 'Literal'
-                    ? hrefAttr.value.expression.value
-                    : null;
-
-              return hrefValue && allowedHrefs.has(hrefValue);
-            }
-            return false;
-          });
-
-          if (!hasSkip) {
-            context.report({ node, messageId: 'missing' });
-          }
+        if (!children.slice(0, MAX_SKIP_LINK_POSITION).some(isSkipLink)) {
+          context.report({ node, messageId: 'missing' });
         }
       },
     };
   },
-};
+});

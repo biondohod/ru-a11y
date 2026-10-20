@@ -1,86 +1,58 @@
 'use strict';
 
-const { getRuleMeta } = require('ru-a11y-toolkit-core');
+/**
+ * require-h1
+ * A page needs a non-empty first level heading.
+ * GOST R 52872-2019, §5.2.3; WCAG 2.1, 2.4.6.
+ */
 
-const pageMeta = getRuleMeta('page-has-heading-one');
-const emptyMeta = getRuleMeta('empty-heading');
+const {
+  createRule,
+  getFilename,
+  isPageLikeFile,
+  messageFromCatalog,
+} = require('./utils/create-rule');
+const { getElementName, getStaticAttribute, hasContent } = require('./utils/jsx');
 
-function getJSXName(node) {
-  return node && node.type === 'JSXIdentifier' ? node.name : null;
-}
+function hasAccessibleName(element) {
+  const { openingElement } = element;
 
-function getLiteralAttribute(node, name) {
-  const attr = node.attributes.find(
-    (item) => item.type === 'JSXAttribute' && item.name && item.name.name === name,
-  );
-
-  if (!attr || !attr.value) return null;
-  if (attr.value.type === 'Literal') return String(attr.value.value);
-  if (attr.value.type === 'JSXExpressionContainer' && attr.value.expression.type === 'Literal') {
-    return String(attr.value.expression.value);
-  }
-
-  return null;
-}
-
-function hasTextContent(node) {
-  return node.children.some((child) => {
-    if (child.type === 'JSXText') return child.value.trim().length > 0;
-    if (child.type === 'JSXExpressionContainer' && child.expression.type === 'Literal') {
-      return String(child.expression.value ?? '').trim().length > 0;
-    }
-    return child.type === 'JSXElement';
-  });
-}
-
-function shouldCheckFile(context) {
-  const filename = context.filename || (context.getFilename && context.getFilename()) || '';
   return (
-    /(?:^|[\\/])(app|pages?|routes?|layouts?)(?:[\\/]|$)/i.test(filename) ||
-    /(?:app|page|layout|route|screen|view|index)\.[jt]sx?$/i.test(filename)
+    hasContent(element) ||
+    Boolean(getStaticAttribute(openingElement, 'aria-label')) ||
+    Boolean(getStaticAttribute(openingElement, 'aria-labelledby'))
   );
 }
 
-module.exports = {
+module.exports = createRule({
+  name: 'require-h1',
   meta: {
     type: 'problem',
-    docs: {
-      description: 'Требует наличие информативного заголовка первого уровня',
-      category: 'Доступность',
-      recommended: true,
-      url: 'https://github.com/ru-a11y/ru-a11y/blob/main/docs/rules/require-h1.md',
-    },
+    docs: { description: 'Требует наличие информативного заголовка первого уровня' },
     messages: {
-      missing: `${pageMeta.title}. ${pageMeta.fix} [${pageMeta.gost ?? 'ГОСТ Р 52872-2019'}; ${pageMeta.wcag ?? 'WCAG 2.1'}]`,
-      empty: `${emptyMeta.title}. ${emptyMeta.fix} [${emptyMeta.gost ?? 'ГОСТ Р 52872-2019'}; ${emptyMeta.wcag ?? 'WCAG 2.1'}]`,
+      missing: messageFromCatalog('page-has-heading-one'),
+      empty: messageFromCatalog('empty-heading'),
     },
-    schema: [],
   },
 
   create(context) {
+    const isPage = isPageLikeFile(getFilename(context));
     let hasH1 = false;
-    const shouldCheck = shouldCheckFile(context);
 
     return {
       JSXElement(node) {
-        const tagName = getJSXName(node.openingElement.name);
-        if (tagName !== 'h1') return;
+        if (getElementName(node.openingElement) !== 'h1') return;
 
         hasH1 = true;
-        const hasAccessibleName =
-          hasTextContent(node) ||
-          getLiteralAttribute(node.openingElement, 'aria-label') ||
-          getLiteralAttribute(node.openingElement, 'aria-labelledby');
-
-        if (!hasAccessibleName) {
+        if (!hasAccessibleName(node)) {
           context.report({ node, messageId: 'empty' });
         }
       },
       'Program:exit'(node) {
-        if (shouldCheck && !hasH1) {
+        if (isPage && !hasH1) {
           context.report({ node, messageId: 'missing' });
         }
       },
     };
   },
-};
+});

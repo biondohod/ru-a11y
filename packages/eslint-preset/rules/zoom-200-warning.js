@@ -1,101 +1,79 @@
-/**
- * Правило: zoom-200-warning
- * Описание: Предупреждение о потенциальных проблемах с масштабированием 200%
- * Стандарт: Постановление Правительства РФ №102 п. б)
- *
- * Проверяет:
- * 1. Мета-тег viewport: user-scalable=no и maximum-scale < 2
- * 2. Инлайн-стили с маленькими размерами шрифта (< 16px/1rem)
- * 3. Фиксированные ширины контейнеров в инлайн-стилях
- */
-
 'use strict';
 
+/**
+ * zoom-200-warning
+ * Pages must stay usable at 200% zoom (Government Decree No. 102, item b)). Flags:
+ * - `<meta name="viewport">` with `user-scalable=no` or `maximum-scale` below 2;
+ * - inline `fontSize` below the configured minimum;
+ * - inline fixed `width` above 200px.
+ */
+
 const messages = require('../messages');
+const { createRule, getOptions } = require('./utils/create-rule');
+const {
+  findAttribute,
+  getElementName,
+  getStaticAttribute,
+  getStaticValue,
+} = require('./utils/jsx');
+
+const DEFAULT_MIN_FONT_SIZE_PX = 16;
+const MAX_FIXED_WIDTH_PX = 200;
+const MIN_MAXIMUM_SCALE = 2;
 
 /**
- * Разбирает строку content мета-тега viewport
- * @param {string} content - значение атрибута content
- * @returns {Object} - объект с параметрами viewport
+ * Minimum font size per unit as a fraction of `minFontSizePx`, assuming a 16px root.
+ * `em` is relative to the parent, so it gets a slightly lower bar (14px at the default).
  */
-function parseViewportContent(content) {
-  const result = {};
-  content.split(',').forEach((part) => {
-    const [key, value] = part
-      .trim()
-      .split('=')
-      .map((s) => s.trim());
-    if (key && value !== undefined) {
-      result[key] = value;
-    }
-  });
-  return result;
+const MIN_FONT_SIZE_FACTOR = { px: 1, rem: 1 / 16, em: 0.875 / 16, pt: 0.75 };
+const CSS_LENGTH = /^(\d+(?:\.\d+)?)(px|rem|em|pt)$/;
+
+/** `width=device-width, user-scalable=no` -> `{ width: 'device-width', 'user-scalable': 'no' }` */
+function parseViewport(content) {
+  return Object.fromEntries(
+    content
+      .split(',')
+      .map((part) => part.split('=').map((token) => token.trim()))
+      .filter(([key, value]) => key && value !== undefined),
+  );
 }
 
 /**
- * Проверяет, является ли значение размера шрифта слишком малым
- * @param {string|number} value - значение CSS-свойства
- * @returns {{ tooSmall: boolean, value: string }}
+ * Parses a literal CSS length. React treats bare numbers as px.
+ * Returns `null` for anything else (`inherit`, `calc()`, percentages).
  */
-function checkFontSize(value) {
-  if (typeof value === 'number') {
-    return { tooSmall: value < 16, value: `${value}px` };
-  }
-  if (typeof value === 'string') {
-    // Проверяем px
-    const pxMatch = /^(\d+(?:\.\d+)?)px$/.exec(value);
-    if (pxMatch) {
-      const px = parseFloat(pxMatch[1]);
-      return { tooSmall: px < 16, value };
-    }
-    // Проверяем rem/em
-    const remMatch = /^(\d+(?:\.\d+)?)rem$/.exec(value);
-    if (remMatch) {
-      const rem = parseFloat(remMatch[1]);
-      return { tooSmall: rem < 1, value };
-    }
-    const emMatch = /^(\d+(?:\.\d+)?)em$/.exec(value);
-    if (emMatch) {
-      const em = parseFloat(emMatch[1]);
-      return { tooSmall: em < 0.875, value };
-    }
-    // pt
-    const ptMatch = /^(\d+(?:\.\d+)?)pt$/.exec(value);
-    if (ptMatch) {
-      const pt = parseFloat(ptMatch[1]);
-      return { tooSmall: pt < 12, value };
-    }
-  }
-  return { tooSmall: false, value: String(value) };
+function parseLength(value) {
+  if (typeof value === 'number') return { amount: value, unit: 'px' };
+  if (typeof value !== 'string') return null;
+
+  const match = CSS_LENGTH.exec(value.trim());
+  return match ? { amount: Number(match[1]), unit: match[2] } : null;
 }
 
-/**
- * Получает значение атрибута JSX
- * @param {import('@typescript-eslint/types').TSESTree.JSXAttribute} attr
- * @returns {string|null}
- */
-function getAttrStringValue(attr) {
-  if (!attr || !attr.value) return null;
-  if (attr.value.type === 'Literal') return String(attr.value.value);
-  if (
-    attr.value.type === 'JSXExpressionContainer' &&
-    attr.value.expression &&
-    attr.value.expression.type === 'Literal'
-  ) {
-    return String(attr.value.expression.value);
-  }
+function getPropertyName(property) {
+  if (property.key.type === 'Identifier') return property.key.name;
+  if (property.key.type === 'Literal') return String(property.key.value);
   return null;
 }
 
-module.exports = {
+function getInlineStyleProperties(openingElement) {
+  const style = findAttribute(openingElement, 'style');
+  const expression = style && style.value && style.value.expression;
+
+  if (!expression || expression.type !== 'ObjectExpression') return [];
+
+  return expression.properties.filter(
+    (property) => property.type === 'Property' && property.value.type === 'Literal',
+  );
+}
+
+module.exports = createRule({
+  name: 'zoom-200-warning',
   meta: {
     type: 'suggestion',
     docs: {
       description:
         'Предупреждает о потенциальных проблемах с масштабированием 200% (Постановление №102 п. б))',
-      category: 'Доступность',
-      recommended: true,
-      url: 'https://github.com/ru-a11y/ru-a11y/blob/main/docs/rules/zoom-200-warning.md',
     },
     messages: {
       userScalableNo: messages.zoom200Warning.userScalableNo,
@@ -107,13 +85,11 @@ module.exports = {
       {
         type: 'object',
         properties: {
-          // Минимальный размер шрифта в px (по умолчанию 16)
           minFontSizePx: {
             type: 'number',
-            default: 16,
+            default: DEFAULT_MIN_FONT_SIZE_PX,
             description: 'Минимальный допустимый размер шрифта в пикселях',
           },
-          // Проверять ли инлайн-стили (по умолчанию true)
           checkInlineStyles: {
             type: 'boolean',
             default: true,
@@ -126,117 +102,66 @@ module.exports = {
   },
 
   create(context) {
-    const options = context.options[0] || {};
-    const checkInlineStyles = options.checkInlineStyles !== false;
+    const { minFontSizePx = DEFAULT_MIN_FONT_SIZE_PX, checkInlineStyles = true } =
+      getOptions(context);
+
+    function checkViewport(node) {
+      if (getStaticAttribute(node, 'name') !== 'viewport') return;
+
+      const contentAttribute = findAttribute(node, 'content');
+      const content = getStaticValue(contentAttribute);
+      if (!content) return;
+
+      const viewport = parseViewport(content);
+      const reportNode = contentAttribute || node;
+
+      if (viewport['user-scalable'] === 'no' || viewport['user-scalable'] === '0') {
+        context.report({ node: reportNode, messageId: 'userScalableNo' });
+      }
+
+      const maximumScale = Number.parseFloat(viewport['maximum-scale']);
+      if (!Number.isNaN(maximumScale) && maximumScale < MIN_MAXIMUM_SCALE) {
+        context.report({
+          node: reportNode,
+          messageId: 'maxScaleLow',
+          data: { value: viewport['maximum-scale'] },
+        });
+      }
+    }
+
+    function checkInlineStyle(node) {
+      for (const property of getInlineStyleProperties(node)) {
+        const name = getPropertyName(property);
+        const length = parseLength(property.value.value);
+        if (!length) continue;
+
+        if (
+          name === 'fontSize' &&
+          length.amount < minFontSizePx * MIN_FONT_SIZE_FACTOR[length.unit]
+        ) {
+          context.report({
+            node: property,
+            messageId: 'smallFontSize',
+            data: { value: `${length.amount}${length.unit}` },
+          });
+        }
+
+        if (name === 'width' && length.unit === 'px' && length.amount > MAX_FIXED_WIDTH_PX) {
+          context.report({ node: property, messageId: 'fixedLayout' });
+        }
+      }
+    }
 
     return {
       JSXOpeningElement(node) {
-        const tagName = node.name && node.name.type === 'JSXIdentifier' ? node.name.name : null;
-
-        // --- Проверка мета-тега viewport ---
-        if (tagName === 'meta') {
-          const nameAttr = node.attributes.find(
-            (attr) => attr.type === 'JSXAttribute' && attr.name && attr.name.name === 'name',
-          );
-          const nameValue = getAttrStringValue(nameAttr);
-
-          if (nameValue === 'viewport') {
-            const contentAttr = node.attributes.find(
-              (attr) => attr.type === 'JSXAttribute' && attr.name && attr.name.name === 'content',
-            );
-            const contentValue = getAttrStringValue(contentAttr);
-
-            if (contentValue) {
-              const viewportParams = parseViewportContent(contentValue);
-
-              // Проверяем user-scalable=no
-              if (
-                viewportParams['user-scalable'] === 'no' ||
-                viewportParams['user-scalable'] === '0'
-              ) {
-                context.report({
-                  node: contentAttr || node,
-                  messageId: 'userScalableNo',
-                });
-              }
-
-              // Проверяем maximum-scale < 2
-              if (viewportParams['maximum-scale']) {
-                const maxScale = parseFloat(viewportParams['maximum-scale']);
-                if (!isNaN(maxScale) && maxScale < 2) {
-                  context.report({
-                    node: contentAttr || node,
-                    messageId: 'maxScaleLow',
-                    data: { value: viewportParams['maximum-scale'] },
-                  });
-                }
-              }
-            }
-          }
+        if (getElementName(node) === 'meta') {
+          checkViewport(node);
         }
 
-        // --- Проверка инлайн-стилей ---
-        if (!checkInlineStyles) return;
-
-        const styleAttr = node.attributes.find(
-          (attr) => attr.type === 'JSXAttribute' && attr.name && attr.name.name === 'style',
-        );
-
-        if (
-          styleAttr &&
-          styleAttr.value &&
-          styleAttr.value.type === 'JSXExpressionContainer' &&
-          styleAttr.value.expression &&
-          styleAttr.value.expression.type === 'ObjectExpression'
-        ) {
-          const styleObj = styleAttr.value.expression;
-
-          for (const prop of styleObj.properties) {
-            if (prop.type !== 'Property') continue;
-
-            const propName =
-              prop.key.type === 'Identifier'
-                ? prop.key.name
-                : prop.key.type === 'Literal'
-                  ? String(prop.key.value)
-                  : null;
-
-            if (!propName) continue;
-
-            const propValue = prop.value.type === 'Literal' ? prop.value.value : null;
-
-            // Проверяем fontSize
-            if (propName === 'fontSize' && propValue !== null) {
-              const { tooSmall, value } = checkFontSize(propValue);
-              if (tooSmall) {
-                context.report({
-                  node: prop,
-                  messageId: 'smallFontSize',
-                  data: { value },
-                });
-              }
-            }
-
-            // Проверяем фиксированную ширину > 200px
-            if (propName === 'width' && typeof propValue === 'number' && propValue > 200) {
-              context.report({
-                node: prop,
-                messageId: 'fixedLayout',
-              });
-            }
-
-            if (propName === 'width' && typeof propValue === 'string') {
-              const pxMatch = /^(\d+(?:\.\d+)?)px$/.exec(propValue);
-              if (pxMatch && parseFloat(pxMatch[1]) > 200) {
-                context.report({
-                  node: prop,
-                  messageId: 'fixedLayout',
-                });
-              }
-            }
-          }
+        if (checkInlineStyles) {
+          checkInlineStyle(node);
         }
       },
     };
   },
-};
+});

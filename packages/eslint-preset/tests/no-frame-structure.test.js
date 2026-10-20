@@ -1,6 +1,6 @@
 /**
- * Тесты для правила: no-frame-structure
- * Стандарт: ГОСТ Р 52872-2019 §5.1.1; Постановление №102 п. а)
+ * Tests for the rule: no-frame-structure
+ * GOST R 52872-2019 §5.1.1; Decree No. 102, item a)
  */
 
 'use strict';
@@ -19,7 +19,7 @@ const ruleTester = new RuleTester({
 ruleTester.run('no-frame-structure', rule, {
   valid: [
     {
-      name: 'iframe с информативным title',
+      name: 'iframe with a meaningful title',
       code: `
         function Map() {
           return <iframe src="map.html" title="Карта расположения офиса" />;
@@ -27,7 +27,7 @@ ruleTester.run('no-frame-structure', rule, {
       `,
     },
     {
-      name: 'iframe с динамическим title',
+      name: 'iframe with a dynamic title',
       code: `
         function Video({ videoTitle }) {
           return <iframe src="video.html" title={videoTitle} />;
@@ -35,7 +35,7 @@ ruleTester.run('no-frame-structure', rule, {
       `,
     },
     {
-      name: 'iframe с title через переменную',
+      name: 'iframe with a title from a variable',
       code: `
         const TITLE = "Виджет погоды";
         function Weather() {
@@ -44,7 +44,7 @@ ruleTester.run('no-frame-structure', rule, {
       `,
     },
     {
-      name: 'обычные HTML-элементы разрешены',
+      name: 'regular HTML elements are allowed',
       code: `
         function Page() {
           return (
@@ -60,7 +60,7 @@ ruleTester.run('no-frame-structure', rule, {
 
   invalid: [
     {
-      name: 'элемент <frame> запрещён',
+      name: '<frame> is forbidden',
       code: `
         function OldApp() {
           return <frame src="page.html" />;
@@ -69,7 +69,7 @@ ruleTester.run('no-frame-structure', rule, {
       errors: [{ messageId: 'frameElement' }],
     },
     {
-      name: 'элемент <frameset> запрещён',
+      name: '<frameset> is forbidden',
       code: `
         function OldApp() {
           return (
@@ -82,13 +82,13 @@ ruleTester.run('no-frame-structure', rule, {
       `,
       errors: [
         { messageId: 'framesetElement' },
-        // frame внутри тоже отловится
+        // a nested frame is reported too
         { messageId: 'frameElement' },
         { messageId: 'frameElement' },
       ],
     },
     {
-      name: 'iframe без атрибута title',
+      name: 'iframe without a title',
       code: `
         function Page() {
           return <iframe src="widget.html" />;
@@ -97,7 +97,7 @@ ruleTester.run('no-frame-structure', rule, {
       errors: [{ messageId: 'iframeWithoutTitle' }],
     },
     {
-      name: 'iframe с пустым title',
+      name: 'iframe with an empty title',
       code: `
         function Page() {
           return <iframe src="widget.html" title="" />;
@@ -106,7 +106,7 @@ ruleTester.run('no-frame-structure', rule, {
       errors: [{ messageId: 'iframeEmptyTitle' }],
     },
     {
-      name: 'iframe с пробельным title',
+      name: 'iframe with a whitespace-only title',
       code: `
         function Page() {
           return <iframe src="widget.html" title="   " />;

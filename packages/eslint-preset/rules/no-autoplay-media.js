@@ -1,44 +1,33 @@
 'use strict';
 
-const { getRuleMeta } = require('ru-a11y-toolkit-core');
+/**
+ * no-autoplay-media
+ * Audio or video must not start playing sound on its own without a way to stop it.
+ * WCAG 2.1, 1.4.2 Audio Control; Government Decree No. 102.
+ */
 
-const meta = getRuleMeta('no-autoplay-audio');
+const { createRule, messageFromCatalog } = require('./utils/create-rule');
+const { getElementName, hasAttribute } = require('./utils/jsx');
 
-function getJSXName(node) {
-  return node && node.type === 'JSXIdentifier' ? node.name : null;
-}
+const MEDIA_TAGS = new Set(['audio', 'video']);
 
-function hasAttribute(node, name) {
-  return node.attributes.some(
-    (item) => item.type === 'JSXAttribute' && item.name && item.name.name === name,
-  );
-}
-
-module.exports = {
+module.exports = createRule({
+  name: 'no-autoplay-media',
   meta: {
     type: 'problem',
-    docs: {
-      description: 'Запрещает autoplay для audio/video без controls или muted',
-      category: 'Доступность',
-      recommended: true,
-      url: 'https://github.com/ru-a11y/ru-a11y/blob/main/docs/rules/no-autoplay-media.md',
-    },
-    messages: {
-      autoplay: `${meta.title}. ${meta.fix} [${meta.post102 ?? 'Постановление №102'}; ${meta.wcag ?? 'WCAG 2.1'}]`,
-    },
-    schema: [],
+    docs: { description: 'Запрещает autoplay для audio/video без controls или muted' },
+    messages: { autoplay: messageFromCatalog('no-autoplay-audio', 'post102') },
   },
 
   create(context) {
     return {
       JSXOpeningElement(node) {
-        const tagName = getJSXName(node.name);
-        if (tagName !== 'audio' && tagName !== 'video') return;
-        if (!hasAttribute(node, 'autoPlay') && !hasAttribute(node, 'autoplay')) return;
-        if (hasAttribute(node, 'controls') || hasAttribute(node, 'muted')) return;
+        if (!MEDIA_TAGS.has(getElementName(node))) return;
+        if (!hasAttribute(node, 'autoPlay', 'autoplay')) return;
+        if (hasAttribute(node, 'controls', 'muted')) return;
 
         context.report({ node, messageId: 'autoplay' });
       },
     };
   },
-};
+});
