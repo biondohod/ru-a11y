@@ -1,7 +1,7 @@
 {
   "name": "ru-a11y-toolkit-cli",
   "version": "2.1.0",
-  "description": "CLI-аудит веб-доступности по ГОСТ и Постановлению №102 на базе Puppeteer + axe-core.",
+  "description": "Accessibility auditor for live pages (Puppeteer + axe-core + ESLint) with reports mapped to GOST R 52872-2019 and Russian Government Decree No. 102.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
@@ -42,7 +42,7 @@
     "url": "https://github.com/biondohod/ru-a11y.git",
     "directory": "packages/cli"
   },
-  "homepage": "https://github.com/biondohod/ru-a11y/tree/main/packages/cli#readme",
+  "homepage": "https://github.com/biondohod/ru-a11y/tree/master/packages/cli#readme",
   "bugs": {
     "url": "https://github.com/biondohod/ru-a11y/issues"
   },

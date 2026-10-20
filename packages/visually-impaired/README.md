@@ -1,17 +1,23 @@
 # ru-a11y-toolkit-visually-impaired
 
-Модуль пользовательских настроек отображения для версии сайта для слабовидящих. Часть `ru-a11y-toolkit`.
+[![npm version](https://img.shields.io/npm/v/ru-a11y-toolkit-visually-impaired)](https://www.npmjs.com/package/ru-a11y-toolkit-visually-impaired)
+[![license](https://img.shields.io/npm/l/ru-a11y-toolkit-visually-impaired)](../../LICENSE)
 
-Пакет решает две задачи:
+The "version for the visually impaired" that Russian public sector sites are expected to offer,
+as a React package: a ready-made settings panel, hooks to build your own controls, and a
+stylesheet that applies the settings to any page. Part of [ru-a11y-toolkit](../../README.md).
 
-- дает готовый минимальный левый overlay `VisuallyImpairedOverlay`;
-- экспортирует хуки и низкоуровневые функции, чтобы разработчик мог встроить те же настройки в собственную шапку, профиль пользователя или дизайн-систему.
+Settings are stored in `localStorage`, survive reloads and stay in sync across open tabs.
 
-Настройки сохраняются в `localStorage` и автоматически применяются ко всем страницам SPA между сессиями.
+## Install
 
-Важно: отдельные настройки можно использовать без полного режима `ru-a11y-visually-impaired`. Например, пользователь может только подчеркнуть ссылки или увеличить интервал, не включая черно-белую версию сайта. Полный режим остается отдельной кнопкой и включает готовый набор усилений.
+```bash
+npm install ru-a11y-toolkit-visually-impaired
+```
 
-## Быстрый Старт
+Peer dependencies: `react` and `react-dom` 17, 18 or 19.
+
+## Quick start
 
 ```tsx
 import { VisuallyImpairedOverlay } from 'ru-a11y-toolkit-visually-impaired';
@@ -27,88 +33,60 @@ export function App() {
 }
 ```
 
-Overlay закреплен слева, имеет крупные текстовые кнопки и исключен из собственных глобальных стилей через `data-ru-a11y-vi-overlay`, поэтому панель остается читаемой после применения пользовательских настроек.
+The panel is pinned to the left edge, uses large text buttons and is excluded from the
+stylesheet itself, so it stays readable whatever the visitor picks.
 
-## Два Слоя
+## Two layers
 
-| Слой                | Как включается                    | Что делает                                                                                                    |
-| ------------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| Отдельные настройки | `data-ru-a11y-vi-*` на `<html>`   | Размер текста, интервал, ссылки, изображения, motion, фокус и цветовая схема применяются независимо           |
-| Полный режим        | класс `ru-a11y-visually-impaired` | Включает готовый пресет: крупный текст, высокий контраст, ссылки, alt-подписи, reduced motion и сильный фокус |
+| Layer               | Applied as                        | Effect                                                                                  |
+| ------------------- | --------------------------------- | --------------------------------------------------------------------------------------- |
+| Individual settings | `data-ru-a11y-vi-*` on `<html>`   | Each setting works on its own: e.g. only underline links                                |
+| Full mode           | `ru-a11y-visually-impaired` class | A preset on top: larger text, high contrast, alt captions, reduced motion, strong focus |
 
-Пример: `useLinkSettings().setUnderlineLinks(true)` добавит только `data-ru-a11y-vi-underline-links`, но не добавит класс `ru-a11y-visually-impaired`.
+Full mode never downgrades a stronger choice: with `fontSize: 'xlarge'` it keeps 150%.
 
-## Что Настраивается
+## Settings
 
-| Настройка             | API                                              | Что меняется                                   | Нормативная логика                                                     |
-| --------------------- | ------------------------------------------------ | ---------------------------------------------- | ---------------------------------------------------------------------- |
-| Полный режим          | `useVisuallyImpairedMode`, `useVisuallyImpaired` | Класс `ru-a11y-visually-impaired` на `<html>`  | Пользователь должен иметь доступ к версии/режиму повышенной читаемости |
-| Размер текста         | `useFontSize`                                    | `normal`, `large`, `xlarge`                    | Размер шрифта для слабовидящих, масштабирование текста                 |
-| Межстрочный интервал  | `setSettings({ lineHeight })`                    | `normal`, `wide`, `extra`                      | Читаемость длинного текста, WCAG Text Spacing                          |
-| Межбуквенный интервал | `setSettings({ letterSpacing })`                 | `normal`, `wide`                               | Дополнительная читаемость при низкой остроте зрения                    |
-| Цветовая схема        | `useColorScheme`                                 | `default`, белая, черная, синяя, бежевая схемы | Пользовательская настройка контраста и цветового восприятия            |
-| Ссылки                | `useLinkSettings`                                | Подчеркивание и дополнительное выделение       | Ссылки различимы не только цветом                                      |
-| Изображения           | `useImageSettings`                               | Обычные, ч/б, скрытые                          | Учет цветового восприятия; возможность убрать визуальный шум           |
-| Alt-подписи           | `useImageSettings`                               | Выводит подписи из `alt` под изображениями     | Текстовая альтернатива становится видимой пользователю                 |
-| Анимации              | `useMotionSettings`                              | Отключает transitions/animations               | Требования к отсутствию мигания и снижению движения                    |
-| Фокус                 | `useFocusSettings`                               | Крупный контур фокуса                          | Видимая клавиатурная навигация                                         |
+| Setting                     | Hook                                             | Values                                                                |
+| --------------------------- | ------------------------------------------------ | --------------------------------------------------------------------- |
+| Full mode                   | `useVisuallyImpairedMode`, `useVisuallyImpaired` | on / off                                                              |
+| Text size                   | `useFontSize`                                    | `normal`, `large` (125%), `xlarge` (150%)                             |
+| Line height, letter spacing | `useVisuallyImpairedSettings`                    | `normal`, `wide`, `extra`; `normal`, `wide`                           |
+| Color scheme                | `useColorScheme`                                 | `default`, `white-black`, `black-white`, `blue-yellow`, `beige-brown` |
+| Links                       | `useLinkSettings`                                | underline, highlight                                                  |
+| Images                      | `useImageSettings`                               | `normal`, `grayscale`, `hidden`; visible `alt` captions               |
+| Motion                      | `useMotionSettings`                              | disable animations and transitions                                    |
+| Focus                       | `useFocusSettings`                               | thick focus outline                                                   |
 
-## Хуки
+## Custom controls
 
 ```tsx
 import {
-  useVisuallyImpaired,
-  useFontSize,
   useColorScheme,
-  useLinkSettings,
+  useFontSize,
+  useVisuallyImpaired,
 } from 'ru-a11y-toolkit-visually-impaired';
 
-function CustomControls() {
+function AccessibilityMenu() {
   const { isEnabled, toggle, reset } = useVisuallyImpaired();
-  const { fontSize, setFontSize } = useFontSize();
-  const { colorScheme, setColorScheme } = useColorScheme();
-  const { underlineLinks, toggleUnderlineLinks } = useLinkSettings();
+  const { increaseFontSize, decreaseFontSize } = useFontSize();
+  const { setColorScheme } = useColorScheme();
 
   return (
-    <section>
+    <div role="group" aria-label="Настройки отображения">
       <button onClick={toggle} aria-pressed={isEnabled}>
-        {isEnabled ? 'Выключить полный режим' : 'Полный режим'}
+        Версия для слабовидящих
       </button>
-      <button onClick={() => setFontSize('xlarge')}>Текст 150%</button>
-      <button onClick={() => setColorScheme('default')}>Цвета сайта</button>
-      <button onClick={() => setColorScheme('black-white')}>Черная схема</button>
-      <button onClick={toggleUnderlineLinks} aria-pressed={underlineLinks}>
-        Подчеркнуть ссылки
-      </button>
-      <button onClick={reset}>Сброс</button>
-      <p>
-        Текущий размер: {fontSize}. Цветовая схема: {colorScheme}.
-      </p>
-    </section>
+      <button onClick={decreaseFontSize}>A−</button>
+      <button onClick={increaseFontSize}>A+</button>
+      <button onClick={() => setColorScheme('black-white')}>Чёрный фон</button>
+      <button onClick={reset}>Сбросить</button>
+    </div>
   );
 }
 ```
 
-Основной хук `useVisuallyImpaired()` возвращает:
-
-```ts
-{
-  (settings, setSettings, reset, isEnabled, enable, disable, toggle);
-}
-```
-
-Дополнительные хуки:
-
-- `useVisuallyImpairedSettings()`
-- `useVisuallyImpairedMode()`
-- `useFontSize()`
-- `useColorScheme()`
-- `useLinkSettings()`
-- `useImageSettings()`
-- `useMotionSettings()`
-- `useFocusSettings()`
-
-## Низкоуровневый API
+Outside React (for example, to sync with a user profile):
 
 ```ts
 import {
@@ -117,48 +95,33 @@ import {
   resetVisuallyImpairedSettings,
   initializeVisuallyImpaired,
 } from 'ru-a11y-toolkit-visually-impaired';
+
+initializeVisuallyImpaired(); // apply saved settings before React mounts
+setVisuallyImpairedSettings({ fontSize: 'large', underlineLinks: true });
 ```
 
-Эти функции полезны, если настройки нужно синхронизировать с профилем пользователя, cookie consent или серверным состоянием.
+Stored data is validated on read: unknown keys are dropped and invalid values fall back to
+defaults. Storage key: `ru-a11y-visually-impaired-settings`.
 
-## Объектный Экспорт
+## Limitations
 
-```tsx
-import { visuallyImpaired } from 'ru-a11y-toolkit-visually-impaired';
+The mode helps visitors adjust the presentation; it does not make an inaccessible page
+accessible. It works best on sites that size text in `rem`/`em`, survive 200% zoom and have
+correct semantics, which [`ru-a11y-toolkit-eslint`](../eslint-preset) and
+[`ru-a11y-toolkit-overlay`](../react-overlay) help verify.
 
-const Overlay = visuallyImpaired.Overlay;
-const { useFontSize } = visuallyImpaired.hooks;
+## Source layout
+
+```text
+src/
+  model/   setting types, defaults, validation, full mode preset, theme tokens
+  store/   localStorage access, shared settings store with cross-tab sync
+  dom/     applying settings to <html>, alt caption observer
+  hooks/   public hooks
+  ui/      VisuallyImpairedOverlay panel
+styles/visually-impaired.css
 ```
 
-## Формат Настроек
+## License
 
-```ts
-type VisuallyImpairedSettings = {
-  enabled: boolean;
-  fontSize: 'normal' | 'large' | 'xlarge';
-  lineHeight: 'normal' | 'wide' | 'extra';
-  letterSpacing: 'normal' | 'wide';
-  colorScheme: 'default' | 'white-black' | 'black-white' | 'blue-yellow' | 'beige-brown';
-  underlineLinks: boolean;
-  highlightLinks: boolean;
-  imageMode: 'normal' | 'grayscale' | 'hidden';
-  showImageAlt: boolean;
-  reducedMotion: boolean;
-  strongFocus: boolean;
-};
-```
-
-Ключ localStorage: `ru-a11y-visually-impaired-settings`.
-
-## Ограничения
-
-Модуль не заменяет доступную верстку. Он помогает пользователю настроить отображение, но сайт все равно должен быть семантичным, масштабируемым, управляемым с клавиатуры и проверенным через `ru-a11y-toolkit-eslint` и `ru-a11y-toolkit-overlay`.
-
-Лучший результат будет на сайтах, где размеры заданы в `rem`/`em`, layout не ломается при увеличении текста, а интерактивные элементы имеют корректные имена и фокус.
-
-## Проверка
-
-```bash
-npm test -w ru-a11y-toolkit-visually-impaired -- --runInBand
-npm run build -w ru-a11y-toolkit-visually-impaired
-```
+MIT

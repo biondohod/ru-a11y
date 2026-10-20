@@ -1,7 +1,7 @@
 {
   "name": "ru-a11y-toolkit-core",
   "version": "1.4.0",
-  "description": "Единое ядро правил, переводов и нормативных ссылок ru-a11y-toolkit.",
+  "description": "Shared rule catalog of ru-a11y-toolkit: Russian texts and GOST R 52872-2019 / Decree No. 102 / WCAG references for every accessibility rule.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -41,7 +41,7 @@
     "url": "https://github.com/biondohod/ru-a11y.git",
     "directory": "packages/core"
   },
-  "homepage": "https://github.com/biondohod/ru-a11y/tree/main/packages/core#readme",
+  "homepage": "https://github.com/biondohod/ru-a11y/tree/master/packages/core#readme",
   "bugs": {
     "url": "https://github.com/biondohod/ru-a11y/issues"
   },

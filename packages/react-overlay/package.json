@@ -1,7 +1,7 @@
 {
   "name": "ru-a11y-toolkit-overlay",
   "version": "2.1.0",
-  "description": "Runtime-визуализатор ошибок доступности в браузере для React-приложений. Часть ru-a11y-toolkit.",
+  "description": "React development overlay that shows accessibility violations in the browser, with Russian descriptions and GOST / Decree No. 102 references. Part of ru-a11y-toolkit.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -46,7 +46,7 @@
     "url": "https://github.com/biondohod/ru-a11y.git",
     "directory": "packages/react-overlay"
   },
-  "homepage": "https://github.com/biondohod/ru-a11y/tree/main/packages/react-overlay#readme",
+  "homepage": "https://github.com/biondohod/ru-a11y/tree/master/packages/react-overlay#readme",
   "bugs": {
     "url": "https://github.com/biondohod/ru-a11y/issues"
   },
