@@ -3,6 +3,7 @@
  *
  * Full mode uses the `ru-a11y-visually-impaired` class on <html>.
  * Individual settings work independently through data attributes on <html>.
+ * The settings panel and the ru-a11y dev overlay are never restyled.
  */
 
 :root {
@@ -24,7 +25,14 @@
 }
 
 :root[data-ru-a11y-vi-color-scheme]
-  :where(*:not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *)) {
+  :where(
+    *:not(
+      [data-ru-a11y-vi-overlay],
+      [data-ru-a11y-vi-overlay] *,
+      [data-ru-a11y-overlay],
+      [data-ru-a11y-overlay] *
+    )
+  ) {
   background-color: var(--ru-a11y-vi-bg) !important;
   background-image: none !important;
   border-color: var(--ru-a11y-vi-border) !important;
@@ -36,28 +44,49 @@
 :root[data-ru-a11y-vi-font-size]
   :where(p, span, li, td, th, label, caption, blockquote, dd, dt):not(
     [data-ru-a11y-vi-overlay],
-    [data-ru-a11y-vi-overlay] *
+    [data-ru-a11y-vi-overlay] *,
+    [data-ru-a11y-overlay],
+    [data-ru-a11y-overlay] *
   ),
 :root[data-ru-a11y-vi-font-size]
   :where(input, textarea, select, button, a):not(
     [data-ru-a11y-vi-overlay],
-    [data-ru-a11y-vi-overlay] *
+    [data-ru-a11y-vi-overlay] *,
+    [data-ru-a11y-overlay],
+    [data-ru-a11y-overlay] *
   ) {
   font-size: calc(1rem * var(--ru-a11y-vi-font-scale)) !important;
 }
 
-:root[data-ru-a11y-vi-font-size] h1:not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *) {
+:root[data-ru-a11y-vi-font-size]
+  h1:not(
+    [data-ru-a11y-vi-overlay],
+    [data-ru-a11y-vi-overlay] *,
+    [data-ru-a11y-overlay],
+    [data-ru-a11y-overlay] *
+  ) {
   font-size: calc(2rem * var(--ru-a11y-vi-font-scale)) !important;
   font-weight: 700 !important;
 }
 
-:root[data-ru-a11y-vi-font-size] h2:not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *) {
+:root[data-ru-a11y-vi-font-size]
+  h2:not(
+    [data-ru-a11y-vi-overlay],
+    [data-ru-a11y-vi-overlay] *,
+    [data-ru-a11y-overlay],
+    [data-ru-a11y-overlay] *
+  ) {
   font-size: calc(1.65rem * var(--ru-a11y-vi-font-scale)) !important;
   font-weight: 700 !important;
 }
 
 :root[data-ru-a11y-vi-font-size]
-  :where(h3, h4, h5, h6):not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *) {
+  :where(h3, h4, h5, h6):not(
+    [data-ru-a11y-vi-overlay],
+    [data-ru-a11y-vi-overlay] *,
+    [data-ru-a11y-overlay],
+    [data-ru-a11y-overlay] *
+  ) {
   font-size: calc(1.35rem * var(--ru-a11y-vi-font-scale)) !important;
   font-weight: 700 !important;
 }
@@ -79,29 +108,57 @@
     select,
     button,
     a
-  ):not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *) {
+  ):not(
+    [data-ru-a11y-vi-overlay],
+    [data-ru-a11y-vi-overlay] *,
+    [data-ru-a11y-overlay],
+    [data-ru-a11y-overlay] *
+  ) {
   line-height: var(--ru-a11y-vi-line-height) !important;
 }
 
 :root[data-ru-a11y-vi-letter-spacing]
-  :where(*:not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *)) {
+  :where(
+    *:not(
+      [data-ru-a11y-vi-overlay],
+      [data-ru-a11y-vi-overlay] *,
+      [data-ru-a11y-overlay],
+      [data-ru-a11y-overlay] *
+    )
+  ) {
   letter-spacing: var(--ru-a11y-vi-letter-spacing) !important;
 }
 
-:root[data-ru-a11y-vi-color-scheme] a:not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *) {
+:root[data-ru-a11y-vi-color-scheme]
+  a:not(
+    [data-ru-a11y-vi-overlay],
+    [data-ru-a11y-vi-overlay] *,
+    [data-ru-a11y-overlay],
+    [data-ru-a11y-overlay] *
+  ) {
   color: var(--ru-a11y-vi-link) !important;
   font-weight: 700 !important;
 }
 
 :root[data-ru-a11y-vi-underline-links]
-  a:not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *) {
+  a:not(
+    [data-ru-a11y-vi-overlay],
+    [data-ru-a11y-vi-overlay] *,
+    [data-ru-a11y-overlay],
+    [data-ru-a11y-overlay] *
+  ) {
   text-decoration: underline !important;
   text-decoration-thickness: 2px !important;
   text-underline-offset: 0.18em !important;
 }
 
 :root[data-ru-a11y-vi-highlight-links]
-  a:not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *) {
+  a:not(
+    [data-ru-a11y-vi-overlay],
+    [data-ru-a11y-vi-overlay] *,
+    [data-ru-a11y-overlay],
+    [data-ru-a11y-overlay] *
+  ) {
   background-color: var(--ru-a11y-vi-link) !important;
   color: var(--ru-a11y-vi-bg) !important;
   padding: 0.08em 0.18em !important;
@@ -110,7 +167,9 @@
 .ru-a11y-visually-impaired
   :where(button, input, textarea, select):not(
     [data-ru-a11y-vi-overlay],
-    [data-ru-a11y-vi-overlay] *
+    [data-ru-a11y-vi-overlay] *,
+    [data-ru-a11y-overlay],
+    [data-ru-a11y-overlay] *
   ) {
   border: 2px solid var(--ru-a11y-vi-border) !important;
   min-height: 3rem !important;
@@ -119,12 +178,22 @@
 }
 
 :root[data-ru-a11y-vi-image-mode="grayscale"]
-  img:not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *) {
+  img:not(
+    [data-ru-a11y-vi-overlay],
+    [data-ru-a11y-vi-overlay] *,
+    [data-ru-a11y-overlay],
+    [data-ru-a11y-overlay] *
+  ) {
   filter: grayscale(100%) contrast(125%) !important;
 }
 
 :root[data-ru-a11y-vi-image-mode="hidden"]
-  img:not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *) {
+  img:not(
+    [data-ru-a11y-vi-overlay],
+    [data-ru-a11y-vi-overlay] *,
+    [data-ru-a11y-overlay],
+    [data-ru-a11y-overlay] *
+  ) {
   display: none !important;
 }
 
@@ -140,7 +209,14 @@
 }
 
 :root[data-ru-a11y-vi-reduced-motion]
-  :where(*:not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *)) {
+  :where(
+    *:not(
+      [data-ru-a11y-vi-overlay],
+      [data-ru-a11y-vi-overlay] *,
+      [data-ru-a11y-overlay],
+      [data-ru-a11y-overlay] *
+    )
+  ) {
   animation-duration: 0.001ms !important;
   animation-iteration-count: 1 !important;
   scroll-behavior: auto !important;
@@ -148,7 +224,12 @@
 }
 
 :root[data-ru-a11y-vi-strong-focus]
-  :where(*:focus, *:focus-visible):not([data-ru-a11y-vi-overlay], [data-ru-a11y-vi-overlay] *) {
+  :where(*:focus, *:focus-visible):not(
+    [data-ru-a11y-vi-overlay],
+    [data-ru-a11y-vi-overlay] *,
+    [data-ru-a11y-overlay],
+    [data-ru-a11y-overlay] *
+  ) {
   outline: 4px solid var(--ru-a11y-vi-focus) !important;
   outline-offset: 3px !important;
 }
@@ -156,7 +237,9 @@
 .ru-a11y-visually-impaired
   :where(button[aria-label] svg, a[aria-label] svg):not(
     [data-ru-a11y-vi-overlay],
-    [data-ru-a11y-vi-overlay] *
+    [data-ru-a11y-vi-overlay] *,
+    [data-ru-a11y-overlay],
+    [data-ru-a11y-overlay] *
   ) {
   display: none !important;
 }
@@ -164,7 +247,9 @@
 .ru-a11y-visually-impaired
   :where(button[aria-label], a[aria-label]):not(
     [data-ru-a11y-vi-overlay],
-    [data-ru-a11y-vi-overlay] *
+    [data-ru-a11y-vi-overlay] *,
+    [data-ru-a11y-overlay],
+    [data-ru-a11y-overlay] *
   )::before {
   content: attr(aria-label) !important;
   display: inline-block !important;

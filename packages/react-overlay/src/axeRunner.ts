@@ -126,13 +126,36 @@ function mapAxeViolations(violations: axe.Result[]): A11yViolationNode[] {
   );
 }
 
+function resolveElement(selector: string): Element | null {
+  try {
+    return document.querySelector(selector);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * axe and the ru-a11y checks can report the same rule on the same element with
+ * different selectors (`input[src="a.png"]` vs `main > section > input`), so
+ * duplicates are detected by the element itself, falling back to the selector.
+ */
 function dedupe(violations: A11yViolationNode[]): A11yViolationNode[] {
-  const seen = new Set<string>();
+  const seenSelectors = new Set<string>();
+  const seenElements = new Map<string, Set<Element>>();
 
   return violations.filter(({ ruleId, selector }) => {
+    const element = resolveElement(selector);
+
+    if (element) {
+      const elements = seenElements.get(ruleId) ?? new Set<Element>();
+      if (elements.has(element)) return false;
+      seenElements.set(ruleId, elements.add(element));
+      return true;
+    }
+
     const key = `${ruleId}::${selector}`;
-    if (seen.has(key)) return false;
-    seen.add(key);
+    if (seenSelectors.has(key)) return false;
+    seenSelectors.add(key);
     return true;
   });
 }

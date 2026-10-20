@@ -91,6 +91,26 @@ describe('overlay custom rules', () => {
     ]);
   });
 
+  it('merges axe and ru-a11y findings for the same element', async () => {
+    (axe.run as unknown as jest.Mock).mockResolvedValueOnce({
+      violations: [
+        {
+          id: 'input-image-alt',
+          impact: 'critical',
+          nodes: [{ target: ['input[src="a.png"]'], html: '<input>', impact: 'critical' }],
+        },
+      ],
+    });
+
+    const result = await scan('<main><h1>Форма</h1><input type="image" src="a.png"></main>');
+    const findings = result.violations.filter(
+      (violation) => violation.ruleId === 'input-image-alt',
+    );
+
+    expect(findings).toHaveLength(1);
+    expect(findings[0].source).toBe('axe');
+  });
+
   it('accepts a select wrapped in a label', async () => {
     const result = await scan(`
       <main><h1>Форма</h1>
