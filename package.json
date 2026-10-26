@@ -1,6 +1,6 @@
 {
   "name": "ru-a11y-toolkit",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Accessibility toolkit for React/JS apps aligned with Russian regulations (GOST R 52872-2019, Government Decree No. 102): ESLint plugin, runtime overlay, CLI auditor and a visually impaired mode.",
   "main": "index.js",
   "workspaces": [
@@ -19,8 +19,8 @@
   "dependencies": {
     "ru-a11y-toolkit-cli": "3.0.0",
     "ru-a11y-toolkit-core": "1.5.0",
-    "ru-a11y-toolkit-eslint": "3.0.0",
-    "ru-a11y-toolkit-overlay": "2.2.0",
+    "ru-a11y-toolkit-eslint": "3.0.1",
+    "ru-a11y-toolkit-overlay": "2.2.1",
     "ru-a11y-toolkit-visually-impaired": "2.2.0"
   },
   "peerDependencies": {

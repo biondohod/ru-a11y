@@ -3,6 +3,20 @@
 All notable changes to this project are documented here. The packages are versioned
 independently; the format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## 2026-10-26
+
+| Package                   | Version |
+| ------------------------- | ------- |
+| `ru-a11y-toolkit`         | 3.0.1   |
+| `ru-a11y-toolkit-eslint`  | 3.0.1   |
+| `ru-a11y-toolkit-overlay` | 2.2.1   |
+
+### Fixed
+
+- **eslint**: `require-lang-attr` with `enforceRussian` reported `lang="RU"` and `lang="RU-ru"` as
+  not Russian. Language tags are case-insensitive (RFC 5646, §2.1.1).
+- **overlay**: `html-lang-valid` reported `lang="RU"` and `lang="EN-us"` as invalid.
+
 ## 2026-10-20
 
 | Package                             | Version |
