@@ -8,7 +8,8 @@ import {
   type CustomRule,
 } from './types';
 
-const BCP47_PRIMARY = /^[a-z]{2,3}(-[a-zA-Z0-9]{2,8})*$/;
+/** language[-subtag...]; tags are case-insensitive (RFC 5646 §2.1.1), so `RU` and `ru-RU` are both valid. */
+const BCP47_PRIMARY = /^[a-z]{2,3}(-[a-z0-9]{2,8})*$/i;
 const VIEWPORT_SELECTOR = 'meta[name="viewport" i]';
 
 function getViewportContent(document: Document): { element: Element; content: string } | null {

@@ -111,6 +111,20 @@ describe('overlay custom rules', () => {
     expect(findings[0].source).toBe('axe');
   });
 
+  it.each(['RU', 'ru-RU', 'EN-us'])('accepts lang="%s" regardless of case', async (lang) => {
+    document.documentElement.setAttribute('lang', lang);
+    const result = await scan('<main><h1>Страница</h1></main>');
+
+    expect(selectorsOf(result, 'html-lang-valid')).toEqual([]);
+  });
+
+  it('still rejects a malformed lang', async () => {
+    document.documentElement.setAttribute('lang', 'russian_RU');
+    const result = await scan('<main><h1>Страница</h1></main>');
+
+    expect(selectorsOf(result, 'html-lang-valid')).toEqual(['html']);
+  });
+
   it('accepts a select wrapped in a label', async () => {
     const result = await scan(`
       <main><h1>Форма</h1>

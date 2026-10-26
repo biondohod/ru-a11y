@@ -14,8 +14,10 @@ const { findAttribute, getElementName, getStaticValue } = require('./utils/jsx')
 /** language[-Script][-REGION][-variant...], e.g. `ru`, `ru-RU`, `zh-Hans-CN`. */
 const BCP47_PATTERN = /^[a-zA-Z]{2,3}(-[a-zA-Z]{4})?(-[a-zA-Z]{2,3})?(-[a-zA-Z0-9]+)*$/;
 
+/** Language tags are case-insensitive (BCP 47, RFC 5646 §2.1.1): `RU-ru` is Russian too. */
 function isRussian(lang) {
-  return lang === 'ru' || lang.startsWith('ru-');
+  const normalized = lang.toLowerCase();
+  return normalized === 'ru' || normalized.startsWith('ru-');
 }
 
 module.exports = createRule({

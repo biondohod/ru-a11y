@@ -43,6 +43,11 @@ ruleTester.run('require-lang-attr', rule, {
       code: `function App() { return <html lang="ru"><body></body></html>; }`,
       options: [{ enforceRussian: true }],
     },
+    {
+      name: 'enforceRussian ignores the case of the language tag',
+      code: `function App() { return <><html lang="RU" /><html lang="RU-ru" /></>; }`,
+      options: [{ enforceRussian: true }],
+    },
   ],
 
   invalid: [
