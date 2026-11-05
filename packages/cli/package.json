@@ -1,6 +1,6 @@
 {
   "name": "ru-a11y-toolkit-cli",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Accessibility auditor for live pages (Puppeteer + axe-core + ESLint) with reports mapped to GOST R 52872-2019 and Russian Government Decree No. 102.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

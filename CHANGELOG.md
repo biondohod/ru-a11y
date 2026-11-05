@@ -3,6 +3,21 @@
 All notable changes to this project are documented here. The packages are versioned
 independently; the format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## 2026-11-05
+
+| Package               | Version |
+| --------------------- | ------- |
+| `ru-a11y-toolkit`     | 3.1.0   |
+| `ru-a11y-toolkit-cli` | 3.1.0   |
+
+### Added
+
+- **cli**: `--format sarif` writes `ru-a11y-report.sarif` (SARIF 2.1.0). Uploaded with
+  `github/codeql-action/upload-sarif`, findings appear in GitHub code scanning; ESLint findings
+  are annotated on the source lines of pull requests. Results carry stable fingerprints, and
+  pages that could not be audited are reported as failed tool executions. `--format all`
+  includes SARIF. `buildSarifReport()` and `writeSarifReport()` are exported.
+
 ## 2026-10-26
 
 | Package                   | Version |
