@@ -21,7 +21,13 @@ export const PROJECT_DEFAULTS = {
 
 export const STANDARD_LEVELS: readonly StandardLevel[] = ['gost-a', 'gost-aa', 'gost-aaa'];
 
-export const OUTPUT_FORMATS: readonly OutputFormat[] = ['console', 'json', 'html', 'junit'];
+export const OUTPUT_FORMATS: readonly OutputFormat[] = [
+  'console',
+  'json',
+  'html',
+  'junit',
+  'sarif',
+];
 
 /** GOST conformance level -> axe-core tags that cover it. */
 export const STANDARD_TO_WCAG_TAGS: Readonly<Record<StandardLevel, readonly string[]>> = {

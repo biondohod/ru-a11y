@@ -27,14 +27,14 @@ with the GOST clause, the Decree 102 item and the WCAG criterion, and comes with
 
 ## Packages
 
-| Package                                                             | What it does                                                                         |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| [`ru-a11y-toolkit-core`](./packages/core)                           | Rule catalog: 115 rules with Russian texts, normative references and id aliases.     |
-| [`ru-a11y-toolkit-eslint`](./packages/eslint-preset)                | ESLint plugin: 10 custom JSX rules, 26 translated jsx-a11y rules, 3 flat configs.    |
-| [`ru-a11y-toolkit-overlay`](./packages/react-overlay)               | React dev overlay: axe-core plus 44 own DOM checks, highlights elements on the page. |
-| [`ru-a11y-toolkit-cli`](./packages/cli)                             | CLI auditor: Puppeteer + axe-core + ESLint, console / JSON / HTML / JUnit reports.   |
-| [`ru-a11y-toolkit-visually-impaired`](./packages/visually-impaired) | Readability mode for site visitors: font size, contrast schemes, spacing, focus.     |
-| [`ru-a11y-toolkit`](./index.js)                                     | Umbrella package re-exporting all of the above.                                      |
+| Package                                                             | What it does                                                                               |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| [`ru-a11y-toolkit-core`](./packages/core)                           | Rule catalog: 115 rules with Russian texts, normative references and id aliases.           |
+| [`ru-a11y-toolkit-eslint`](./packages/eslint-preset)                | ESLint plugin: 10 custom JSX rules, 26 translated jsx-a11y rules, 3 flat configs.          |
+| [`ru-a11y-toolkit-overlay`](./packages/react-overlay)               | React dev overlay: axe-core plus 44 own DOM checks, highlights elements on the page.       |
+| [`ru-a11y-toolkit-cli`](./packages/cli)                             | CLI auditor: Puppeteer + axe-core + ESLint, console / JSON / HTML / JUnit / SARIF reports. |
+| [`ru-a11y-toolkit-visually-impaired`](./packages/visually-impaired) | Readability mode for site visitors: font size, contrast schemes, spacing, focus.           |
+| [`ru-a11y-toolkit`](./index.js)                                     | Umbrella package re-exporting all of the above.                                            |
 
 ## Architecture
 
@@ -92,10 +92,11 @@ import { RuA11yOverlay } from 'ru-a11y-toolkit-overlay';
 }
 ```
 
-**Audit pages in CI** and fail the build on new issues:
+**Audit pages in CI** and fail the build on new issues, or send them to GitHub code scanning as SARIF:
 
 ```bash
 npx ru-a11y-cli https://example.com --format junit --output ./reports --max-issues 0
+npx ru-a11y-cli https://example.com --with-eslint --format sarif --output ./reports
 ```
 
 **Offer a readability mode** to visitors:
@@ -152,7 +153,7 @@ packages/
   cli/                auditor (Node)
     src/args/         declarative flag parser
     src/runner/       Puppeteer and ESLint runners
-    src/report/       console, JSON, HTML, JUnit reporters
+    src/report/       console, JSON, HTML, JUnit, SARIF reporters
   visually-impaired/  end-user mode (React)
     src/model/ store/ dom/ hooks/ ui/
 ```

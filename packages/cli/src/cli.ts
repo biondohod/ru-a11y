@@ -56,7 +56,7 @@ async function emitReports(result: AuditRunResult, options: CliOptions, io: CliI
 
     const reporter = FILE_REPORTERS[format];
     const outputDir = isMultiFormat ? join(options.outputDir, format) : options.outputDir;
-    const filePath = await reporter.write(result, outputDir);
+    const filePath = await reporter.write(result, outputDir, { projectRoot: options.projectRoot });
     io.stdout.write(`${reporter.label} сохранен: ${filePath}\n`);
   }
 }

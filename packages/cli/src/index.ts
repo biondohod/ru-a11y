@@ -11,10 +11,14 @@ export {
   buildHtmlReport,
   buildJsonReport,
   buildJunitReport,
+  buildSarifReport,
   writeHtmlReport,
   writeJsonReport,
   writeJunitReport,
+  writeSarifReport,
   type JsonReport,
+  type SarifLog,
+  type SarifReportOptions,
 } from './report';
 export { VERSION } from './version';
 export type {

@@ -7,8 +7,8 @@ export const HELP_TEXT = `ru-a11y-cli - проверка доступности 
   --urls-file <путь>      Файл со списком URL (по одному на строку)
   --standard <уровень>    Целевой уровень: gost-a | gost-aa | gost-aaa (по умолчанию: gost-aa)
   --wcag-tags <теги>      Дополнительный фильтр правил axe по тегам (через запятую)
-  --format <формат>       Формат отчета: console | json | html | junit | all (по умолчанию: console)
-  --output <директория>   Путь к директории для json/html/junit отчетов
+  --format <формат>       Формат отчета: console | json | html | junit | sarif | all (по умолчанию: console)
+  --output <директория>   Путь к директории для json/html/junit/sarif отчетов
   --max-issues <число>    Порог нарушений для кода выхода 1
   --timeout <мс>          Таймаут проверки одной страницы в миллисекундах
   --concurrency <число>   Количество одновременных проверок
@@ -26,4 +26,5 @@ export const HELP_TEXT = `ru-a11y-cli - проверка доступности 
   ru-a11y-cli https://example.com
   ru-a11y-cli https://example.com https://example.com/catalog --format json --output ./reports
   ru-a11y-cli --urls-file ./urls.txt --standard gost-aaa --max-issues 0
+  ru-a11y-cli https://example.com --with-eslint --format sarif --output ./reports
 `;

@@ -4,7 +4,7 @@ export type { GostPrinciple, GostSeverity };
 
 export type StandardLevel = 'gost-a' | 'gost-aa' | 'gost-aaa';
 
-export type OutputFormat = 'console' | 'json' | 'html' | 'junit';
+export type OutputFormat = 'console' | 'json' | 'html' | 'junit' | 'sarif';
 export type CliOutputFormat = OutputFormat | 'all';
 
 export type AxeIssueType = 'violation' | 'incomplete' | 'inapplicable' | 'pass';

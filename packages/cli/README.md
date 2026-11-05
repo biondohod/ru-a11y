@@ -46,7 +46,7 @@ ru-a11y-cli <url...> [options]
 | `--urls-file <path>`       | —                          | URLs, one per line; blank lines and `#` comments are ignored                |
 | `--standard <level>`       | `gost-aa`                  | `gost-a`, `gost-aa` or `gost-aaa`; selects the axe-core tags                |
 | `--wcag-tags <list>`       | from `--standard`          | Explicit axe-core tags, e.g. `wcag2a,wcag21aa`                              |
-| `--format <type>`          | `console`                  | `console`, `json`, `html`, `junit` or `all`                                 |
+| `--format <type>`          | `console`                  | `console`, `json`, `html`, `junit`, `sarif` or `all`                        |
 | `--output <dir>`           | `ru-a11y-reports`          | Directory for file reports (`all` writes one sub-directory per format)      |
 | `--max-issues <n>`         | unlimited                  | Exit with code 1 when more issues are found                                 |
 | `--timeout <ms>`           | `30000`                    | Navigation timeout per page                                                 |
@@ -96,12 +96,13 @@ ru-a11y-cli --with-eslint --project-root ./app
 
 ## Reports
 
-| Format    | File                  | Contents                                                                 |
-| --------- | --------------------- | ------------------------------------------------------------------------ |
-| `console` | stdout                | Issues grouped by page and WCAG principle, with code snippets for ESLint |
-| `json`    | `ru-a11y-report.json` | `generatedAt`, `scannedPages`, `totalIssues`, `pages[].issues[]`         |
-| `html`    | `ru-a11y-report.html` | Self-contained page with summary, navigation and collapsible issue cards |
-| `junit`   | `ru-a11y-junit.xml`   | One test suite per page/file, one failing test case per issue            |
+| Format    | File                   | Contents                                                                  |
+| --------- | ---------------------- | ------------------------------------------------------------------------- |
+| `console` | stdout                 | Issues grouped by page and WCAG principle, with code snippets for ESLint  |
+| `json`    | `ru-a11y-report.json`  | `generatedAt`, `scannedPages`, `totalIssues`, `pages[].issues[]`          |
+| `html`    | `ru-a11y-report.html`  | Self-contained page with summary, navigation and collapsible issue cards  |
+| `junit`   | `ru-a11y-junit.xml`    | One test suite per page/file, one failing test case per issue             |
+| `sarif`   | `ru-a11y-report.sarif` | SARIF 2.1.0 for GitHub code scanning and other static analysis dashboards |
 
 Every issue carries `ruRuleCode`, `axeRuleId`, Russian `title` / `description` /
 `recommendation`, `severity`, `principle`, `gostRefs`, `post102Refs`, `wcagRefs`, `origin`
@@ -110,8 +111,39 @@ issues, file, line and column for ESLint).
 
 ## CI
 
+### GitHub code scanning
+
+With `--format sarif` the findings show up in the repository's **Security → Code scanning**
+tab, and ESLint findings are annotated on the changed lines of pull requests.
+
 ```yaml
-# GitHub Actions
+# .github/workflows/a11y.yml
+permissions:
+  contents: read
+  security-events: write
+
+steps:
+  - uses: actions/checkout@v5
+  - uses: actions/setup-node@v5
+    with:
+      node-version: 22
+  - run: npm ci
+  - run: npx ru-a11y-cli https://staging.example.com --with-eslint --format sarif --output reports
+  - uses: github/codeql-action/upload-sarif@v4
+    if: always()
+    with:
+      sarif_file: reports/ru-a11y-report.sarif
+      category: ru-a11y
+```
+
+ESLint findings carry the file, line and column relative to `--project-root`. Runtime findings
+have no source file, so they are reported with the page URL and CSS selector as a logical
+location. Each result has a stable fingerprint, so an alert stays the same alert across runs,
+and pages that could not be audited are listed as failed tool executions.
+
+### Any CI
+
+```yaml
 - run: npx ru-a11y-cli --urls-file urls.txt --format junit --output reports --max-issues 0
 - uses: actions/upload-artifact@v4
   if: always()
@@ -150,7 +182,7 @@ src/
   audit/          filters, merging, exit code
   runner/         Puppeteer + axe-core, ESLint
   mapping/        axe / ESLint result -> ru-a11y issue
-  report/         console, JSON, HTML, JUnit and shared helpers
+  report/         console, JSON, HTML, JUnit, SARIF and shared helpers
   utils/          terminal styling, bounded concurrency
 ```
 

@@ -24,14 +24,14 @@ ESLint-правила, overlay для разработки, CLI-аудит дл�
 
 ## Пакеты
 
-| Пакет                                                               | Что делает                                                                       |
-| ------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| [`ru-a11y-toolkit-core`](./packages/core)                           | Каталог: 115 правил с русскими текстами, нормативными ссылками и алиасами id.    |
-| [`ru-a11y-toolkit-eslint`](./packages/eslint-preset)                | ESLint-плагин: 10 своих правил, 26 переведённых правил jsx-a11y, 3 flat-конфига. |
-| [`ru-a11y-toolkit-overlay`](./packages/react-overlay)               | Overlay для dev-режима: axe-core и 44 собственные DOM-проверки, подсветка.       |
-| [`ru-a11y-toolkit-cli`](./packages/cli)                             | CLI-аудит: Puppeteer + axe-core + ESLint, отчёты console / JSON / HTML / JUnit.  |
-| [`ru-a11y-toolkit-visually-impaired`](./packages/visually-impaired) | Режим повышенной читаемости для посетителей: шрифт, контраст, интервалы, фокус.  |
-| [`ru-a11y-toolkit`](./index.js)                                     | Umbrella-пакет со всеми модулями.                                                |
+| Пакет                                                               | Что делает                                                                              |
+| ------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| [`ru-a11y-toolkit-core`](./packages/core)                           | Каталог: 115 правил с русскими текстами, нормативными ссылками и алиасами id.           |
+| [`ru-a11y-toolkit-eslint`](./packages/eslint-preset)                | ESLint-плагин: 10 своих правил, 26 переведённых правил jsx-a11y, 3 flat-конфига.        |
+| [`ru-a11y-toolkit-overlay`](./packages/react-overlay)               | Overlay для dev-режима: axe-core и 44 собственные DOM-проверки, подсветка.              |
+| [`ru-a11y-toolkit-cli`](./packages/cli)                             | CLI-аудит: Puppeteer + axe-core + ESLint, отчёты console / JSON / HTML / JUnit / SARIF. |
+| [`ru-a11y-toolkit-visually-impaired`](./packages/visually-impaired) | Режим повышенной читаемости для посетителей: шрифт, контраст, интервалы, фокус.         |
+| [`ru-a11y-toolkit`](./index.js)                                     | Umbrella-пакет со всеми модулями.                                                       |
 
 ## Быстрый старт
 
